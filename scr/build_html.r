@@ -6,7 +6,7 @@
 ## andreas.scheidegger@eawag.ch
 ## -------------------------------------------------------
 
-## libraries needed to run notebook
+## libraries needed 
 library(rmarkdown)
 library(knitr)
 

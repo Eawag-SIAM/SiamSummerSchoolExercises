@@ -572,33 +572,27 @@ the correlation, respectively.</p>
 and strings). Dataframes are designed to work with this kind of data
 conveniently.</p>
 <ol style="list-style-type: lower-alpha">
-<li><p>Import the data <code>./data/model_growth.dat</code>. The data
+<li><p>Import the data <code>./data/model_growth.csv</code>. The data
 should be contained dataframe. Perform some analyses similar to the ones
 in <a href="#visualize">Task 6</a>.</p></li>
-<li><p>Transform one of the samples of <a href="#generate">Task 5</a>
-into a dataframe. Add a new column to it that contains the variable name
-(say “C_new”), then append this dataframe to the growth data.</p></li>
+<li><p>Add a new column (say <code>C_new</code>) to it that contains
+some random values to the growth data.</p></li>
 </ol>
 <div id="hints-3" class="section level3 tabset">
 <h3 class="tabset">Hints</h3>
 <div id="r-3" class="section level4">
 <h4>R</h4>
 <p>Read the data using
-<code>read.table(&quot;&lt;/path/to/somefile.txt&gt;&quot;, header=TRUE, stringsAsFactors=FALSE)</code>
-to indicate that the first row are the column names (use file
-<code>../data/model_growth.dat</code>). To select the observations of
-either of the two variables “C_M” and “C_S” for the analysis, you can
-use <code>subset(&lt;somedata&gt;, var == &quot;&lt;text&gt;&quot;)</code>.</p>
-<p>To add a column, you can use <code>cbind</code> inside
-<code>data.frame</code> to column-bind the new data to the available
-matrix and convert everything to a <code>data.frame</code>. Then, you
-can rename the columns by assigning the desired names with function
-<code>names()</code> applied to the newly created
-<code>data.frame</code>.</p>
-<p>To append one <code>data.frame</code> to another, you can use
-<code>rbind()</code> (easier) or <code>merge()</code>. When using
-<code>rbind()</code>, make sure that the <code>colnames()</code> of the
-two data frames are identical.</p>
+<code>read.table(&quot;&lt;/path/to/somefile.txt&gt;&quot;, header=TRUE)</code> to
+indicate that the first row are the column names (use file
+<code>../data/model_growth.csv</code>). To select the column
+<code>C_M</code> from a dataframe, say <code>data</code>, you can use
+<code>data$C_M</code> or <code>data[,&quot;C_M&quot;]</code>.</p>
+<p>To add columns, you can use <code>cbind</code> to column-bind the new
+data to the available matrix and convert everything to a
+<code>data.frame</code>. Then, you can rename the columns by assigning
+the desired names with function <code>colnames()</code> applied to the
+newly created <code>data.frame</code>.</p>
 </div>
 <div id="julia-3" class="section level4">
 <h4>Julia</h4>

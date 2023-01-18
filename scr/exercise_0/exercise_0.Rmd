@@ -189,28 +189,25 @@ TODO
 Real data contain often columns of different data types (e.g. numbers and
 strings).  Dataframes are designed to work with this kind of data conveniently.
 
-a. Import the data `./data/model_growth.dat`. The data should be
+a. Import the data `./data/model_growth.csv`. The data should be
 contained dataframe.  Perform some analyses similar to the ones in
 [Task 6](#visualize).
 
-b. Transform one of the samples of [Task 5](#generate) into a dataframe. Add a new column to it that contains the variable name (say
-"C\_new"), then append this dataframe to the growth data.
+b. Add a new column (say
+`C_new`) to it that contains some random values to the growth data.
 
 ### Hints {.tabset}
 
 #### R
-Read the data using `read.table("</path/to/somefile.txt>", header=TRUE, stringsAsFactors=FALSE)`
-to indicate that the first row are the column names (use file `../data/model_growth.dat`).
-To select the observations of either of the two variables "C_M" and "C_S" for the analysis,
-you can use `subset(<somedata>, var == "<text>")`.
+Read the data using `read.table("</path/to/somefile.txt>", header=TRUE)`
+to indicate that the first row are the column names (use file `../data/model_growth.csv`).
+To select the column `C_M` from a dataframe, say `data`,
+you can use `data$C_M` or `data[,"C_M"]`.
 
-To add a column, you can use `cbind` inside `data.frame` to column-bind the new data to the
+To add columns, you can use `cbind`  to column-bind the new data to the
 available matrix and convert everything to a `data.frame`. Then, you can rename the columns
-by assigning the desired names with function `names()` applied to the newly created `data.frame`.
+by assigning the desired names with function `colnames()` applied to the newly created `data.frame`.
 
-To append one `data.frame` to another, you can use `rbind()` (easier) or `merge()`. When using
-`rbind()`, make sure that the `colnames()` of the two data frames are
-identical.
 
 #### Julia
 TODO
