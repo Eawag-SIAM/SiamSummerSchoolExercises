@@ -3,6 +3,7 @@
 Source code of all exercises and solutions of the summer
 school.
 
-## Build html's
+You should find the exercises here:
+https://scheidan.github.io/SiamSummerSchoolExercises/
 
-todo
+## Build html's
