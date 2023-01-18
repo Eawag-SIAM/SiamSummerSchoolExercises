@@ -1,0 +1,59 @@
+### Solution {.tabset}
+
+#### R
+
+a. Quantiles
+```{r}
+
+quartiles.indep <- cbind(quantile(y.obs.indep[,1], probs = c(0.25,0.75)),
+                         quantile(y.obs.indep[,2],probs = c(0.25,0.75)))
+# OR with apply method (faster as vectorized):
+quartiles.indep <- apply(y.obs.indep, MARGIN=2, FUN=quantile, probs=c(0.25,0.75))
+
+# then we use apply
+quartiles.dep <- apply(y.obs.dep, MARGIN=2, FUN=quantile, probs=c(0.25,0.75))
+quant5_95.indep <- apply(y.obs.indep, MARGIN=2, FUN=quantile, probs=c(0.05,0.95))
+quant5_95.dep <- apply(y.obs.dep, MARGIN=2, FUN=quantile, probs=c(0.05,0.95))
+cat("Interquartile range\nIndep: ", diff(quartiles.indep),
+    "\nDep: ", diff(quartiles.dep), "\n")
+
+```
+
+b. Histograms and densities
+
+```{r}
+par(mfrow=c(2,2))
+hist(y.obs.indep[,1], main="y1 of y.indep")
+hist(y.obs.indep[,2], main="y2 of y.indep")
+hist(y.obs.dep[,1],   main="y1 of y.dep")
+hist(y.obs.dep[,2],   main="y2 of y.dep")
+
+par(mfrow=c(2,2))
+plot(density(y.obs.indep[,1]), main="y1 of y.indep")
+plot(density(y.obs.indep[,2]), main="y2 of y.indep")
+plot(density(y.obs.dep[,1]),   main="y1 of y.dep")
+plot(density(y.obs.dep[,2]),   main="y2 of y.dep")
+
+```
+
+c. Scatterplots
+
+```{r}
+
+plot(y.obs.indep, main="y.obs.indep")
+plot(y.obs.dep, main="y.obs.dep")
+
+```
+
+d. Covariance and correlation
+```{r}
+
+covariance.indep <- cov(y.obs.indep)
+covariance.dep <- cov(y.obs.dep)
+correlation.indep <- cor(y.obs.indep)
+correlation.dep <- cor(y.obs.dep)
+
+```
+
+#### Julia
+TODO

@@ -1,0 +1,26 @@
+### Solution
+
+- ![](DAG.pdf){width=65%}
+
+- $p(B, C, E) = p(C \mid B, E) \, p(E \mid B) \, p(B)$
+- The joint distribution is
+      $$
+        p(A, B, C, D, E) = p(C \mid B, E) \, p(E \mid B) \, p(B) \,
+        p(A, D \mid E)
+      $$
+- $$
+        p(A, B \mid C, D, E) = \frac{p(A, B, C, D, E)}{p(C, D, E)} =  \frac{p(A, B, C,
+          D, E)}{\int p(A, B, C,
+          D, E)\, dA\,dB}
+$$
+- $$
+        p(A \mid D) = \frac{p(A,  D)}{p(D)} = \frac{\int p(A, B, C,
+          D, E)\, dB\,dC\,dE}{\int p(A, B, C,
+          D, E)\, dA\,dB\,dC\,dE}
+         = \frac{\int p(A, D \mid E)\,p(E \mid B)\,p(B) dB\,dE}{\int p(A, D \mid E)\,p(E \mid B)\,p(B) dA\,dB\,dE}
+$$
+- $$
+       p(A \mid B, E) = \frac{\int p(A, D\mid E)\,p(E \mid B) \,p(B)
+         \, dD}{p(E \mid B) \,p(B)}
+        =  \int p(A, D\mid E) \, dD = p(A \mid E)
+$$

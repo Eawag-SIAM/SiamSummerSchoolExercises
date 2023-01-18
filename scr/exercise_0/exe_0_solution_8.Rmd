@@ -1,0 +1,32 @@
+### Solution {.tabset}
+
+#### R
+
+```{r}
+fun <- function(x){
+  return(sin(sqrt(x)))
+}
+
+X <- rlnorm(1000, meanlog=0, sdlog=1)
+
+```
+
+```{r collapse=TRUE, echo=FALSE}
+cat("mean of X: ", mean(X), "\n")
+cat("mean of f(X): ", mean(fun(X)), "\n")
+cat("f(mean of X): ", fun(mean(X)), "\n")
+cat("variance of X:", var(X), "\n")
+cat("variance of f(X):", var(fun(X)), "\n")
+
+X <- sort(X)
+```
+
+```{r plot_X}
+plot(X,fun(X))
+hist(X)
+hist(fun(X))
+
+```
+
+#### Julia
+TODO

@@ -1,0 +1,8 @@
+name: SummerSchoolTest
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - numpy
+  - matplotlib
+prefix: /home/scheidan/miniconda3/envs/SummerSchoolTest

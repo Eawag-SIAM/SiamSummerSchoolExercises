@@ -1,0 +1,26 @@
+
+## Solution (only shown if `showsolutions==TRUE`){.tabset}
+
+Here is some Code to solve the exercise.
+
+### R {-}
+This the R solution:
+```{r}
+x <- rnorm(10)^2
+mean(x)
+```
+
+### Julia {-}
+This the Julia solution:
+```{julia}
+x = randn(10).^2
+mean(x)
+```
+
+### Python {-}
+This the Python solution:
+```{python}
+import numpy as np
+x = np.random.normal(10)
+np.mean(x)
+```

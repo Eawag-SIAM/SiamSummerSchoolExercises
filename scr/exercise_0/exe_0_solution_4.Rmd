@@ -1,0 +1,35 @@
+### Solution {.tabset}
+
+#### R
+1. evaluate pdf
+```{r}
+dunif(0.8, 0, 1)
+dnorm(0.8, 2, 10)
+
+```
+2. sample from distributions and plot them
+```{r}
+xs <- runif(10000, 0, 1)
+ys <- rnorm(10000, 2, 10)
+```
+
+```{r}
+par(mfrow=c(1,2))                       # optional, arranges both plots together
+hist(xs)
+hist(ys)
+
+```
+
+3. sample from $Z$
+```{r}
+xs <- runif(10000, 0, 1)                # sample from X
+zs <- sin(2*pi*xs) * sqrt(xs)           # transfrom samples
+
+```
+
+```{r}
+hist(zs, breaks=75)
+```
+
+#### Julia
+TODO

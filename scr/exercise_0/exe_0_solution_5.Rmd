@@ -1,0 +1,14 @@
+### Solution {.tabset}
+
+#### R
+```{r}
+library(mvtnorm)
+y.obs.indep <- cbind(rnorm(1000, mean=3, sd=2),
+                     rnorm(1000, mean=8, sd=5))
+Sigma.dep <- matrix(c(4,8,8,25), nrow=2, ncol=2)
+y.obs.dep <- rmvnorm(1000, mean=c(3,8), sigma=Sigma.dep)
+
+```
+
+#### Julia
+TODO

@@ -1,0 +1,29 @@
+### Solution
+
+- joint distribution:
+  $$
+f_{X, \mu}(x, m) = f_{X|\mu}(x| m) \, f_{\mu}(m) = \frac{1}{\sqrt{2\pi}}
+  e^{-\frac{(x-m)^2}{2}}   0.1e^{-0.1m}
+  $$
+
+- compound distribution
+  $$
+   f_{X}(x) = \int_0^\infty f_{X, \mu}(x, m) \,dm
+  $$
+-  probability that $\mu$ is larger than 5:
+  $$
+  P(\mu>5) = \int_5^\infty f_{\mu}(m) \, dm = \exp (-0.1 \cdot 5)
+  $$
+- The joint distribution under the constraint that $\mu>5$:
+  $$
+    f_{X,\mu|\mu>5}(x, m)=
+    \begin{cases}
+      f_{X, \mu}(x, m) / P(\mu>5)& \text{if}\ m>5\\
+      0 & \text{otherwise}
+    \end{cases}
+  $$
+-
+  marginal of $X$  under constrain that $\mu>5$:
+  $$
+    f_{X|\mu>5}(x) = \int_5^\infty f_{X,\mu|\mu>5}(x, m) \, dm \neq  f_{X}(x)
+  $$

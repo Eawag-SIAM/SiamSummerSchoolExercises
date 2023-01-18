@@ -1,0 +1,11 @@
+
+### Solution
+
+- The joint probability $P_{A,B}(1,2) = 0.1$ can be read directly from the table.
+- The marginal $P_{B}(2)$ is computed by summing over all      joint probabilities with $B=2$, i.e. $P_{A,B}(1,2) + P_{A,B}(2,2) = 0.2$.
+- Using the results from above we can compute the conditional probability $P_{A|B}(1|2)=\frac{P_{A,B}(1,2)}{P_{B}(2)}=0.5$.
+- $A$ and $B$ are not independent. To see this calculate first the
+  marginal probabilities. In this example the joint probability is not
+  equal to the product of the marginal probabilities,
+  $P_{A,B}(a,b) \neq P_{A}(a) \,P_{B}(b)$, hence $A$ and $B$
+  cannot be independent.

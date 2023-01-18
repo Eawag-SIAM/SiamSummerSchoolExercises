@@ -1,0 +1,38 @@
+### Solution {.tabset}
+
+#### R
+
+a.
+```{r}
+
+## Loading data
+## ----------------------------------------------
+growth.dat <- read.table("../../data/model_growth.dat", header=TRUE, stringsAsFactors=FALSE)
+C_M <- subset(growth.dat, var=="C_M")
+C_S <- subset(growth.dat, var=="C_S")
+```
+
+```{r}
+## Plotting data
+## ----------------------------------------------
+plot(C_S$t, C_S$data, type="b", xlab="Time", ylab="Concentration")
+lines(C_M$t, C_M$data, type="b", pch=17, col=2)
+legend("topright", legend=c("Substrate", "Microorganisms"), col=c(1,2), pch=c(1,17), lty=1)
+
+```
+
+b.
+```{r}
+
+## Combining Data
+## ----------------------------------------------
+## Construct new data frame
+y.df <- data.frame( cbind( rep( "C_new", nrow(y.obs.dep) ), y.obs.dep ) )
+names(y.df) <- colnames(growth.dat)
+
+## Combine the two data sets
+growth.dat.long <- rbind(growth.dat, y.df)
+
+```
+#### Julia
+TODO

@@ -1,0 +1,169 @@
+---
+title: Rmarkdown Template for Summer School Exercises
+number_sections: TRUE
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: "Eawag Summer School in Environmental Systems Analysis"
+output:
+  html_document:
+    number_sections: TRUE
+    toc: TRUE
+    toc_depth: 2
+params:
+  showsolutions: TRUE
+---
+
+# Setup R, Julia, and Python environments {-}
+
+### R  {-}
+```{r, echo=TRUE}
+library(renv, warn.conflicts = FALSE)
+renv::use(lockfile="renv.lock")
+.libPaths()  # package load paths
+```
+
+### Julia  {-}
+```{julia, echo=TRUE}
+import Pkg
+Pkg.activate(".")         # activate summer school environment
+Pkg.instantiate()         # install Package version from manifest.toml
+Pkg.status()
+```
+
+### Python via Conda {-}
+```{r}
+library(reticulate)
+## create conda environment if needed
+if(!("SummerSchoolTest" %in% conda_list()[,1])) {
+    conda_create(environment = "environment.yml")
+}
+use_condaenv("SummerSchoolTest") # activate environment
+conda_python(envname = "SummerSchoolTest") # show the active python binary
+```
+
+
+# Rendering Rmarkdown files
+
+`Rmarkdown` files (typical file eding is `*.rmd`) are compiles with
+the R packages `rmarkdown`. Additionally `pandoc` may need to be
+installed.
+
+Then simply run:
+```{r, eval=FALSE}
+library(rmarkdown)
+rmarkdown::render("example.rmd")
+```
+
+In Rstudio there is a button to execute this command.
+
+# Show and evaluate code
+
+We can show the code and the result:
+```{r}
+x <- rnorm(10)^2
+summary(x)
+```
+
+Or just run the code but don't show it, only the result:
+```{r, echo=FALSE}
+y <- sin(x)
+mean(y)
+```
+
+Or just run and show the code but hide the result
+```{r, results='hide'}
+temp.result <- cos(x)
+```
+
+Or only show the code but do not run it at all:
+```{r, eval=FALSE}
+this.will.error <- 11 + "22"
+```
+
+Like equations, we can also inline code. For example, a circle with
+the radius `r mean(x)` has an area of `r pi * mean(x)^2`.
+
+
+
+## Use tabs to for different languages
+
+We use tabs to organize the solution in different languages.
+
+
+### Solution {.tabset}
+
+#### R {-}
+This the R solution:
+```{r}
+x <- rnorm(10)^2
+mean(x)
+```
+
+```{r}
+hist(y)
+```
+
+#### Julia {-}
+Needs the R package `JuliaCall` installed!
+```{julia, eval=TRUE}
+using Plots
+α = randn(100);
+plot(α, randn(100), label="That's a mess")
+```
+
+#### Python {-}
+This the Python solution:
+```{python}
+import numpy as np
+x = np.random.normal(10)
+np.mean(x)
+```
+
+Another code snippet
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+
+xpoints = np.array([1, 2, 6, 8])
+ypoints = np.array([3, 8, 1, 10])
+
+plt.plot(xpoints, ypoints)
+plt.show()
+```
+
+
+
+# Show and hide solutions
+
+We want to compile two documents, one with and without the solutions.
+Set the set the parameter `showsolutions` in the header accordingly
+```
+params:
+  showsolutions: TRUE
+```
+to `TRUE` or `FALSE`. Alternatively you can also overwrite the parameter during compilation:
+```{r, eval=FALSE}
+rmarkdown::render("example.rmd", params=list(showsolutions=FALSE))
+```
+
+The solutions for every task needs to be written in a separate document that is
+optionally included with
+````
+## ```{r, child = if(params$showsolutions){"solutions.Rmd"}}
+## ```
+````
+
+<!-- inlcude the solutions if `showsolutions==TRUE` -->
+```{r, child = if(params$showsolutions){"exercise_template_solution_1.Rmd"}}
+```
+
+# Math
+
+Latex syntax is used to for equation. Either inline $a=\int g(x)\, \text{d}x$ or as
+separate equation like this
+
+$$M(x, \theta) = \theta_1 + \theta_2 x^2 + \theta_1 \theta_2 \sqrt{x} .$$
+
+
+# More on Rmarkdown
+
+[This online book](https://bookdown.org/yihui/rmarkdown/) provides a very comprehensive description what can be done with Rmarkdown.
