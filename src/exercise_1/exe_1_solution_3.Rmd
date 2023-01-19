@@ -1,0 +1,63 @@
+# 3. Solutions
+
+## Deterministic model simulation {.tabset}
+
+### R
+```{r }
+source("../../models/models.r") # load the model
+
+## parameters
+C.monod <- seq(0, 10, 0.1)    # concentrations at which model output should be calculated
+par.monod <- c(r_max=5, K=3)   # define parameter vector for the model "Monod"
+
+## run model
+r.det <- model.monod(par.monod, C.monod)
+
+## plot result
+plot(C.monod, r.det, col=2, type="l", ylab="r")
+```
+
+### Julia
+TODO
+
+## Stochastic model simulation  {.tabset}
+
+Suppose that we want to produce stochastic model outputs for model parameters $\boldsymbol{\theta} = \{r_{\mathrm{max}},K,\sigma\}$ and input variables  $\mathbf{C} = (C_1,...,C_{n})$. First, we calculate the deterministic growth rate, for each concentration in $\mathbf{C}$, and store the results in vector $\mathbf{y}_{\mathrm{det}} = \mathbf{r}(\mathbf{C},r_{\mathrm{max}},K) = \{r(C_1,r_{\mathrm{max}},K),\dots,r(C_n,r_{\mathrm{max}},K)\}$.
+Next, we simulate the measurement errors by generating $n$ random
+normal values with mean $0$ and standard deviation $\sigma$ and store
+the results in vector $\mathbf{z}$. Both vectors can then be added to
+get the probabilistic model output.
+
+### R
+```{r }
+simulate.monod.stoch <- function(par, C){
+    ## run model
+    r.det <- model.monod(par, C)
+
+    ## generate noise
+    z <- rnorm(length(C.monod), 0, par["sigma"])
+
+    return(r.det + z)
+}
+
+## parameters
+C.monod <- seq(0, 10, 0.1)    # concentrations at which model output should be calculated
+par.monod <- c(r_max=5, K=3, sigma=0.2)   # define parameter vector for the model "Monod"
+n.rep <- 1000
+
+## run `n.rep` simulations
+r.sims <- replicate(n=n.rep, simulate.monod.stoch(par.monod, C.monod))
+dim(r.sims)
+
+## compute quantiles
+quant <- apply(r.sims, MARGIN=1, FUN=quantile, probs=c(0.1, 0.9))
+dim(quant)
+
+## plot result
+plot(C.monod, r.det, type="n", ylab="r")
+polygon(c(C.monod,rev(C.monod)), c(quant[1,],rev(quant[2,])), col = "grey85")
+lines(C.monod, r.det, col=2, lwd=2, ylab="r")
+```
+
+### Julia
+TODO

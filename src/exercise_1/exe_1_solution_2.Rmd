@@ -1,0 +1,71 @@
+# 2. Solutions
+
+## Analytical expression
+
+For the model "Monod" with additive normal i.i.d. noise, constructing the likelihood follows exactly the same procedure as in the linear case (Exercise 1.1), only with a simple change in the deterministic part of the model. So again, our complete probabilistic model is given by the deterministic part plus a Gaussian noise term,
+
+$$
+Y_i = y_{i,det} + Z_i  , \quad \quad Z_i \sim \mathcal{N}(0,\sigma)
+\;,
+$$
+
+but now the deterministic part is given by
+
+$$
+y_{det}(x,\boldsymbol{\theta}_{monod}) =
+r(C,r_{max}, K) =  \frac{r_{max} C}{K+C}
+\;.
+\label{eqn:monodDet}
+$$
+
+We therefore again have three model parameters in total: $\boldsymbol{\theta} = \{ \boldsymbol{\theta}_{monod},\sigma\} = \{r_{max}, K,\sigma\}$.
+
+The expression for the likelihood is then similar to that of the linear model:
+
+$$
+L(\boldsymbol{\theta}) = p(\mathbf{y}|\mathbf{C},r_{max}, K,\sigma) = \frac{1}{(2 \pi)^{n/2} \sigma^n } \exp\left( {-\frac{1}{2\sigma^2}} \sum_{i=1}^n (y_i - r(C_i,r_{max},K))^2 \right)
+\;.
+$$
+
+
+
+## Likelihood evaluation {.tabset}
+
+
+### R
+The implementation then looks like this:
+
+
+```{r}
+
+loglikelihood.monod <- function( y, C, par){
+
+    ## deterministic part:
+    y.det <- (par['r_max'] * C) / (par['K'] + C)
+
+    ## Calculate loglikelihood:
+    return( sum(dnorm(y, mean=y.det, sd=par['sigma'], log=TRUE)) )
+}
+
+```
+
+Again, the parameters with higher likelihood are more likely to have generated the data. In our case, this should be the parameter set $\{r_{\mathrm{max}} = 5,\,K = 3,\,\sigma=0.2\}$.
+
+Plotting the data together with the model output given those parameters looks ok too:
+```{r}
+## read data
+dat <- read.table("../../data/model_monod_stoch.csv", header=TRUE)
+C <- dat$C
+r <- dat$r
+
+## prediction
+par <- c(r_max = 5, K=3)
+r.det <- (par['r_max'] * C) / (par['K'] + C)
+
+## plot
+plot(C, r)
+lines(C, r.det, col=2)
+```
+
+### Julia
+TODO

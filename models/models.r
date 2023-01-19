@@ -54,9 +54,7 @@ model.monod <- function(par, C){
     ## return results:
     ## ---------------
 
-    res <- as.numeric(r)
-    names(res) <- paste("r_",C,sep="")
-    return(res)
+    return(r)
 }
 
 

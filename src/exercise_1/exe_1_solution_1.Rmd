@@ -1,0 +1,181 @@
+# 1. Solutions
+
+## Analytical expression
+
+For a one-dimensional linear model with an additive error, a model output  $Y$ is given by the deterministic term $y_{det}$ plus the noise term. For the noise term we choose here identical independent normal errors, so that for a single observation $i$ (in a set of $n$ observations) the full model is given by
+
+$$
+Y_i = y_{i,det} + Z_i  , \quad \quad Z_i \sim \mathcal{N}(0,\sigma) , \quad \quad i \in \{1,\dots,n\}
+\;.
+$$
+
+
+For the deterministic part, we have an input $x$ and two model parameters $\{\beta, \gamma\}$, from which $y_{det}$ is given by
+
+$$
+y_{det}(x,\beta, \gamma) =  \beta  x + \gamma
+\;.
+$$
+
+
+We therefore have three model parameters in total: $\beta$ and $\gamma$ from the deterministic term, and $\sigma$ from the noise term. For convenience, we collect these into the set of parameters ${\boldsymbol{\theta}} = \{\beta,\gamma,\sigma\}$.
+
+
+So for a single observation, the model is given by
+
+$$
+Y_i = \beta  x_i + \gamma +Z_i
+\;,
+$$
+
+
+which is equivalent to
+
+$$
+Y_i \sim \mathcal{N}\left(y_{i,det}(x_i,\beta,\gamma),\sigma\right)
+\;.
+$$
+
+
+That is, the model output $Y_i$ is normally distributed, where the mean is the deterministic model output $y_{i,det}$ and the standard deviation $\sigma$ is the standard deviation of the error term $Z_i$. Note that adding a constant $\mu$ to a standard normally distributed random variable $Z$ results in a new normally distributed random variable, the mean of which is simply shifted: $Y = \mu + Z$,  $Z \sim \mathcal{N}(0,\sigma)$ $\implies$ $Y \sim \mathcal{N}(\mu,\sigma)$.
+
+
+So, the likelihood for a single observation $y_i$, given input $x_i$ and parameters $\boldsymbol{\theta}$, is given by
+
+$$
+L(\boldsymbol{\theta}) = p(y_i|x_i,\boldsymbol{\theta}) = \frac{1}{\sqrt{2 \pi \sigma^2 }} \exp\left( {-\frac{(y_i - y_{i,det})^2}{2\sigma^2}}  \right)
+\;.
+$$
+
+
+Under the assumption of independence\textbf{*}, the likelihood of all observations $\mathbf{y} = \{y_1,y_2,...,y_n\}$, given all inputs $\mathbf{x} = \{x_1,x_2,...,x_n\}$, is then given by
+
+$$
+p(\mathbf{y}|\mathbf{x},\boldsymbol{\theta}) = p(y_1|x_1,\boldsymbol{\theta}) \, p(y_2|x_2,\boldsymbol{\theta}) \, p(y_3|x_3,\boldsymbol{\theta}) \, \dots \, p(y_n|x_n,\boldsymbol{\theta}) = \prod_{i=1}^n p(y_i|x_i,\boldsymbol{\theta})
+\;,
+$$
+
+
+which is then given in full by
+
+$$
+L(\boldsymbol{\theta}) = p(\mathbf{y}|\mathbf{x},\boldsymbol{\theta})
+= \prod_{i=1}^n \frac{1}{\sqrt{2 \pi \sigma^2} } \exp\left( {-\frac{(y_i - y_{i,det})^2}{2\sigma^2}}  \right) \\
+= \frac{1}{(2 \pi)^{n/2} \sigma^n } \exp\left( {-\frac{1}{2\sigma^2}} \sum_{i=1}^n (y_i - \beta x_i - \gamma)^2 \right)
+\;.
+$$
+
+
+
+
+
+**Note**: If the observations were not independent, the likelihood would instead be given by
+
+$$
+p(\mathbf{y}|\mathbf{x},\boldsymbol{\theta}) = p(y_1|\mathbf{x},\boldsymbol{\theta}) \, p(y_2|y_1,\mathbf{x},\boldsymbol{\theta}) \, p(y_3|y_1,y_2,\mathbf{x},\boldsymbol{\theta}) \, \dots \, p(y_n|y_1,y_2,...,y_{n-1},\mathbf{x},\boldsymbol{\theta})
+\;.
+$$
+
+
+Only because the observations are independent, this reduces to the simple product given above.
+
+
+
+
+
+## Likelihood evaluation {.tabset}
+
+### R
+
+The likelihood can be implemented like this:
+
+```{r}
+
+loglikelihood.linear <- function(x, y, par){
+    ## deterministic part:
+    y.det <- par[1] * x + par[2]
+
+    ## Calculate log-likelihood:
+    return( sum(dnorm(y, mean=y.det, sd=par[3], log=TRUE)) )
+}
+
+```
+
+
+You can then compute the likelihood of some parameters, given the data, for instance like this:
+
+```{r}
+## read data
+dat <- read.table("../../data/model_linear.csv", header=TRUE)
+x <- dat$x
+y <- dat$y
+
+## parameters for testing:
+par.linear.test = c(2, 1, 1)
+
+## compute likelihood for these parameters:
+loglikelihood.linear(x, y, par.linear.test)
+```
+
+Computing the log-likelihood for the given experimental data and the sets of model parameters, we see that the likelihood of the parameter set $\{\beta = 2,\, \gamma = 1, \, \sigma = 1\}$ is larger. This implies that these parameters are more likely to have generated the data, assuming that the linear model is an accurate description of the data generating mechanism.
+
+### Julia
+
+TODO
+
+
+## Likelihood optimisation {.tabset}
+
+### R
+
+Calling the `optim` function then looks like this:
+
+```{r}
+## define starting parameters for optimisation:
+par.init <- c(beta = 2,
+              gamma = 1,
+              sigma = 1)
+
+## because `optim` is minimizing, we define the negative loglikelihood
+neg.loglikelihood.linear <- function(x, y, par) -loglikelihood.linear(x, y, par)
+
+## maximum likelihood estimation
+MLEparameters <- optim(par = par.init, fn = neg.loglikelihood.linear, x=x, y=y)
+
+## inspect the result:
+MLEparameters$par
+```
+
+
+We can check that the result looks reasonable by plotting the resulting linear model together with the data:
+
+
+```{r}
+
+# model output from x-input and estimated parameters:
+y.estimate = MLEparameters$par[1]*x + MLEparameters$par[2]
+
+plot(x, y)
+lines(x, y.estimate, col=2)
+
+```
+
+### Julia
+TODO
+
+## Linear regression {.tabset}
+
+### R
+
+The R linear regression function `lm` works differently (it uses a method called "QR decomposition"), but should give very similar results to our likelihood optimisation.
+
+```{r}
+mod <- lm(y~x)
+mod
+```
+Note, `(intercept)` corresponds to $\gamma$ and `x` to $\beta$.
+
+
+### Julia
+
+TODO

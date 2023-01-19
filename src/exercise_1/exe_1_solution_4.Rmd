@@ -1,0 +1,133 @@
+# 4. Solutions
+
+## Analytical expression for the likelihood
+
+The probability for an individual with mortality rate $\lambda$ to survive until time $t$ is given by the exponential
+$$
+S(t,\lambda)=e^{-\lambda t}\,.
+$$
+
+Thus, the probability of the individual to die within time interval $[t_{i-1},t_i]$ is given by
+$$
+p_{i,\lambda}=S(t_{i-1},\lambda) - S(t_i,\lambda)\,.
+$$
+
+Assume that we have $N$ individuals, each with the same mortality rate.
+We want to calculate the probability that $y_1$ individuals die in time interval $[t_0,t_1]$, $y_2$ individuals die in time interval $[t_2,t_3]$ etc.
+Those individuals who survive the whole experiment die in the time interval $[t_n,\infty]$, and this happens with probability $p_{n+1}=S(t_n)$.
+For the time being, assume that we distinguish the individuals and want to calculate the probability that individual 1 dies in, say, time interval $[t_3,t_4]$, individual 2 in time interval, say, $[t_1,t_2]$ etc. in such a way that the counts $\bf y$ are assumed.
+Due to the independence of the individuals, the probability, for such an event, is then simply given by the product
+$$
+p_{1,\lambda}^{y_1} \cdot p_{2,\lambda}^{y_2} \cdot \ldots \cdot \, p_{n,\lambda}^{y_n}\,.
+$$
+
+Since we do not distinguish individuals, we have to multiply this product by a so-called multinomial coefficient, which counts the number of ways to put $N$ individuals into $n+1$ buckets, with $y_1$ ending up in the first bucket etc.
+Thus, the likelihood function, for model parameter $\lambda$, given an output $\bf y$ of our survival model is described by the so-called multinomial distribution
+$$
+L_{\text{survival}}(\lambda,{\bf y})
+=
+\frac{N!}{y_1!\cdots y_{n+1}!} p_{1,\lambda}^{y_1} \cdot p_{2,\lambda}^{y_2} \cdot \ldots \cdot p_{n+1,\lambda}^{y_{n+1}}\,.
+$$
+
+
+## Forward simulation {.tabset}
+
+### R
+The simplest way to simulate a model output is to use the R function `rmultinom`.
+Alternatively, we can simulate the death time, for each individual, drawing from the exponential distribution
+$$
+f(t|\lambda)=\lambda e^{-\lambda t}\,,
+$$
+which is the negative derivative of the survival probability $S(t)$.
+After that, we count how many individuals die within the different time intervals.
+
+```{r}
+## parameters for model "Survival":
+
+N            <- 30                 # Number of individuals
+t            <- 1:5                # Times at which the numbers of deaths are counted
+par.survival <- c(lambda=0.2)    # Parameter vector of the model "Survival"
+
+
+## Simulation from  model "Survival".
+## Here we  sample from the multinomial distribution implemented in R:
+model.survival <- function(N, t, par){
+    ## Calculate survival probabilities at measurement points
+    ## and add zero "at time-point infinity":
+    S <- exp(-par*c(0,t))
+    S <- c(S,0)
+
+    ## Calcute probabilities to die within observation windows:
+    p <- -diff(S)
+
+    ## Simulate from multinomial distribution:
+    y <- rmultinom(1, N, p)[-length(p) ]
+
+    return(y)
+}
+
+
+## Alternatively, we generate the exponentially distributed
+## times of death and bin them
+model.survival.alt <- function(N, t, par) {
+    ## Generate deaths times:
+    T <- rexp(N, par)
+
+    ## Count number of deaths within observation windows:
+    t2 <- c(t,6)     # construct the bins
+    y <- table(cut(T+1, breaks = t2)) # do the data binning
+
+    return(y)
+}
+
+
+## Generate n.sample simulations from the probabilistic model
+n.sample  <- 1000
+pred.survival <- matrix(nrow=n.sample, ncol=length(t))
+for (i in 1:n.sample){
+	pred.survival[i,] <- model.survival(N, t, par.survival)
+}
+
+
+## Make a boxplot:
+boxplot(pred.survival, xlab="time", ylab="# death")
+```
+
+### Julia
+todo
+
+
+## Likelihood evaluation {.tabset}
+
+### R
+
+```{r}
+
+loglikelihood.survival <- function(y, N, t, par){
+
+    ## Calculate survival probabilities at measurement points
+    ## and add zero "at time-point infinity":
+    S <- exp(-par*c(0,t))
+    S <- c(S,0)
+
+    ## Calcute probabilities to die within observation windows:
+    p <- -diff(S)
+
+    ## Add number of survivors at the end of the experiment:
+    y <- c(y, N-sum(y))
+
+    ## Calculate log-likelihood of multinomial distribution at point y:
+    LL <- dmultinom(y, prob=p, log=TRUE)
+
+    return(LL)
+}
+
+## simulate data
+y.sim <- model.survival(N,t,par.survival)
+
+## evaluation likelihood
+loglikelihood.survival(y.sim,N,t,par.survival)
+```
+
+### Julia
+TODO
