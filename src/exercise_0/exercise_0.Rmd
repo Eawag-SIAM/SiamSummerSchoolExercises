@@ -189,12 +189,11 @@ TODO
 Real data contain often columns of different data types (e.g. numbers and
 strings).  Dataframes are designed to work with this kind of data conveniently.
 
-a. Import the data `./data/model_growth.csv`. The data should be
-contained dataframe.  Perform some analyses similar to the ones in
+a. Import the file `./data/model_growth.csv` as dataframe.  Perform some analyses similar to the ones in
 [Task 6](#visualize).
 
 b. Add a new column (say
-`C_new`) to it that contains some random values to the growth data.
+`C_new`) to the growth data frame to it that contains some random values .
 
 ### Hints {.tabset}
 

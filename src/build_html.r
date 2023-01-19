@@ -13,14 +13,16 @@ library(knitr)
 library(JuliaCall)  # needed for Julia
 
 ## --- settings
-out.dir <- "../docs"
-
+out.dir <- "docs"
+src.dir <- "src"
 
 ## --- compile all exercises
-exercises <- list.dirs(recursive = FALSE)[1]
+exercises <- c("exercise_0" #, "exercise_1"
+               )
+
 for(exer in exercises){
     source.file <- paste0(gsub("\\./", "", exer), ".Rmd")
-    source <- file.path(exer, source.file)
+    source <- file.path(src.dir, exer, source.file)
     print(paste("Comile:", source))
     
     ## compile without solutions

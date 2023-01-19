@@ -6,11 +6,11 @@ a. Quantiles
 ```{r}
 
 quartiles.indep <- cbind(quantile(y.obs.indep[,1], probs = c(0.25,0.75)),
-                         quantile(y.obs.indep[,2],probs = c(0.25,0.75)))
-# OR with apply method (faster as vectorized):
+                         quantile(y.obs.indep[,2], probs = c(0.25,0.75)))
+                                        # Or with `apply`:
 quartiles.indep <- apply(y.obs.indep, MARGIN=2, FUN=quantile, probs=c(0.25,0.75))
 
-# then we use apply
+                                        # then we use apply
 quartiles.dep <- apply(y.obs.dep, MARGIN=2, FUN=quantile, probs=c(0.25,0.75))
 quant5_95.indep <- apply(y.obs.indep, MARGIN=2, FUN=quantile, probs=c(0.05,0.95))
 quant5_95.dep <- apply(y.obs.dep, MARGIN=2, FUN=quantile, probs=c(0.05,0.95))
