@@ -17,7 +17,7 @@ out.dir <- "docs"
 src.dir <- "src"
 
 ## --- compile all exercises
-exercises <- c("exercise_0" , "exercise_1")
+exercises <- c("exercise_0", "exercise_1", "exercise_2")
 
 for(exer in exercises){
     source.file <- paste0(gsub("\\./", "", exer), ".Rmd")
@@ -36,4 +36,3 @@ for(exer in exercises){
                       output_dir = out.dir,
                       params = list(showsolutions=TRUE))
 }
-
