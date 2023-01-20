@@ -226,7 +226,7 @@ TODO
 ```
 
 
-# 4. Likelihood and forward fimulation for the model "Survival"
+# 4. Likelihood and forward simulation for the model "Survival"
 
 ## Analytical expression for the likelihood
 
