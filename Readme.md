@@ -12,5 +12,5 @@ The `Rmarkdown` files  are compiles with
 the R packages `rmarkdown`. Additionally `pandoc` may need to be
 installed manually.
 
-Run the R script `/src/build_html.R` to update the documents in
-`/docs`. Then commit all changes and push it to GitHub. The new html will be deployed automatically in a few minutes.
+Run the R script `src/build_html.R` to update the documents in
+`docs/`. Then commit all changes and push it to GitHub. The new html will be deployed automatically in a few minutes.

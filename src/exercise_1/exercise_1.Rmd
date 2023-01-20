@@ -167,12 +167,12 @@ the file `model_monod_stoch.dat` and use them as "observation  data" to compute 
 
 ## Deterministic model simulation
 
-Produce deterministic model outputs of the model "Monod" over a
+Produce deterministic model outputs. Do this for the two example models:
+
+- Model "Monod" over a
 concentration ($C$) range from 0 to 10 with the default parameter values $r_{\mathrm{max}} = 5$ and $K = 3$.
 
-Also produce deterministic model outputs of the model "Growth" over a time
-interval from 0 to 2 with default parameter values
-
+- Model "Growth" over a time interval from 0 to 2 with default parameter values
 $\mu = 4$,
 $K = 10$,
 $b = 1$,
@@ -187,7 +187,7 @@ Plot and interpret the results.
 
 #### R {-}
 
-You can find the models implemented as `model.monod` and
+Both deterministic models are already implemented as `model.monod` and
 `model.growth` in the file `models.R` .
 
 #### Julia {-}
@@ -197,12 +197,18 @@ TODO
 ## Probabilistic model simulation
 
 For the model "Monod", write a function that produces model outputs
-(i.e. samples from the probabilistic model), given by the
-deterministic part plus normal i.i.d. noise. Use $r_{\mathrm{max}} =
-5$, $K = 3, and $\sigma = 0.2$
+(i.e. samples from the probabilistic model). In other words, we want to
+simulate new observation data including observation noise.
 
-Use this function to simulate several thousand probabilistic model
-realisations, for fixed model parameters, and plot the 10% and 90% quantiles as continuous prediction bands.
+- For what could that be useful?
+
+Make the assumptions that the noise is i.i.d normal with standard
+deviation $\sigma = 0.2$. For the
+deterministic model use  $r_{\mathrm{max}} =
+5$ and $K = 3$.
+
+Use your function to simulate several thousand probabilistic model
+realisations (hypothetical data sets), for fixed model parameters, and plot the 10% and 90% quantiles as continuous prediction bands.
 
 ### Hints {.tabset}
 

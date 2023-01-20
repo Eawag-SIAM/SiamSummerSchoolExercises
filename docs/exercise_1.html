@@ -353,7 +353,7 @@ display: none;
 likelihood functions</h1>
 <h4 class="author">Eawag Summer School in Environmental Systems
 Analysis</h4>
-<h4 class="date">19 January, 2023</h4>
+<h4 class="date">20 January, 2023</h4>
 
 </div>
 
@@ -391,8 +391,8 @@ for the likelihood</a></li>
 simulation</a></li>
 <li><a href="#likelihood-evaluation-2" id="toc-likelihood-evaluation-2">Likelihood evaluation</a></li>
 </ul></li>
-<li><a href="#sensitivity-analysis" id="toc-sensitivity-analysis">5.
-Sensitivity analysis</a>
+<li><a href="#sensitivity-analysis-needs-to-be-rewritten" id="toc-sensitivity-analysis-needs-to-be-rewritten">5. Sensitivity
+analysis (NEEDS TO BE REWRITTEN!)</a>
 <ul>
 <li><a href="#manual-sensitivity-analysis" id="toc-manual-sensitivity-analysis">Manual sensitivity
 analysis</a></li>
@@ -549,20 +549,24 @@ generated this data?</p>
 <h1>3. Forward model simulation (recommended)</h1>
 <div id="deterministic-model-simulation" class="section level2">
 <h2>Deterministic model simulation</h2>
-<p>Produce deterministic model outputs of the model “Monod” over a
-concentration (<span class="math inline">\(C\)</span>) range from 0 to
-10 with the default parameter values <span class="math inline">\(r_{\mathrm{max}} = 5\)</span> and <span class="math inline">\(K = 3\)</span>.</p>
-<p>Also produce deterministic model outputs of the model “Growth” over a
-time interval from 0 to 2 with default parameter values</p>
-<p><span class="math inline">\(\mu = 4\)</span>, <span class="math inline">\(K = 10\)</span>, <span class="math inline">\(b =
-1\)</span>, <span class="math inline">\(Y = 0.6\)</span>, <span class="math inline">\(C_{\mathrm{M,ini}} = 10\)</span>, and <span class="math inline">\(C_{\mathrm{S,ini}} = 50\)</span>.</p>
+<p>Produce deterministic model outputs. Do this for the two example
+models:</p>
+<ul>
+<li><p>Model “Monod” over a concentration (<span class="math inline">\(C\)</span>) range from 0 to 10 with the default
+parameter values <span class="math inline">\(r_{\mathrm{max}} =
+5\)</span> and <span class="math inline">\(K = 3\)</span>.</p></li>
+<li><p>Model “Growth” over a time interval from 0 to 2 with default
+parameter values <span class="math inline">\(\mu = 4\)</span>, <span class="math inline">\(K = 10\)</span>, <span class="math inline">\(b =
+1\)</span>, <span class="math inline">\(Y = 0.6\)</span>, <span class="math inline">\(C_{\mathrm{M,ini}} = 10\)</span>, and <span class="math inline">\(C_{\mathrm{S,ini}} = 50\)</span>.</p></li>
+</ul>
 <p>Plot and interpret the results.</p>
 <div id="hints-3" class="section level3 tabset">
 <h3 class="tabset">Hints</h3>
 <div id="r-3" class="section level4 unnumbered">
 <h4 class="unnumbered">R</h4>
-<p>You can find the models implemented as <code>model.monod</code> and
-<code>model.growth</code> in the file <code>models.R</code> .</p>
+<p>Both deterministic models are already implemented as
+<code>model.monod</code> and <code>model.growth</code> in the file
+<code>models.R</code> .</p>
 </div>
 <div id="julia-3" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
@@ -573,11 +577,18 @@ time interval from 0 to 2 with default parameter values</p>
 <div id="probabilistic-model-simulation" class="section level2">
 <h2>Probabilistic model simulation</h2>
 <p>For the model “Monod”, write a function that produces model outputs
-(i.e. samples from the probabilistic model), given by the deterministic
-part plus normal i.i.d. noise. Use <span class="math inline">\(r_{\mathrm{max}} = 5\)</span>, $K = 3, and <span class="math inline">\(\sigma = 0.2\)</span></p>
-<p>Use this function to simulate several thousand probabilistic model
-realisations, for fixed model parameters, and plot the 10% and 90%
-quantiles as continuous prediction bands.</p>
+(i.e. samples from the probabilistic model). In other words, we want to
+simulate new observation data including observation noise.</p>
+<ul>
+<li>For what could that be useful?</li>
+</ul>
+<p>Make the assumptions that the noise is i.i.d normal with standard
+deviation <span class="math inline">\(\sigma = 0.2\)</span>. For the
+deterministic model use <span class="math inline">\(r_{\mathrm{max}} =
+5\)</span> and <span class="math inline">\(K = 3\)</span>.</p>
+<p>Use your function to simulate several thousand probabilistic model
+realisations (hypothetical data sets), for fixed model parameters, and
+plot the 10% and 90% quantiles as continuous prediction bands.</p>
 <div id="hints-4" class="section level3 tabset">
 <h3 class="tabset">Hints</h3>
 <div id="r-4" class="section level4 unnumbered">
@@ -635,8 +646,8 @@ computing the likelihood for several parameters, including the one that
 you generated the data with.</p>
 </div>
 </div>
-<div id="sensitivity-analysis" class="section level1">
-<h1>5. Sensitivity analysis</h1>
+<div id="sensitivity-analysis-needs-to-be-rewritten" class="section level1">
+<h1>5. Sensitivity analysis (NEEDS TO BE REWRITTEN!)</h1>
 <p>For the models “Monod” and “Growth”, do the following exercises:</p>
 <div id="manual-sensitivity-analysis" class="section level2">
 <h2>Manual sensitivity analysis</h2>

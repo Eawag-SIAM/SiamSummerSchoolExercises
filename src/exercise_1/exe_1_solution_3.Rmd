@@ -3,6 +3,7 @@
 ## Deterministic model simulation {.tabset}
 
 ### R
+#### Monod Model
 ```{r }
 source("../../models/models.r") # load the model
 
@@ -17,16 +18,41 @@ r.det <- model.monod(par.monod, C.monod)
 plot(C.monod, r.det, col=2, type="l", ylab="r")
 ```
 
+#### Growth Model
+```{r }
+source("../../models/models.r") # load the model
+
+## parameters
+par.growth <- c(mu=4,
+                K=10,
+                b=1,
+                Y=0.6,
+                C_M_ini=10,
+                C_S_ini=50)
+
+times <- seq(0, 2, length=101) # time resolution of solution
+
+## run model
+out <- model.growth(par.growth, times)
+
+## plot results
+plot(out$time, out$C_M, col=3, type="l", ylim=c(0, 51),
+     xlab="time", ylab="concentration")
+lines(out$time, out$C_S, col=4)
+legend("topright", legend=c("microorganisms", "substrate"),
+       col=c(3,4), lty=1)
+```
+
 ### Julia
 TODO
 
 ## Stochastic model simulation  {.tabset}
 
-Suppose that we want to produce stochastic model outputs for model parameters $\boldsymbol{\theta} = \{r_{\mathrm{max}},K,\sigma\}$ and input variables  $\mathbf{C} = (C_1,...,C_{n})$. First, we calculate the deterministic growth rate, for each concentration in $\mathbf{C}$, and store the results in vector $\mathbf{y}_{\mathrm{det}} = \mathbf{r}(\mathbf{C},r_{\mathrm{max}},K) = \{r(C_1,r_{\mathrm{max}},K),\dots,r(C_n,r_{\mathrm{max}},K)\}$.
-Next, we simulate the measurement errors by generating $n$ random
-normal values with mean $0$ and standard deviation $\sigma$ and store
-the results in vector $\mathbf{z}$. Both vectors can then be added to
-get the probabilistic model output.
+The growth model takes the input variables  $\mathbf{C} =
+(C_1,...,C_{n})$ and returns the deterministic growth rate $\mathbf{r}_{\mathrm{det}} = \mathbf{r}(\mathbf{C},r_{\mathrm{max}},K) = \{r(C_1,r_{\mathrm{max}},K),\dots,r(C_n,r_{\mathrm{max}},K)\}$.
+We simulate the measurement errors by generating $n$ random
+normal values with mean $0$ and standard deviation $\sigma$ and add
+them to the deterministic model output.
 
 ### R
 ```{r }
