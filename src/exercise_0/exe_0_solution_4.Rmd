@@ -32,4 +32,9 @@ hist(zs, breaks=75)
 ```
 
 #### Julia
-TODO
+```{julia}
+[i^2 for i in 1:10]
+```
+```{julia}
+VERSION
+```
