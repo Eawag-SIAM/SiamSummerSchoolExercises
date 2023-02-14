@@ -36,20 +36,20 @@ hist(zs, breaks=75)
 ```{julia, results = 'hide'}
 using Distributions
 
-d_X = Uniform(0,1)
-d_Y = Normal(2, 10)
+X = Uniform(0,1)
+Y = Normal(2, 10)
 ```
 Use the function `pdf`(Probability Density Function)
 ```{julia}
-pdf_X = pdf(d_X, 0.8)
-pdf_Y = pdf(d_Y, 0.8) 
+pdf_X = pdf(X, 0.8)
+pdf_Y = pdf(Y, 0.8) 
 ```
 
 2. Sample from distributions and plot them
 
 ```{julia, results = 'hide'}
-X_s = rand(d_X, 10000) 
-Y_s=rand(d_Y, 10000)
+X_s = rand(X, 10000) 
+Y_s = rand(Y, 10000)
 ```
 
 ```{julia}

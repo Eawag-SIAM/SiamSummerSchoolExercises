@@ -130,6 +130,16 @@ number of bins with the argument `breaks`, e.g. `hist(rnorm(10000), breaks=100)`
 #### Julia
 Use the package `Distributions.jl` to have access to many probability distributions, like a uniform or a gaussian one. Type `?Distributions` in the Julia REPL to get information about this package. You can sample n random numbers following a certain distribution `d_X` via the command `rand(d_X, n)`.
 
+Here are some useful functions: for any distribution `__`
+```{julia, eval = FALSE}
+pdf(__, x)       #evaluate pdf at x
+cdf(__, x)       #evaluate cdf at x
+quantile(__, p)  #evaluate the p-th quantile
+rand(__, n)      #sample n random numbers
+```
+
+
+
 Histograms are generated with the function `histogram` from the package `Plots.jl`. You can adjust the number of bins with the argument `nbins`, e.g `histogram(rand(Uniform(0,5), 10000), nbins = 100)`. 
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_4.Rmd"}}
@@ -258,9 +268,9 @@ Try `?sin` in the R console to get access to the manual of the harmonic function
 These can be used anywhere in the code, including inside a custom function.
 
 #### Julia
-Use `LogNormal()` from the package `Distributions.jl`for a log-normal distribution. You can create you brand new Julia function following the synthax
+Use `LogNormal()` from the package `Distributions.jl`for a log-normal distribution. You can create you brand new Julia function following the syntax
 ```{julia, eval = FALSE}
-function f(arg_1, arg_2)
+function choose_your_name(arg_1, arg_2)
     return arg_1 + arg_2 #for example
 end
 ```

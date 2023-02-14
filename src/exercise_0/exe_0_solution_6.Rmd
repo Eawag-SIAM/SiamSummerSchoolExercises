@@ -59,10 +59,14 @@ correlation.dep <- cor(y.obs.dep)
 a. Quantiles
 ```{julia, results = 'hide'}
 using StatsBase
+
 interquartiles_indep = [iqr(Y_indep_sample[1, :]) iqr(Y_indep_sample[2, :])]
+
 interquartiles_dep = [iqr(Y_dep_sample[1, :]) iqr(Y_dep_sample[2, :])]
+
 inter_5_95_quantile_indep = [percentile(Y_indep_sample[1, :], 95)-percentile(Y_indep_sample[1, :], 5) 
 percentile(Y_indep_sample[2, :], 95)-percentile(Y_indep_sample[2, :], 5)]'
+
 inter_5_95_quantile_dep = [percentile(Y_dep_sample[1, :], 95)-percentile(Y_dep_sample[1, :], 5) 
 percentile(Y_dep_sample[2, :], 95)-percentile(Y_dep_sample[2, :], 5)]'
 ```
@@ -71,57 +75,41 @@ b. Histograms and densities
 ```{julia, results = 'hide'}
 hist = [
 histogram(Y_indep_sample[1, :], nbins = 15, 
-    labels=false, 
     xlabel="Y_1_indep sample", 
-    ylabel="Frequency", 
     title="Y_1 of Y_indep"),
 histogram(Y_indep_sample[2, :], nbins = 15, 
-    labels=false, 
     xlabel="Y_2_indep sample", 
-    ylabel="Frequency", 
     title="Y_2 of Y_indep"),
 histogram(Y_dep_sample[1, :], nbins = 15, 
-    labels=false, 
     xlabel="Y_1_dep sample", 
-    ylabel="Frequency", 
     title="Y_1 of Y_dep"),
 histogram(Y_dep_sample[2, :], nbins = 15, 
-    labels=false, 
     xlabel="Y_2_dep sample", 
-    ylabel="Frequency", 
     title="Y_2 of Y_dep")
 ]
 ```
 ```{julia}
-plot(hist...)
+plot(hist..., legend = false, ylabel = "Frequency")
 ```
 ```{julia, results = 'hide'}
 using StatsPlots
 dens = [
 density(Y_indep_sample[1,:],
-    labels=false, 
     xlabel="N=1000", 
-    ylabel="Density", 
     title="Y_1 of Y_indep"),
 density(Y_indep_sample[2,:],
-    labels=false, 
     xlabel="N=1000", 
-    ylabel="Density", 
     title="Y_2 of Y_indep"),
 density(Y_dep_sample[1,:],
-    labels=false, 
     xlabel="N=1000", 
-    ylabel="Density", 
     title="Y_1 of Y_dep"),
 density(Y_dep_sample[2,:],
-    labels=false, 
     xlabel="N=1000", 
-    ylabel="Density", 
     title="Y_2 of Y_dep")
 ]
 ```
 ```{julia}
-plot(dens...)
+plot(dens..., lengend = false, ylabel = "Density")
 ```
 
 Note that it is sometimes easier to make a loop instead of explicitely writing severals times the histogram and density plots. We will see examples of such loops later.

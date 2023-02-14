@@ -502,6 +502,12 @@ probability distributions, like a uniform or a gaussian one. Type
 this package. You can sample n random numbers following a certain
 distribution <code>d_X</code> via the command
 <code>rand(d_X, n)</code>.</p>
+<p>Here are some useful functions: for any distribution
+<code>__</code></p>
+<pre class="julia"><code>pdf(__, x)       #evaluate pdf at x
+cdf(__, x)       #evaluate cdf at x
+quantile(__, p)  #evaluate the p-th quantile
+rand(__, n)      #sample n random numbers</code></pre>
 <p>Histograms are generated with the function <code>histogram</code>
 from the package <code>Plots.jl</code>. You can adjust the number of
 bins with the argument <code>nbins</code>, e.g
@@ -655,8 +661,8 @@ be used anywhere in the code, including inside a custom function.</p>
 <h4>Julia</h4>
 <p>Use <code>LogNormal()</code> from the package
 <code>Distributions.jl</code>for a log-normal distribution. You can
-create you brand new Julia function following the synthax</p>
-<pre class="julia"><code>function f(arg_1, arg_2)
+create you brand new Julia function following the syntax</p>
+<pre class="julia"><code>function choose_your_name(arg_1, arg_2)
     return arg_1 + arg_2 #for example
 end</code></pre>
 </div>

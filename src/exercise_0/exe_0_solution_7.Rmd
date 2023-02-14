@@ -41,13 +41,13 @@ using CSV
 using DataFrames
 pwd()
 ```
-Given your working directory, go to the desired file with a relative path. Remember that '..' allows to come one step back. 
+Given your working directory, go to the desired file with a relative path. Remember that `..` allows to come one step back. 
 ```{julia, results ='hide'}
 growth_dat = CSV.read(joinpath("..", "..", "data", "model_growth.csv"),
 DataFrame)
 #show(growth_dat, allrows=true) if you want to see all you data
 ```
-Extraction of a colon vector can be done with the following synthax.
+Extraction of a column vector can be done with the following syntax.
 ```{julia, results = 'hide'}
 C_M = growth_dat[:, "C_M"]
 C_S = growth_dat[:, "C_S"]
