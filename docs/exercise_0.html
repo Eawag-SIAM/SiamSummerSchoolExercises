@@ -352,7 +352,7 @@ display: none;
 <h1 class="title toc-ignore">Introductory exercises</h1>
 <h4 class="author">Eawag Summer School in Environmental Systems
 Analysis</h4>
-<h4 class="date">13 Februar, 2023</h4>
+<h4 class="date">14 Februar, 2023</h4>
 
 </div>
 
@@ -496,7 +496,16 @@ e.g. <code>hist(rnorm(10000), breaks=100)</code>.</p>
 </div>
 <div id="julia" class="section level4">
 <h4>Julia</h4>
-<p>TODO</p>
+<p>Use the package <code>Distributions.jl</code> to have access to many
+probability distributions, like a uniform or a gaussian one. Type
+<code>?Distributions</code> in the Julia REPL to get information about
+this package. You can sample n random numbers following a certain
+distribution <code>d_X</code> via the command
+<code>rand(d_X, n)</code>.</p>
+<p>Histograms are generated with the function <code>histogram</code>
+from the package <code>Plots.jl</code>. You can adjust the number of
+bins with the argument <code>nbins</code>, e.g
+<code>histogram(rand(Uniform(0,5), 10000), nbins = 100)</code>.</p>
 </div>
 </div>
 </div>
@@ -530,7 +539,11 @@ construct <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,dep}\)</span>.<
 </div>
 <div id="julia-1" class="section level4">
 <h4>Julia</h4>
-<p>TODO</p>
+<p>Given a mean vector <span class="math inline">\(\mu\)</span> and a
+correlation matrix <span class="math inline">\(\Sigma\)</span>, you can
+construct a multivariate distribution, using the function
+<code>MvNormal(\mu, \Sigma)</code> from the package
+<code>Distribution.jl</code>.</p>
 </div>
 </div>
 </div>
@@ -562,7 +575,16 @@ the correlation, respectively.</p>
 </div>
 <div id="julia-2" class="section level4">
 <h4>Julia</h4>
-<p>TODO</p>
+<p>You can use the function <code>iqr</code> from the
+<code>Statsbase.jl</code>package, as well as the
+<code>percentile</code>function.</p>
+<p>To plot histograms, you can use the package <code>Plots.jl</code>as
+already mentionned. You can also scatter from this package, using the
+function <code>scatter</code>. However, to plot densities, you have to
+use the function <code>density</code>from the package
+<code>StatsPlots.jl</code>.</p>
+<p>Use the package <code>Statistics.jl</code>to find the covariance and
+correlation matrix.</p>
 </div>
 </div>
 </div>
@@ -595,7 +617,11 @@ newly created <code>data.frame</code>.</p>
 </div>
 <div id="julia-3" class="section level4">
 <h4>Julia</h4>
-<p>TODO</p>
+<p>Use the packages <code>CSV.jl</code> (Comma Separated Values) and
+<code>DataFrames.jl</code> to read and manipulate data. Use the function
+<code>pwd()</code>the see which directory you are currently working in,
+and read the desired file using a relative path. You can use the
+function <code>joinpath</code>to make the process easier.</p>
 </div>
 </div>
 </div>
@@ -627,7 +653,12 @@ be used anywhere in the code, including inside a custom function.</p>
 </div>
 <div id="julia-4" class="section level4">
 <h4>Julia</h4>
-<p>TODO</p>
+<p>Use <code>LogNormal()</code> from the package
+<code>Distributions.jl</code>for a log-normal distribution. You can
+create you brand new Julia function following the synthax</p>
+<pre class="julia"><code>function f(arg_1, arg_2)
+    return arg_1 + arg_2 #for example
+end</code></pre>
 </div>
 </div>
 </div>
