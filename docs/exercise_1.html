@@ -353,7 +353,7 @@ display: none;
 likelihood functions</h1>
 <h4 class="author">Eawag Summer School in Environmental Systems
 Analysis</h4>
-<h4 class="date">20 January, 2023</h4>
+<h4 class="date">15 Februar, 2023</h4>
 
 </div>
 
@@ -382,8 +382,8 @@ simulation</a></li>
 <li><a href="#probabilistic-model-simulation" id="toc-probabilistic-model-simulation">Probabilistic model
 simulation</a></li>
 </ul></li>
-<li><a href="#likelihood-and-forward-fimulation-for-the-model-survival" id="toc-likelihood-and-forward-fimulation-for-the-model-survival">4.
-Likelihood and forward fimulation for the model “Survival”</a>
+<li><a href="#likelihood-and-forward-simulation-for-the-model-survival" id="toc-likelihood-and-forward-simulation-for-the-model-survival">4.
+Likelihood and forward simulation for the model “Survival”</a>
 <ul>
 <li><a href="#analytical-expression-for-the-likelihood" id="toc-analytical-expression-for-the-likelihood">Analytical expression
 for the likelihood</a></li>
@@ -469,7 +469,14 @@ need to fill in the important bits!</p>
 </div>
 <div id="julia" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
-<p>TODO</p>
+<p>Read your data using the function <code>read</code> from the package
+<code>CSV.jl</code>. Remember to give a relative path in argument, and
+that the function <code>joinpath</code>can help.</p>
+<p>Your loglikelihood function should look like this</p>
+<pre class="julia"><code>function loglikelihood_linear(beta, gamma, sigma, x, y)
+    y_det = ???
+    return ??? 
+end</code></pre>
 </div>
 </div>
 </div>
@@ -495,7 +502,13 @@ default!</p>
 </div>
 <div id="julia-1" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
-<p>TODO</p>
+<p>Use the function <code>minimizer</code> from the package
+<code>Optim.jl</code>. As such, you will have to create a
+negative-loglikelihood function to minimize. This could look like
+this:</p>
+<pre class="julia"><code>using Optim
+param = Optim.minimizer(optimize(???, ???));
+best_param = ???</code></pre>
 </div>
 </div>
 </div>
@@ -518,7 +531,9 @@ summary(linearModel)</code></pre>
 </div>
 <div id="julia-2" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
-<p>TODO</p>
+<p>Use the function <code>lm</code> from the package
+<code>GLM.jl</code>(Generalized Linear Model) and the macro
+<code>@formula</code>.</p>
 </div>
 </div>
 </div>
@@ -570,7 +585,19 @@ parameter values <span class="math inline">\(\mu = 4\)</span>, <span class="math
 </div>
 <div id="julia-3" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
-<p>TODO</p>
+<p>For the model <em>Growth</em>, use the package
+<code>DifferentialEquations</code> and implement the
+<code>model.growth</code> ODE system. This could look like that:</p>
+<pre class="julia"><code>#ODE system given by model growth
+function growth!(du, u, p, t)
+    du[1] = ???
+    du[2] = ???  
+end
+#solving
+u0 = ???
+tspan = ???
+prob = ODEProblem(growth!, u0, tspan)
+sol = solve(prob)</code></pre>
 </div>
 </div>
 </div>
@@ -598,13 +625,14 @@ plot the 10% and 90% quantiles as continuous prediction bands.</p>
 </div>
 <div id="julia-4" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
-<p>TODO</p>
+<p>For the computation of quantiles, you can use the function
+<code>quantile</code>.</p>
 </div>
 </div>
 </div>
 </div>
-<div id="likelihood-and-forward-fimulation-for-the-model-survival" class="section level1">
-<h1>4. Likelihood and forward fimulation for the model “Survival”</h1>
+<div id="likelihood-and-forward-simulation-for-the-model-survival" class="section level1">
+<h1>4. Likelihood and forward simulation for the model “Survival”</h1>
 <div id="analytical-expression-for-the-likelihood" class="section level2">
 <h2>Analytical expression for the likelihood</h2>
 <p>Construct the likelihood for the model “Survival”. The mortality rate

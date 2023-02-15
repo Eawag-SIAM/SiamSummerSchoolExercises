@@ -120,8 +120,34 @@ loglikelihood.linear(x, y, par.linear.test)
 Computing the log-likelihood for the given experimental data and the sets of model parameters, we see that the likelihood of the parameter set $\{\beta = 2,\, \gamma = 1, \, \sigma = 1\}$ is larger. This implies that these parameters are more likely to have generated the data, assuming that the linear model is an accurate description of the data generating mechanism.
 
 ### Julia
+The likelihood can be implemented like this
+```{julia, results = 'hide'}
+function loglikelihood_linear(beta, gamma, sigma, x, y)
+    y_det = beta .* x .+ gamma
+    return sum(logpdf.(Normal.(y_det, sigma), y))
+end
+```
+Then read you data so that you can manipulate it
+```{julia, results = 'hide'}
+linear_data = CSV.read(joinpath("..", "..", "data", "model_linear.csv"),
+             DataFrame)
+#show(linear_data, allrows=true) if you want to see all your data
 
-TODO
+x = linear_data[:, "x"]
+y = linear_data[:, "y"]
+```
+Compute
+```{julia}
+#Log likelihood with parameters β = 2, γ = 1, σ = 1
+loglikelihood_linear(2,1,1, x, y)
+#Log likelihood with parameters β = 3, γ = 2, σ = 1
+loglikelihood_linear(3,2,1, x, y)
+#parameters  β = 2, γ = 1, σ = 1 are more likely to have produced to data
+```
+
+
+
+
 
 
 ## Likelihood optimisation {.tabset}
@@ -161,7 +187,35 @@ lines(x, y.estimate, col=2)
 ```
 
 ### Julia
-TODO
+Implementing the negative loglikelihood that we will minimize.
+```{julia, results = 'hide'}
+beta_init = 2
+gamma_init = 1
+sigma_init = 1
+
+function neg_loglikelihood_linear(θ::Vector)
+    beta, gamma, log_sigma = θ
+    #minus sign to be able to minimize after
+    - loglikelihood_linear(beta, gamma, exp(log_sigma), x, y)
+end
+```
+Minimizing
+```{julia}
+using Optim
+param = Optim.minimizer(optimize(neg_loglikelihood_linear, [2.0, 1.0, log(0.5)]));
+best_param = [param[1], param[2], exp(param[3])]
+```
+
+
+Plotting
+```{julia}
+scatter(x, y,
+    labels=false,
+    xlabel = "x",
+    ylabel = "y");
+plot!(x -> 2.25*x+0.38,
+    labels = false)
+```
 
 ## Linear regression {.tabset}
 
@@ -177,5 +231,10 @@ Note, `(intercept)` corresponds to $\gamma$ and `x` to $\beta$.
 
 
 ### Julia
-
-TODO
+```{julia, results = 'hide'}
+using GLM
+fm = @formula(y ~ x)
+```
+```{julia}
+linear_mod = GLM.lm(fm, linear_data)
+```

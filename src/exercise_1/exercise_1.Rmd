@@ -11,6 +11,12 @@ params:
   showsolutions: TRUE
 ---
 
+```{julia, echo = FALSE, results = FALSE}
+import Pkg
+Pkg.activate("../.")
+Pkg.instantiate()
+Pkg.status()
+```
 
 **Objectives**:
 
@@ -86,7 +92,15 @@ loglikelihood.linear <- function(par, x, y){
 ```
 
 #### Julia {-}
-TODO
+Read your data using the function `read` from the package `CSV.jl`. Remember to give a relative path in argument, and that the function `joinpath`can help.
+
+Your loglikelihood function should look like this 
+```{julia, eval = FALSE}
+function loglikelihood_linear(beta, gamma, sigma, x, y)
+    y_det = ???
+    return ??? 
+end
+```
 
 
 ## Likelihood optimization
@@ -113,7 +127,12 @@ par.max$par
 **Careful**: `optim` does minimisation per default!
 
 #### Julia {-}
-TODO
+Use the function `minimizer` from the package `Optim.jl`. As such, you will have to create a negative-loglikelihood function to minimize. This could look like this:
+```{julia, eval = FALSE}
+using Optim
+param = Optim.minimizer(optimize(???, ???));
+best_param = ???
+```
 
 ## Linear regression
 
@@ -136,7 +155,7 @@ summary(linearModel)
 ```
 
 #### Julia {-}
-TODO
+Use the function `lm` from the package `GLM.jl`(Generalized Linear Model) and the macro `@formula`. 
 
 
 ```{r, child = if(params$showsolutions){"exe_1_solution_1.Rmd"}}
@@ -191,7 +210,20 @@ Both deterministic models are already implemented as `model.monod` and
 `model.growth` in the file `models.R` .
 
 #### Julia {-}
-TODO
+For the model *Growth*, use the package `DifferentialEquations` and implement
+the `model.growth` ODE system. This could look like that:
+```{julia, eval = FALSE}
+#ODE system given by model growth
+function growth!(du, u, p, t)
+    du[1] = ???
+    du[2] = ???  
+end
+#solving
+u0 = ???
+tspan = ???
+prob = ODEProblem(growth!, u0, tspan)
+sol = solve(prob)
+```
 
 
 ## Probabilistic model simulation
@@ -218,7 +250,7 @@ For the computation of quantiles you can use the R function `quantile`.
 
 
 #### Julia {-}
-TODO
+For the computation of quantiles, you can use the function `quantile`.
 
 
 

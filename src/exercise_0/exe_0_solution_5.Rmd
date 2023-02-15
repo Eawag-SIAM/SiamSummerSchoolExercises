@@ -21,7 +21,6 @@ Sigma_dep = [4 8; 8 25]
 Y_obs_indep = MvNormal(mean, Sigma_indep)
 Y_indep_sample = rand(Y_obs_indep, 1000)
 
-
 Y_obs_dep = MvNormal(mean, Sigma_dep)
 Y_dep_sample = rand(Y_obs_dep, 1000)
 

@@ -44,7 +44,55 @@ legend("topright", legend=c("microorganisms", "substrate"),
 ```
 
 ### Julia
-TODO
+#### Monod model
+```{julia, results = 'hide'}
+#set parameters
+C_monod = 0:0.1:10
+r_max, K = 5, 3
+
+#deterministic model monod
+Y_monod = (r_max .*C_monod)./(K .+ C_monod)
+```
+Plotting
+```{julia}
+plot(C_monod, Y_monod,
+    labels = false,
+    xlabel = "C",
+    ylabel = "r")
+```
+
+
+
+#### Growth model
+```{julia, results = 'hide'}
+using DifferentialEquations
+
+#set parameters
+mu, K, b, Y, C_M_ini, C_S_ini = 4, 10, 1, 0.6, 10.0, 50.0
+
+#ODE system given by model growth
+function growth!(du, u, p, t)
+    du[1] = mu * (u[2]/(K + u[2]))*u[1] - b*u[1]
+    du[2] = (- mu / Y)*(u[2]/(K+u[2]))*u[1]  
+end
+#solving
+u0 = [C_M_ini; C_S_ini]
+tspan = (0.0,2.0)
+prob = ODEProblem(growth!, u0, tspan)
+sol = solve(prob)
+```
+Plotting
+```{julia}
+plot(sol,
+    labels = ["C_M" "C_S"],
+    xlabel = "time",
+    ylabel = "C_M, C_S",
+    title = "Deterministic model growth")
+
+```
+
+
+
 
 ## Stochastic model simulation  {.tabset}
 
@@ -86,4 +134,34 @@ lines(C.monod, r.det, col=2, lwd=2, ylab="r")
 ```
 
 ### Julia
-TODO
+```{julia, results = 'hide'}
+#non deterministic monod
+function  monod(C, r_max, K, sigma)
+    Y_det = (r_max * C) / (K + C) #det part
+    Y = Y_det + rand(Normal(0, sigma)) #adding noise
+    Y > 0 ? Y : 0
+end
+
+#setting
+n_sample = 5000
+r_max, K = 5, 3
+sigma = 0.2
+
+
+monod_stoch = [monod(c, r_max, K, sigma) for _ in 1:n_sample, c in C_monod]
+
+#compute quantile
+low_quantile = [quantile(monod_stoch[:,i], 0.025) for i in 1:length(C_monod)]
+med_quantile = [quantile(monod_stoch[:,i], 0.5) for i in 1:length(C_monod)]
+upper_quantile = [quantile(monod_stoch[:,i], 0.975) for i in 1:length(C_monod)]
+```
+Plotting
+```{julia}
+plot(C_monod, upper_quantile, 
+    fillrange = low_quantile,
+    labels = false,
+    xlabel = "C",
+    ylabel = "r");
+plot!(C_monod, med_quantile,
+    labels = false)
+```

@@ -94,7 +94,48 @@ boxplot(pred.survival, xlab="time", ylab="# death")
 ```
 
 ### Julia
-todo
+Create a function survival, whose arguments are:
+
+* N, the number of individuals, 
+
+* t, a vector of the form 0:k, if we want k+1 bins,
+
+* lambda, the mortality rate.
+
+Returns a random vector `y` of number of deaths per bin.
+```{julia, results = 'hide'}
+function survival(N::Int64, t, lambda)
+    #S is a vector whose first component is 1 and last is 0, 
+    #because the probability to be alive at time t=0 is 1,
+    # and the probability to be alive at time t=infinity is 0
+    S = exp.(-lambda .* t) ; S = push!(S, 0)
+    p = .-diff(S)
+    y = rand(Multinomial(N, p))
+    return y
+end
+
+#setting parameter
+N = 30
+t = 0:5
+lambda = 0.2
+n_sample = 5
+
+
+pred_survival = [survival(N, t, lambda) for _ in 1:n_sample]
+```
+Plotting
+```{julia}
+boxplot(pred_survival,
+    labels = false)
+
+```
+
+
+
+
+
+
+
 
 
 ## Likelihood evaluation {.tabset}
@@ -130,4 +171,22 @@ loglikelihood.survival(y.sim,N,t,par.survival)
 ```
 
 ### Julia
-TODO
+```{julia, results = 'hide'}
+function loglikelihood_survival(N::Int64, t, y::Vector, lambda)
+    S = exp.(-lambda .* t) ; S = push!(S, 0)
+    p = .-diff(S)
+    return logpdf(Multinomial(N, p), y)
+end
+
+
+#setting parameters
+N = 30
+t = 0:5
+lambda = 0.2
+```
+```{julia}
+#Generating and checking
+y=survival(N, t, lambda)
+loglikelihood_survival(N, t, y, lambda)
+
+```

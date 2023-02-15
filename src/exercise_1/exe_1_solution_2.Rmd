@@ -68,4 +68,43 @@ lines(C, r.det, col=2)
 ```
 
 ### Julia
-TODO
+Implementing the loglikelihood
+```{julia, results = 'hide'}
+function loglikelihood_monod(C, r_max, K, sigma)   
+    Y_1_det = (r_max .*C)./(K.+C)
+    return sum(logpdf.(Normal.(Y_1_det, sigma), Y_1))
+end
+```
+Read the table
+```{julia, results = 'hide'}
+monod_data = CSV.read(joinpath("..", "..", "data", "model_monod_stoch.csv"),
+             DataFrame)
+#show(monod_data, allrows=true)
+
+
+C = monod_data[:,"C"]
+Y_1 = monod_data[:, "r"]
+```
+We can compute 
+```{julia}
+#log likelihood of parameters r_max = 5, K = 3, σ = 0.2
+loglikelihood_monod(C, 5, 3, 0.2)
+#log likelihood of parameters r_max = 10, K = 4, σ = 0.2
+loglikelihood_monod(C, 10, 4, 0.2)
+# parameters r_max = 5, K = 3, σ = 0.2 are more likely to have generated the data
+```
+Plotting
+```{julia, results = 'hide'}
+y_estimate = (5 .*C) ./ (3 .+C)
+```
+```{julia}
+scatter(C, Y_1,
+    labels = false,
+    xlabel = "C",
+    ylabel = "r");
+plot!(C, y_estimate,
+    labels = false)
+```
+
+
+
