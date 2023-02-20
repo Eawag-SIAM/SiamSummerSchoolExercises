@@ -57,34 +57,37 @@ correlation.dep <- cor(y.obs.dep)
 
 #### Julia
 a. Quantiles
-```{julia, results = 'hide'}
+```{julia}
+using Statistics
 using StatsBase
 
-interquartiles_indep = [iqr(Y_indep_sample[1, :]) iqr(Y_indep_sample[2, :])]
+interquartiles_indep = [iqr(Y_indep_sample[1, :]),
+                        iqr(Y_indep_sample[2, :])]
 
-interquartiles_dep = [iqr(Y_dep_sample[1, :]) iqr(Y_dep_sample[2, :])]
+interquartiles_dep = [iqr(Y_dep_sample[1, :]),
+                      iqr(Y_dep_sample[2, :])]
 
-inter_5_95_quantile_indep = [percentile(Y_indep_sample[1, :], 95)-percentile(Y_indep_sample[1, :], 5) 
-percentile(Y_indep_sample[2, :], 95)-percentile(Y_indep_sample[2, :], 5)]'
+inter_5_95_quantile_indep = [diff(quantile(Y_indep_sample[1, :], [0.05, 0.95])),
+                             diff(quantile(Y_indep_sample[2, :], [0.05, 0.95]))]
 
-inter_5_95_quantile_dep = [percentile(Y_dep_sample[1, :], 95)-percentile(Y_dep_sample[1, :], 5) 
-percentile(Y_dep_sample[2, :], 95)-percentile(Y_dep_sample[2, :], 5)]'
+inter_5_95_quantile_dep = [diff(quantile(Y_dep_sample[1, :], [0.05, 0.95])),
+                           diff(quantile(Y_dep_sample[2, :], [0.05, 0.95]))]
 ```
 
 b. Histograms and densities
 ```{julia, results = 'hide'}
 hist = [
-histogram(Y_indep_sample[1, :], nbins = 15, 
-    xlabel="Y_1_indep sample", 
+histogram(Y_indep_sample[1, :], nbins = 15,
+    xlabel="Y_1_indep sample",
     title="Y_1 of Y_indep"),
-histogram(Y_indep_sample[2, :], nbins = 15, 
-    xlabel="Y_2_indep sample", 
+histogram(Y_indep_sample[2, :], nbins = 15,
+    xlabel="Y_2_indep sample",
     title="Y_2 of Y_indep"),
-histogram(Y_dep_sample[1, :], nbins = 15, 
-    xlabel="Y_1_dep sample", 
+histogram(Y_dep_sample[1, :], nbins = 15,
+    xlabel="Y_1_dep sample",
     title="Y_1 of Y_dep"),
-histogram(Y_dep_sample[2, :], nbins = 15, 
-    xlabel="Y_2_dep sample", 
+histogram(Y_dep_sample[2, :], nbins = 15,
+    xlabel="Y_2_dep sample",
     title="Y_2 of Y_dep")
 ]
 ```
@@ -95,16 +98,16 @@ plot(hist..., legend = false, ylabel = "Frequency")
 using StatsPlots
 dens = [
 density(Y_indep_sample[1,:],
-    xlabel="N=1000", 
+    xlabel="N=1000",
     title="Y_1 of Y_indep"),
 density(Y_indep_sample[2,:],
-    xlabel="N=1000", 
+    xlabel="N=1000",
     title="Y_2 of Y_indep"),
 density(Y_dep_sample[1,:],
-    xlabel="N=1000", 
+    xlabel="N=1000",
     title="Y_1 of Y_dep"),
 density(Y_dep_sample[2,:],
-    xlabel="N=1000", 
+    xlabel="N=1000",
     title="Y_2 of Y_dep")
 ]
 ```
@@ -112,21 +115,21 @@ density(Y_dep_sample[2,:],
 plot(dens..., lengend = false, ylabel = "Density")
 ```
 
-Note that it is sometimes easier to make a loop instead of explicitely writing severals times the histogram and density plots. We will see examples of such loops later.
+Note, we could also have written a loop for the four plots.
 
 
 c. Scatterplots
 
 ```{julia}
 scatter(Y_indep_sample[1, :], Y_indep_sample[2, :],
-    labels=false, 
-    xlabel="Y_indep_sample 1", 
-    ylabel="Y_indep_sample 2", 
+    labels=false,
+    xlabel="Y_indep_sample 1",
+    ylabel="Y_indep_sample 2",
     title="Y_indep_sample")
 scatter(Y_dep_sample[1, :], Y_dep_sample[2, :],
-    labels=false, 
-    xlabel="Y_dep_sample 1", 
-    ylabel="Y_dep_sample 2", 
+    labels=false,
+    xlabel="Y_dep_sample 1",
+    ylabel="Y_dep_sample 2",
     title="Y_dep_sample")
 ```
 

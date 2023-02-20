@@ -17,7 +17,7 @@ Pkg.instantiate()
 Pkg.status()
 ```
 
-The first three exercises are pencil and paper exercises. 
+The first three exercises are pencil and paper exercises.
 
 # 1. Joint, marginal and conditional distributions I
 The joint discrete probability table of $P_{A,B}(a,b)$ is given below:
@@ -128,19 +128,23 @@ Histograms are generated with the function `hist`. You can adjust the
 number of bins with the argument `breaks`, e.g. `hist(rnorm(10000), breaks=100)`.
 
 #### Julia
-Use the package `Distributions.jl` to have access to many probability distributions, like a uniform or a gaussian one. Type `?Distributions` in the Julia REPL to get information about this package. You can sample n random numbers following a certain distribution `d_X` via the command `rand(d_X, n)`.
+The package `Distributions.jl` provides access to many probability
+distributions, see the [documentation](https://juliastats.org/Distributions.jl/stable/).
 
-Here are some useful functions: for any distribution `__`
+Here are some useful functions you can apply to all distributions (not
+only normal):
 ```{julia, eval = FALSE}
-pdf(__, x)       #evaluate pdf at x
-cdf(__, x)       #evaluate cdf at x
-quantile(__, p)  #evaluate the p-th quantile
-rand(__, n)      #sample n random numbers
+π = Normal(0, 10) # define distritbution
+
+pdf(π, x)       # evaluate pdf at x
+cdf(π, x)       # evaluate cdf at x
+quantile(π, p)  # evaluate the p-th quantile
+rand(π, n)      # sample n random numbers
 ```
 
 
 
-Histograms are generated with the function `histogram` from the package `Plots.jl`. You can adjust the number of bins with the argument `nbins`, e.g `histogram(rand(Uniform(0,5), 10000), nbins = 100)`. 
+Histograms are generated with the function `histogram` from the package `Plots.jl`. You can adjust the number of bins with the argument `nbins`, e.g `histogram(rand(Uniform(0,5), 10000), nbins = 100)`.
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_4.Rmd"}}
 ```
@@ -172,7 +176,8 @@ $\boldsymbol{Y}_\mathrm{obs,indep}$ and `rmvnorm()` from the package
  `mvtnorm` to construct $\boldsymbol{Y}_\mathrm{obs,dep}$.
 
 #### Julia
-Given a mean vector $\mu$ and a correlation matrix $\Sigma$, you can construct a multivariate distribution, using the function `MvNormal(\mu, \Sigma)` from the package `Distribution.jl`.
+Given a mean vector $\mu$ and a correlation matrix $\Sigma$, you can
+construct a multivariate normal distribution with  `MvNormal(μ, Σ)` from the package `Distribution.jl`.
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_5.Rmd"}}
 ```
@@ -198,11 +203,12 @@ the data; use `cov()`,`cor()` for the covariance and the correlation,
 respectively.
 
 #### Julia
-You can use the function `iqr` from the `Statsbase.jl`package, as well as the `percentile`function.
+You can use the function `quntile` from the `Statistics.jl`package.
 
-To plot histograms, you can use the package `Plots.jl`as already mentionned. You can also scatter from this package, using the function `scatter`. However, to plot densities, you have to use the function `density`from the package `StatsPlots.jl`.
+With package `Plots.jl` you can also scatter plots(`scatter`) and
+histograms (`histogram`). For densities plots, you use the function `density`from the package `StatsPlots.jl`.
 
-Use the package `Statistics.jl`to find the covariance and correlation matrix.
+The package `Statistics.jl` provides functions to compute the covariance and correlation matrix.
 
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_6.Rmd"}}
@@ -233,7 +239,20 @@ by assigning the desired names with function `colnames()` applied to the newly c
 
 
 #### Julia
-Use the packages `CSV.jl` (Comma Separated Values) and `DataFrames.jl` to read and manipulate data. Use the function `pwd()`the see which directory you are currently working in, and read the desired file using a relative path. You can use the function `joinpath`to make the process easier. 
+Use the package `DataFrames.jl`
+to read and manipulate data. To import csv (comma separated values)
+files, we also use `CSV.jl`. You can use `pwd()` the find
+your currently working directory.
+```{julia, eval = FALSE}
+using DataFrames
+import CSV
+
+path = joinpath("data", "myfile.csv")
+data = DataFrame(CSV.File(path; delim=";"))
+
+# select columns "x"
+data.x
+```
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_7.Rmd"}}
 ```
@@ -256,7 +275,6 @@ Use `rlnorm` to sample from a log-normal distribution, which accepts the mean an
 deviation on the log-scale, not on the original scale. Additionally, keep in mind that in R a
 general function can be defined as:
 ```{r}
-
 function.name <- function(arg1,arg2){
   result <- arg1 + arg2 # or any other operation
   return(result)
@@ -268,11 +286,16 @@ Try `?sin` in the R console to get access to the manual of the harmonic function
 These can be used anywhere in the code, including inside a custom function.
 
 #### Julia
-Use `LogNormal()` from the package `Distributions.jl`for a log-normal distribution. You can create you brand new Julia function following the syntax
+Use `LogNormal()` from the package `Distributions.jl`for a log-normal distribution. You can create you own Julia functions following the syntax
 ```{julia, eval = FALSE}
 function choose_your_name(arg_1, arg_2)
-    return arg_1 + arg_2 #for example
+    res = arg_1 + arg_2
+    return res
 end
+```
+Very short function can be defined as
+```{julia, eval = FALSE}
+foo(a, b) = a + b
 ```
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_8.Rmd"}}

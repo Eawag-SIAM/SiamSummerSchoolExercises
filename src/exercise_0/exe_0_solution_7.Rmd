@@ -41,17 +41,19 @@ using CSV
 using DataFrames
 pwd()
 ```
-Given your working directory, go to the desired file with a relative path. Remember that `..` allows to come one step back. 
+Given your working directory, go to the desired file with a relative path. Remember that `..` allows to come one step back.
 ```{julia, results ='hide'}
 growth_dat = CSV.read(joinpath("..", "..", "data", "model_growth.csv"),
-DataFrame)
-#show(growth_dat, allrows=true) if you want to see all you data
+                      DataFrame)
+# show(growth_dat, allrows=true) if you want to see all you data
 ```
-Extraction of a column vector can be done with the following syntax.
+Extraction of a column can be done with the following syntax.
 ```{julia, results = 'hide'}
 C_M = growth_dat[:, "C_M"]
 C_S = growth_dat[:, "C_S"]
 time = growth_dat[:, "t"]
+## or alternatively
+time = growth_dat.t
 ```
 Plotting
 ```{julia}
@@ -64,12 +66,9 @@ plot!(time, C_S,
 ```
 b.
 ```{julia, results = 'hide'}
-dataframe_indep = DataFrame("Y indep 1"=> Y_indep_sample[1, :],
-"Y indep 2"=>Y_indep_sample[2, :], "C_new"=>0) 
+# generate some data
+C_new = rand(nrow(growth_dat))
 
-rename!(dataframe_indep, [names(growth_dat)[1], names(growth_dat)[2], names(growth_dat)[3]])
-```
-
-```{julia}
-growth_data_long = vcat(growth_dat, dataframe_indep)
+# add new column
+growth_dat.Cnew = C_new
 ```

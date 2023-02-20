@@ -352,7 +352,7 @@ display: none;
 <h1 class="title toc-ignore">Introductory exercises</h1>
 <h4 class="author">Eawag Summer School in Environmental Systems
 Analysis</h4>
-<h4 class="date">15 Februar, 2023</h4>
+<h4 class="date">20 February, 2023</h4>
 
 </div>
 
@@ -496,18 +496,16 @@ e.g. <code>hist(rnorm(10000), breaks=100)</code>.</p>
 </div>
 <div id="julia" class="section level4">
 <h4>Julia</h4>
-<p>Use the package <code>Distributions.jl</code> to have access to many
-probability distributions, like a uniform or a gaussian one. Type
-<code>?Distributions</code> in the Julia REPL to get information about
-this package. You can sample n random numbers following a certain
-distribution <code>d_X</code> via the command
-<code>rand(d_X, n)</code>.</p>
-<p>Here are some useful functions: for any distribution
-<code>__</code></p>
-<pre class="julia"><code>pdf(__, x)       #evaluate pdf at x
-cdf(__, x)       #evaluate cdf at x
-quantile(__, p)  #evaluate the p-th quantile
-rand(__, n)      #sample n random numbers</code></pre>
+<p>The package <code>Distributions.jl</code> provides access to many
+probability distributions, see the <a href="https://juliastats.org/Distributions.jl/stable/">documentation</a>.</p>
+<p>Here are some useful functions you can apply to all distributions
+(not only normal):</p>
+<pre class="julia"><code>π = Normal(0, 10) # define distritbution
+
+pdf(π, x)       # evaluate pdf at x
+cdf(π, x)       # evaluate cdf at x
+quantile(π, p)  # evaluate the p-th quantile
+rand(π, n)      # sample n random numbers</code></pre>
 <p>Histograms are generated with the function <code>histogram</code>
 from the package <code>Plots.jl</code>. You can adjust the number of
 bins with the argument <code>nbins</code>, e.g
@@ -547,8 +545,8 @@ construct <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,dep}\)</span>.<
 <h4>Julia</h4>
 <p>Given a mean vector <span class="math inline">\(\mu\)</span> and a
 correlation matrix <span class="math inline">\(\Sigma\)</span>, you can
-construct a multivariate distribution, using the function
-<code>MvNormal(\mu, \Sigma)</code> from the package
+construct a multivariate normal distribution with
+<code>MvNormal(μ, Σ)</code> from the package
 <code>Distribution.jl</code>.</p>
 </div>
 </div>
@@ -581,16 +579,14 @@ the correlation, respectively.</p>
 </div>
 <div id="julia-2" class="section level4">
 <h4>Julia</h4>
-<p>You can use the function <code>iqr</code> from the
-<code>Statsbase.jl</code>package, as well as the
-<code>percentile</code>function.</p>
-<p>To plot histograms, you can use the package <code>Plots.jl</code>as
-already mentionned. You can also scatter from this package, using the
-function <code>scatter</code>. However, to plot densities, you have to
-use the function <code>density</code>from the package
-<code>StatsPlots.jl</code>.</p>
-<p>Use the package <code>Statistics.jl</code>to find the covariance and
-correlation matrix.</p>
+<p>You can use the function <code>quntile</code> from the
+<code>Statistics.jl</code>package.</p>
+<p>With package <code>Plots.jl</code> you can also scatter
+plots(<code>scatter</code>) and histograms (<code>histogram</code>). For
+densities plots, you use the function <code>density</code>from the
+package <code>StatsPlots.jl</code>.</p>
+<p>The package <code>Statistics.jl</code> provides functions to compute
+the covariance and correlation matrix.</p>
 </div>
 </div>
 </div>
@@ -623,11 +619,18 @@ newly created <code>data.frame</code>.</p>
 </div>
 <div id="julia-3" class="section level4">
 <h4>Julia</h4>
-<p>Use the packages <code>CSV.jl</code> (Comma Separated Values) and
-<code>DataFrames.jl</code> to read and manipulate data. Use the function
-<code>pwd()</code>the see which directory you are currently working in,
-and read the desired file using a relative path. You can use the
-function <code>joinpath</code>to make the process easier.</p>
+<p>Use the package <code>DataFrames.jl</code> to read and manipulate
+data. To import csv (comma separated values) files, we also use
+<code>CSV.jl</code>. You can use <code>pwd()</code> the find your
+currently working directory.</p>
+<pre class="julia"><code>using DataFrames
+import CSV
+
+path = joinpath(&quot;data&quot;, &quot;myfile.csv&quot;)
+data = DataFrame(CSV.File(path; delim=&quot;;&quot;))
+
+# select columns &quot;x&quot;
+data.x</code></pre>
 </div>
 </div>
 </div>
@@ -661,10 +664,13 @@ be used anywhere in the code, including inside a custom function.</p>
 <h4>Julia</h4>
 <p>Use <code>LogNormal()</code> from the package
 <code>Distributions.jl</code>for a log-normal distribution. You can
-create you brand new Julia function following the syntax</p>
+create you own Julia functions following the syntax</p>
 <pre class="julia"><code>function choose_your_name(arg_1, arg_2)
-    return arg_1 + arg_2 #for example
+    res = arg_1 + arg_2
+    return res
 end</code></pre>
+<p>Very short function can be defined as</p>
+<pre class="julia"><code>foo(a, b) = a + b</code></pre>
 </div>
 </div>
 </div>

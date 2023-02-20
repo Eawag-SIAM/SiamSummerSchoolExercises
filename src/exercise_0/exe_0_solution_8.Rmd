@@ -30,42 +30,44 @@ hist(fun(X))
 
 #### Julia
 ```{julia, results = 'hide'}
-function f(x)
-    return sin.(sqrt.(x))
-end
+f(x) = sin(sqrt(x))
+
 ```
 
 ```{julia, results = 'hide'}
-log_norm_X = LogNormal()
-log_norm_X_s = rand(log_norm_X, 1000)
+x = rand(LogNormal(), 1000)
 ```
 
 ```{julia}
-#mean of X
-Statistics.mean(log_norm_X_s)
-#mean of f(X)
-Statistics.mean(f(log_norm_X_s))
-#f(mean of X)
-f(Statistics.mean(log_norm_X_s))
-#variance of x
-Statistics.var(log_norm_X_s)
-#variance of f(X)
-Statistics.var(f(log_norm_X_s))
+using Statistics
+
+# mean of X
+mean(x)
+# mean of f(X)
+mean(f.(x))
+# f(mean of X)
+f(mean(x))
+# variance of x
+var(x)
+# variance of f(X)
+var(f.(x))
 ```
 Plotting
 ```{julia}
-scatter(log_norm_X_s, f(log_norm_X_s),
-    labels = false,
-    xlabel = "X",
-    ylabel = "f(X)")
-histogram(log_norm_X_s, nbins=20,
-    labels = false,
-    xlabel = "X",
-    ylabel = "Frenquency",
-    title = "Histogram of X")
-histogram(f(log_norm_X_s), nbins=20,
-    labels = false,
-    xlabel = "f(X)",
-    ylabel = "Frenquency",
-    title = "Histogram of f(X)")
+using Plots
+
+scatter(x, f.(x),
+        labels = false,
+        xlabel = "X",
+        ylabel = "f(X)")
+histogram(x, nbins=20,
+          labels = false,
+          xlabel = "X",
+          ylabel = "Frequency",
+          title = "Histogram of X")
+histogram(f.(x), nbins=20,
+          labels = false,
+          xlabel = "f(X)",
+          ylabel = "Frequency",
+          title = "Histogram of f(X)")
 ```
