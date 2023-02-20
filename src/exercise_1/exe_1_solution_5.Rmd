@@ -1,0 +1,69 @@
+
+# 5. Solutions  !!TODO!!
+
+## Local sensitivity analysis
+
+## Variance-based sensitivity {.tabset}
+
+### R
+```R{eval=FALSE}
+library(sensitivity)
+
+## get sampling points
+res.fast <- fast99(model=NULL,factors=names(par.growth),n=100,
+                   q="qlnorm.trunc",
+                   q.arg=list(list(meanlog=meanlog[1],sdlog=sdlog[1]),
+                              list(meanlog=meanlog[2],sdlog=sdlog[2]),
+                              list(meanlog=meanlog[3],sdlog=sdlog[3]),
+                              list(meanlog=meanlog[4],sdlog=sdlog[4]),
+                              list(meanlog=meanlog[5],sdlog=sdlog[5]),
+                              list(meanlog=meanlog[6],sdlog=sdlog[6])))
+
+## calculate results for sample:
+ressamp.growth <- matrix(nrow=0,ncol=0)
+for ( i in 1:nrow(res.fast$X) )
+{
+    res.growth.new <- model.growth(t(res.fast$X[i,]),L.growth)
+}
+
+## calculate results of variance-based regional sensitivity analysis:
+res <- tell(res.fast,y = ressamp.growth[,j])
+```
+
+### Julia
+
+```Julia {eval=FALSE}
+using GlobalSensitivity
+
+res1 = gsa(model.growth,
+           eFAST(),
+           [(0,1),
+            (2, 5)
+            ],
+           samples=1500)
+```
+
+Or
+```Julia {eval=FALSE}
+using GlobalSensitivityAnalysis
+using Distributions
+using DataStructures
+
+
+# define the data
+data = SobolData(
+    params = OrderedDict(:x1 => Uniform(-3.14159265359, 3.14159265359),
+        :x2 => Uniform(-3.14159265359, 3.14159265359),
+        :x3 => Uniform(-3.14159265359, 3.14159265359)),
+    N = 1000
+)
+
+# generate samples using Sobol sequence
+samples = sample(data)
+
+# run model (example)
+Y = model.(samples)
+
+# perform Sobol Analysis
+analyze(data, Y)
+```

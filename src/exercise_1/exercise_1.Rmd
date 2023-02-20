@@ -94,11 +94,11 @@ loglikelihood.linear <- function(par, x, y){
 #### Julia {-}
 Read your data using the function `read` from the package `CSV.jl`. Remember to give a relative path in argument, and that the function `joinpath`can help.
 
-Your loglikelihood function should look like this 
+Your loglikelihood function should look like this
 ```{julia, eval = FALSE}
 function loglikelihood_linear(beta, gamma, sigma, x, y)
     y_det = ???
-    return ??? 
+    return ???
 end
 ```
 
@@ -155,7 +155,7 @@ summary(linearModel)
 ```
 
 #### Julia {-}
-Use the function `lm` from the package `GLM.jl`(Generalized Linear Model) and the macro `@formula`. 
+Use the function `lm` from the package `GLM.jl`(Generalized Linear Model) and the macro `@formula`.
 
 
 ```{r, child = if(params$showsolutions){"exe_1_solution_1.Rmd"}}
@@ -216,7 +216,7 @@ the `model.growth` ODE system. This could look like that:
 #ODE system given by model growth
 function growth!(du, u, p, t)
     du[1] = ???
-    du[2] = ???  
+    du[2] = ???
 end
 #solving
 u0 = ???
@@ -298,27 +298,54 @@ Check that your log-likelihood is implemented correctly by generating model outp
 
 # 5. Sensitivity analysis (NEEDS TO BE REWRITTEN!)
 
-For the models "Monod" and "Growth", do the following exercises:
+For the models "Monod" and "Growth" try and compare different sensitivity analysis
+approaches.
 
 
 ## Manual sensitivity analysis
 
-Increase the model parameters sequentially by $10 \%$ and by $50 \%$, redo the forward simulations, and try to understand the effect of the parameter change on the model results.
+Increase the model parameters by $10 \%$ and by $50 \%$, redo the forward simulations, and try to understand the effect of the parameter change on the model results.
 
 
 ## Local sensitivity analysis
 
-Do local sensitivity analysis (see Equation (7.3)) with uncertainty ranges of $10 \%$ and by $50 \%$ of the parameter values. Interpret the results.
+A simple metric that measures the sensitivity of model parameters
+$\theta$ to model output $Y$ is defined as
+$$
+s_{loc} = \frac{\Delta Y}{\Delta \theta}
+$$
+Often a relative metric is easier to interpret:
+$$
+s_{loc} = \frac{\theta}{Y} \frac{\Delta Y}{\Delta \theta}
+$$
+
+Set the ranges $\Delta \theta$ to  $10 \%$ and by $50 \%$ of the
+parameter values and interpret the results.
 
 
 ## Variance-based sensitivity
-Do variance-based regional sensitivity analyses (see Equation (7.19)) with lognormal parameter distributions based on default mean values and standard deviations of $10 \%$ and $50 \%$ of the mean and interpret the results.
+Conduct a variance-based regional (global) sensitivity analyses with lognormal parameter distributions based on default mean values and standard deviations of $10 \%$ and $50 \%$ of the mean and interpret the results.
 
-Use the FAST sampling as implemented in the package `sensitivity` and then by generating a random sampling (mimicking a situation in which a sample would already be available).
+### Hints {.tabset}
+
+#### R {-}
+
+Use the `fast99` function implemented in the package `sensitivity`.
+
+
+
+#### Julia {-}
+Use the package
+[`GlobalSensitivity.jl`](https://docs.sciml.ai/GlobalSensitivity/stable/)
+and the method `eFAST`.
+
+
+
 
 ## Comparing different sensitivity measures
 
-Plot $s_{i,j}^{\mathrm{loc}}$ (Equation (7.3)) and $s_{i,j}^{\mathrm{var}}$
-(Equation (7.19)).
+Compare the results of the different sensitivity approaches. Do the
+rankings agree? Which one would you trust?
 
-Interpret the differences between the results of the local and regional analyses for both standard deviations.
+```{r, child = if(params$showsolutions){"exe_1_solution_5.Rmd"}}
+```

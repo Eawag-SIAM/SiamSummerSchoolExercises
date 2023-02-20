@@ -353,7 +353,7 @@ display: none;
 likelihood functions</h1>
 <h4 class="author">Eawag Summer School in Environmental Systems
 Analysis</h4>
-<h4 class="date">15 Februar, 2023</h4>
+<h4 class="date">20 February, 2023</h4>
 
 </div>
 
@@ -475,7 +475,7 @@ that the function <code>joinpath</code>can help.</p>
 <p>Your loglikelihood function should look like this</p>
 <pre class="julia"><code>function loglikelihood_linear(beta, gamma, sigma, x, y)
     y_det = ???
-    return ??? 
+    return ???
 end</code></pre>
 </div>
 </div>
@@ -591,7 +591,7 @@ parameter values <span class="math inline">\(\mu = 4\)</span>, <span class="math
 <pre class="julia"><code>#ODE system given by model growth
 function growth!(du, u, p, t)
     du[1] = ???
-    du[2] = ???  
+    du[2] = ???
 end
 #solving
 u0 = ???
@@ -676,38 +676,52 @@ you generated the data with.</p>
 </div>
 <div id="sensitivity-analysis-needs-to-be-rewritten" class="section level1">
 <h1>5. Sensitivity analysis (NEEDS TO BE REWRITTEN!)</h1>
-<p>For the models “Monod” and “Growth”, do the following exercises:</p>
+<p>For the models “Monod” and “Growth” try and compare different
+sensitivity analysis approaches.</p>
 <div id="manual-sensitivity-analysis" class="section level2">
 <h2>Manual sensitivity analysis</h2>
-<p>Increase the model parameters sequentially by <span class="math inline">\(10 \%\)</span> and by <span class="math inline">\(50 \%\)</span>, redo the forward simulations, and
-try to understand the effect of the parameter change on the model
-results.</p>
+<p>Increase the model parameters by <span class="math inline">\(10
+\%\)</span> and by <span class="math inline">\(50 \%\)</span>, redo the
+forward simulations, and try to understand the effect of the parameter
+change on the model results.</p>
 </div>
 <div id="local-sensitivity-analysis" class="section level2">
 <h2>Local sensitivity analysis</h2>
-<p>Do local sensitivity analysis (see Equation (7.3)) with uncertainty
-ranges of <span class="math inline">\(10 \%\)</span> and by <span class="math inline">\(50 \%\)</span> of the parameter values. Interpret
-the results.</p>
+<p>A simple metric that measures the sensitivity of model parameters
+<span class="math inline">\(\theta\)</span> to model output <span class="math inline">\(Y\)</span> is defined as <span class="math display">\[
+s_{loc} = \frac{\Delta Y}{\Delta \theta}
+\]</span> Often a relative metric is easier to interpret: <span class="math display">\[
+s_{loc} = \frac{\theta}{Y} \frac{\Delta Y}{\Delta \theta}
+\]</span></p>
+<p>Set the ranges <span class="math inline">\(\Delta \theta\)</span> to
+<span class="math inline">\(10 \%\)</span> and by <span class="math inline">\(50 \%\)</span> of the parameter values and
+interpret the results.</p>
 </div>
 <div id="variance-based-sensitivity" class="section level2">
 <h2>Variance-based sensitivity</h2>
-<p>Do variance-based regional sensitivity analyses (see Equation (7.19))
-with lognormal parameter distributions based on default mean values and
+<p>Conduct a variance-based regional (global) sensitivity analyses with
+lognormal parameter distributions based on default mean values and
 standard deviations of <span class="math inline">\(10 \%\)</span> and
 <span class="math inline">\(50 \%\)</span> of the mean and interpret the
 results.</p>
-<p>Use the FAST sampling as implemented in the package
-<code>sensitivity</code> and then by generating a random sampling
-(mimicking a situation in which a sample would already be
-available).</p>
+<div id="hints-5" class="section level3 tabset">
+<h3 class="tabset">Hints</h3>
+<div id="r-5" class="section level4 unnumbered">
+<h4 class="unnumbered">R</h4>
+<p>Use the <code>fast99</code> function implemented in the package
+<code>sensitivity</code>.</p>
+</div>
+<div id="julia-5" class="section level4 unnumbered">
+<h4 class="unnumbered">Julia</h4>
+<p>Use the package <a href="https://docs.sciml.ai/GlobalSensitivity/stable/"><code>GlobalSensitivity.jl</code></a>
+and the method <code>eFAST</code>.</p>
+</div>
+</div>
 </div>
 <div id="comparing-different-sensitivity-measures" class="section level2">
 <h2>Comparing different sensitivity measures</h2>
-<p>Plot <span class="math inline">\(s_{i,j}^{\mathrm{loc}}\)</span>
-(Equation (7.3)) and <span class="math inline">\(s_{i,j}^{\mathrm{var}}\)</span> (Equation
-(7.19)).</p>
-<p>Interpret the differences between the results of the local and
-regional analyses for both standard deviations.</p>
+<p>Compare the results of the different sensitivity approaches. Do the
+rankings agree? Which one would you trust?</p>
 </div>
 </div>
 
