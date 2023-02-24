@@ -46,12 +46,15 @@ legend("topright", legend=c("microorganisms", "substrate"),
 ### Julia
 #### Monod model
 ```{julia, results = 'hide'}
-#set parameters
-C_monod = 0:0.1:10
-r_max, K = 5, 3
+using ComponentArrays
+include("../../models/models.jl") # load the model
 
-#deterministic model monod
-Y_monod = (r_max .*C_monod)./(K .+ C_monod)
+#set parameters
+par = ComponentVector(r_max = 5, K = 3)
+C_monod = 0:0.1:10
+
+# run deterministic model monod
+Y_monod = model_monod(C_monod, par)
 ```
 Plotting
 ```{julia}
@@ -65,29 +68,26 @@ plot(C_monod, Y_monod,
 
 #### Growth model
 ```{julia, results = 'hide'}
-using DifferentialEquations
+using ComponentArrays
+include("../../models/models.jl") # load the model
 
-#set parameters
-mu, K, b, Y, C_M_ini, C_S_ini = 4, 10, 1, 0.6, 10.0, 50.0
+# set parameters
+par = ComponentVector(mu=4, K=10, b=1, Y=0.6,
+                      inits = (C_M=10.0, C_S=50.0))
+times = 0:0.01:3
 
-#ODE system given by model growth
-function growth!(du, u, p, t)
-    du[1] = mu * (u[2]/(K + u[2]))*u[1] - b*u[1]
-    du[2] = (- mu / Y)*(u[2]/(K+u[2]))*u[1]  
-end
-#solving
-u0 = [C_M_ini; C_S_ini]
-tspan = (0.0,2.0)
-prob = ODEProblem(growth!, u0, tspan)
-sol = solve(prob)
+# run model
+res = model_growth(times, par)
+
 ```
 Plotting
 ```{julia}
-plot(sol,
-    labels = ["C_M" "C_S"],
-    xlabel = "time",
-    ylabel = "C_M, C_S",
-    title = "Deterministic model growth")
+plot(res.time, res.C_M,
+     label = "C_M",
+     xlabel = "time",
+     ylabel = "concentrations",
+     title = "Deterministic model growth");
+plot!(res.time, res.C_S, label="C_S")
 
 ```
 
@@ -104,6 +104,8 @@ them to the deterministic model output.
 
 ### R
 ```{r }
+source("../../models/models.r") # load the model
+
 simulate.monod.stoch <- function(par, C){
     ## run model
     r.det <- model.monod(par, C)
@@ -135,29 +137,31 @@ lines(C.monod, r.det, col=2, lwd=2, ylab="r")
 
 ### Julia
 ```{julia, results = 'hide'}
-#non deterministic monod
-function  monod(C, r_max, K, sigma)
-    Y_det = (r_max * C) / (K + C) #det part
-    Y = Y_det + rand(Normal(0, sigma)) #adding noise
-    Y > 0 ? Y : 0
+using ComponentArrays
+include("../../models/models.jl") # load the deterministic model
+
+# function to simulate stochastic realisations
+function  simulate_monod_stoch(C, par)
+    Ydet = model_monod(C, par)
+    z = rand(Normal(0, par.sigma)) # adding noise
+    Ydet .+ z
 end
 
-#setting
-n_sample = 5000
-r_max, K = 5, 3
-sigma = 0.2
+# parameters
+par = ComponentVector(r_max = 5, K = 3, sigma=0.2)
+C_monod = 0:0.1:10
+n_sample = 1000
 
-
-monod_stoch = [monod(c, r_max, K, sigma) for _ in 1:n_sample, c in C_monod]
+monod_stoch = hcat((simulate_monod_stoch(C_monod, par) for _ in 1:n_sample)...)
 
 #compute quantile
-low_quantile = [quantile(monod_stoch[:,i], 0.025) for i in 1:length(C_monod)]
-med_quantile = [quantile(monod_stoch[:,i], 0.5) for i in 1:length(C_monod)]
-upper_quantile = [quantile(monod_stoch[:,i], 0.975) for i in 1:length(C_monod)]
+low_quantile = [quantile(monod_stoch[i,:], 0.025) for i in 1:length(C_monod)]
+med_quantile = [quantile(monod_stoch[i,:], 0.5) for i in 1:length(C_monod)]
+upper_quantile = [quantile(monod_stoch[i,:], 0.975) for i in 1:length(C_monod)]
 ```
 Plotting
 ```{julia}
-plot(C_monod, upper_quantile, 
+plot(C_monod, upper_quantile,
     fillrange = low_quantile,
     labels = false,
     xlabel = "C",

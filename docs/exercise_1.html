@@ -353,7 +353,7 @@ display: none;
 likelihood functions</h1>
 <h4 class="author">Eawag Summer School in Environmental Systems
 Analysis</h4>
-<h4 class="date">20 February, 2023</h4>
+<h4 class="date">24 February, 2023</h4>
 
 </div>
 
@@ -406,13 +406,11 @@ sensitivity measures</a></li>
 
 <p><strong>Objectives</strong>:</p>
 <ul>
-<li>Understand the concept of a likelihood function. In particular, be
-able to write down the likelihood functions for our toy models and to be
-able to write code for the evaluation of these likelihood
-functions.</li>
-<li>Perform a maximum likelihood estimation.</li>
-<li>Understand the difference between evaluating a likelihood function
-and sampling from a likelihood function.</li>
+<li>Being able to derive and implement the likelihood function of a
+model.</li>
+<li>Performing maximum likelihood estimations.</li>
+<li>Understanding the difference between evaluating a likelihood
+function and sampling from a likelihood function.</li>
 </ul>
 <p><strong>Toy Models</strong>:</p>
 <p>Some exercises will use the toy models “Monod”, “Growth”, or
@@ -437,7 +435,7 @@ model likelihood functions” if you need inspiration.</p>
 <h2>Likelihood evaluation</h2>
 <p>For the linear model, implement a function that returns the logarithm
 of the likelihood, for given model parameters and measurement data. Read
-the data provided in the file <code>model_linear.dat</code> and use them
+the data provided in the file <code>model_linear.csv</code> and use them
 as “observation data” to compute the log-likelihood for two parameter
 sets: <span class="math inline">\(\{\beta = 2,\, \gamma = 1, \, \sigma =
 1\}\)</span> and <span class="math inline">\(\{ \beta = 3,\, \gamma = 2,
@@ -469,14 +467,24 @@ need to fill in the important bits!</p>
 </div>
 <div id="julia" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
-<p>Read your data using the function <code>read</code> from the package
-<code>CSV.jl</code>. Remember to give a relative path in argument, and
-that the function <code>joinpath</code>can help.</p>
+<p>Read the data in to a <code>DataFrame</code></p>
+<pre class="julia"><code>using DataFrames
+import CSV
+
+dat = DataFrame(CSV.File(&quot;data/model_linear.csv&quot;, delim=&#39; &#39;))
+dat.x
+dat.y
+</code></pre>
 <p>Your loglikelihood function should look like this</p>
-<pre class="julia"><code>function loglikelihood_linear(beta, gamma, sigma, x, y)
-    y_det = ???
-    return ???
-end</code></pre>
+<pre class="julia"><code>using Distributions
+
+function loglikelihood_linear(theta, x, y)
+    y_det = ... # first evaluate the deterministic model output,
+        # using the parameters par = c(beta, gamma, sigma)
+
+        ## Calculate loglikelihood. use `logpdf(Normal(...))`
+
+        end</code></pre>
 </div>
 </div>
 </div>

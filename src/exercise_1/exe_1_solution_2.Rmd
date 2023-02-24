@@ -37,19 +37,21 @@ The implementation then looks like this:
 
 
 ```{r}
+source("../../models/models.r") # load the deterministic model
 
-loglikelihood.monod <- function( y, C, par){
+loglikelihood.monod <- function(yobs, C, par){
 
     ## deterministic part:
-    y.det <- (par['r_max'] * C) / (par['K'] + C)
+    y.det <- model.monod(par, C)
 
     ## Calculate loglikelihood:
-    return( sum(dnorm(y, mean=y.det, sd=par['sigma'], log=TRUE)) )
+    return( sum(dnorm(yobs, mean=y.det, sd=par['sigma'], log=TRUE)) )
 }
+
 
 ```
 
-Again, the parameters with higher likelihood are more likely to have generated the data. In our case, this should be the parameter set $\{r_{\mathrm{max}} = 5,\,K = 3,\,\sigma=0.2\}$.
+The parameters with higher likelihood are more likely to have generated the data. In our case, this should be the parameter set $\{r_{\mathrm{max}} = 5,\,K = 3,\,\sigma=0.2\}$.
 
 Plotting the data together with the model output given those parameters looks ok too:
 ```{r}
@@ -58,9 +60,16 @@ dat <- read.table("../../data/model_monod_stoch.csv", header=TRUE)
 C <- dat$C
 r <- dat$r
 
+## compare the two parameter vectors
+par1 <- c(r_max = 5, K = 3, sigma=0.2)
+par2 <- c(r_max = 5, K = 4, sigma=0.2)
+
+loglikelihood.monod(r, C, par1)
+loglikelihood.monod(r, C, par2)
+
 ## prediction
-par <- c(r_max = 5, K=3)
-r.det <- (par['r_max'] * C) / (par['K'] + C)
+par <- c(r_max = 5, K = 3, sigma=0.2)
+r.det <- model.monod(par, C)
 
 ## plot
 plot(C, r)
@@ -70,41 +79,46 @@ lines(C, r.det, col=2)
 ### Julia
 Implementing the loglikelihood
 ```{julia, results = 'hide'}
-function loglikelihood_monod(C, r_max, K, sigma)   
-    Y_1_det = (r_max .*C)./(K.+C)
-    return sum(logpdf.(Normal.(Y_1_det, sigma), Y_1))
+using ComponentArrays
+using Distributions
+include("../../models/models.jl") # load the deterministic model
+
+function loglikelihood_monod(yobs, C, par)
+    ## deterministic part:
+    ydet = model_monod(C, par)
+
+    ## Calculate loglikelihood:
+    return sum(logpdf.(Normal.(ydet, par.sigma), yobs))
 end
 ```
-Read the table
+Read the data
 ```{julia, results = 'hide'}
 monod_data = CSV.read(joinpath("..", "..", "data", "model_monod_stoch.csv"),
              DataFrame)
-#show(monod_data, allrows=true)
 
-
-C = monod_data[:,"C"]
-Y_1 = monod_data[:, "r"]
+C = monod_data.C
+yobs = monod_data.C
 ```
-We can compute 
+We can compute
 ```{julia}
-#log likelihood of parameters r_max = 5, K = 3, σ = 0.2
-loglikelihood_monod(C, 5, 3, 0.2)
-#log likelihood of parameters r_max = 10, K = 4, σ = 0.2
-loglikelihood_monod(C, 10, 4, 0.2)
-# parameters r_max = 5, K = 3, σ = 0.2 are more likely to have generated the data
+## compare the two parameter vectors
+par1 = ComponentVector(r_max = 5, K = 3, sigma=0.2)
+par2 = ComponentVector(r_max = 10, K = 4, sigma=0.2)
+
+loglikelihood_monod(yobs, C, par1)
+loglikelihood_monod(yobs, C, par2)
+
 ```
 Plotting
 ```{julia, results = 'hide'}
-y_estimate = (5 .*C) ./ (3 .+C)
+# use the better parameters to compute the deterministic predictions
+y_det = model_monod(C, par1)
+
+# plots
+scatter(C, yobs,
+        labels = false,
+        xlabel = "C",
+        ylabel = "r");
+plot!(C, y_det,
+      labels = false)
 ```
-```{julia}
-scatter(C, Y_1,
-    labels = false,
-    xlabel = "C",
-    ylabel = "r");
-plot!(C, y_estimate,
-    labels = false)
-```
-
-
-

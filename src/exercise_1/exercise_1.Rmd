@@ -20,12 +20,9 @@ Pkg.status()
 
 **Objectives**:
 
-* Understand the concept of a likelihood function. In particular, be
-  able to write down the likelihood functions for our toy models and
-  to be able to write code for the evaluation of these likelihood
-  functions.
-* Perform a maximum likelihood estimation.
-* Understand the difference between evaluating a likelihood function and sampling
+* Being able to derive and implement the likelihood function of a model.
+* Performing maximum likelihood estimations.
+* Understanding the difference between evaluating a likelihood function and sampling
   from a likelihood function.
 
 
@@ -55,7 +52,7 @@ functions" if you need inspiration.
 
 For the linear model, implement a function that returns the logarithm of the likelihood,
 for given model parameters and measurement data.
-Read the data provided in the file `model_linear.dat` and use them as "observation data" to compute the log-likelihood for two parameter sets: $\{\beta = 2,\, \gamma = 1, \, \sigma = 1\}$  and $\{ \beta = 3,\, \gamma = 2, \, \sigma = 1 \}$.
+Read the data provided in the file `model_linear.csv` and use them as "observation data" to compute the log-likelihood for two parameter sets: $\{\beta = 2,\, \gamma = 1, \, \sigma = 1\}$  and $\{ \beta = 3,\, \gamma = 2, \, \sigma = 1 \}$.
 Which parameters are more likely to have generated this data?
 
 
@@ -92,14 +89,28 @@ loglikelihood.linear <- function(par, x, y){
 ```
 
 #### Julia {-}
-Read your data using the function `read` from the package `CSV.jl`. Remember to give a relative path in argument, and that the function `joinpath`can help.
+Read the data in to a `DataFrame`
+```{julia, eval=FALSE}
+using DataFrames
+import CSV
+
+dat = DataFrame(CSV.File("data/model_linear.csv", delim=' '))
+dat.x
+dat.y
+
+```
 
 Your loglikelihood function should look like this
 ```{julia, eval = FALSE}
-function loglikelihood_linear(beta, gamma, sigma, x, y)
-    y_det = ???
-    return ???
-end
+using Distributions
+
+function loglikelihood_linear(theta, x, y)
+    y_det = ... # first evaluate the deterministic model output,
+        # using the parameters par = c(beta, gamma, sigma)
+
+        ## Calculate loglikelihood. use `logpdf(Normal(...))`
+
+        end
 ```
 
 

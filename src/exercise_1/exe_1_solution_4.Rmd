@@ -131,7 +131,6 @@ Plotting
 ```{julia}
 using StatsPlots
 
-# pred_survival_m = hcat(pred_survival...)'
 boxplot(pred_survival,
         labels = false, xlab="time", ylab="# deaths")
 

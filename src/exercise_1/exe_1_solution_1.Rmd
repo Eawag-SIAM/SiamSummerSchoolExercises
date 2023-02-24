@@ -43,7 +43,7 @@ That is, the model output $Y_i$ is normally distributed, where the mean is the d
 So, the likelihood for a single observation $y_i$, given input $x_i$ and parameters $\boldsymbol{\theta}$, is given by
 
 $$
-L(\boldsymbol{\theta}) = p(y_i|x_i,\boldsymbol{\theta}) = \frac{1}{\sqrt{2 \pi \sigma^2 }} \exp\left( {-\frac{(y_i - y_{i,det})^2}{2\sigma^2}}  \right)
+p(y_i|x_i,\boldsymbol{\theta}) = \frac{1}{\sqrt{2 \pi \sigma^2 }} \exp\left( {-\frac{(y_i - y_{i,det})^2}{2\sigma^2}}  \right)
 \;.
 $$
 
@@ -138,8 +138,8 @@ linear_data = CSV.read(joinpath("..", "..", "data", "model_linear.csv"),
                        DataFrame)
 #show(linear_data, allrows=true) if you want to see all your data
 
-x = linear_data[:, "x"]
-y = linear_data[:, "y"]
+x = linear_data.x
+y = linear_data.y
 ```
 Compute
 ```{julia}
@@ -192,23 +192,23 @@ lines(x, y.estimate, col=2)
 ```
 
 ### Julia
-Implementing the negative loglikelihood that we will minimize.
+Implementing the negative loglikelihood that we will minimize. Note,
+we optimize for the `log_sigma` to avoid any negative values for `sigma`.
 ```{julia, results = 'hide'}
-beta_init = 2
-gamma_init = 1
-sigma_init = 1
-
 function neg_loglikelihood_linear(θ::Vector)
     beta, gamma, log_sigma = θ
-    #minus sign to be able to minimize after
+    # minus sign to be able to minimize after
     - loglikelihood_linear(beta, gamma, exp(log_sigma), x, y)
 end
 ```
 Minimizing
 ```{julia}
 using Optim
-param = Optim.minimizer(optimize(neg_loglikelihood_linear, [2.0, 1.0, log(0.5)]));
-best_param = [param[1], param[2], exp(param[3])]
+θinit = [2.0, 1, log(0.5)]
+param = Optim.minimizer(optimize(neg_loglikelihood_linear, θinit));
+
+param[3] = exp(param[3])        # back-transform to sigma
+param
 ```
 
 
@@ -220,15 +220,17 @@ scatter(x, y,
     labels=false,
     xlabel = "x",
     ylabel = "y");
-plot!(x -> 2.25*x+0.38,
-    labels = false)
+plot!(x -> param[1]*x + param[2],
+      labels = false)
 ```
 
 ## Linear regression {.tabset}
 
-### R
+The linear regression functions  works differently (it uses a
+method called "QR decomposition"), but should give very similar
+results to our likelihood optimisation.
 
-The R linear regression function `lm` works differently (it uses a method called "QR decomposition"), but should give very similar results to our likelihood optimisation.
+### R
 
 ```{r}
 mod <- lm(y~x)
@@ -238,10 +240,8 @@ Note, `(intercept)` corresponds to $\gamma$ and `x` to $\beta$.
 
 
 ### Julia
-```{julia, results = 'hide'}
-using GLM
-fm = @formula(y ~ x)
-```
 ```{julia}
-linear_mod = GLM.lm(fm, linear_data)
+using GLM
+linear_mod = GLM.lm(@formula(y ~ x), linear_data)
 ```
+Note, `(intercept)` corresponds to $\gamma$ and `x` to $\beta$.

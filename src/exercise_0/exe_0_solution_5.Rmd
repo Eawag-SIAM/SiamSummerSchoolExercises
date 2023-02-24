@@ -15,7 +15,7 @@ y.obs.dep <- rmvnorm(1000, mean=c(3,8), sigma=Sigma.dep)
 using Distributions
 
 μs = [3, 8]
-Σ_indep = [2 0; 0 5]
+Σ_indep = [2^2 0; 0 5^2]
 Σ_dep = [4 8; 8 25]
 
 Y_obs_indep = MvNormal(μs, Σ_indep)
