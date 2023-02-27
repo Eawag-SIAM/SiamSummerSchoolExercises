@@ -130,7 +130,12 @@ plt.plot(xpoints, ypoints)
 plt.show()
 ```
 
+# Swap all tabsets together
 
+we need something similar than this:
+https://github.com/rstudio/flexdashboard/issues/264#issuecomment-624304902
+
+https://stackoverflow.com/questions/61458456/change-second-tabset-on-click-in-flexdashboard
 
 # Show and hide solutions
 

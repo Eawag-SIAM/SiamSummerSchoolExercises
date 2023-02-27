@@ -1,0 +1,56 @@
+---
+title: Exercises and Resources
+number_sections: TRUE
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: "Eawag Summer School in Environmental Systems Analysis"
+output:
+  html_document:
+    number_sections: FALSE
+    toc: TRUE
+    toc_depth: 2
+---
+
+# General information
+
+- How to approach the exercises?
+- Should I use R or Julia (or Python)?
+
+## R resources
+
+- how to install the packages
+
+## Julia resources
+
+- how to install the packages
+
+# Example models and data
+
+...
+
+
+# Exercises
+
+- [Exercises 0](exercise_0.html): review of probability
+  calculus, basics of R and Julia
+
+- [Exercises 1](exercise_1.html): deriving and implementing likelihood
+  functions, sensitivity analysis
+
+- [Exercises 2](exercise_2.html): Bayesian computations, MCMC
+
+# Solutions
+
+- [Solutions 0](exercise_0_solution.html)
+
+- [Solutions 1](exercise_1_solution.html)
+
+- [Solutions 2](exercise_2_solution.html)
+
+
+# I found a typo!
+
+If you find any typos, errors, confusing instructions, bad solutions,
+or general suggestions how to
+improve the exercises, please open an
+[issue here](https://github.com/scheidan/SiamSummerSchoolExercises/issues)
+(PRs are welcome too). Thanks a lot!

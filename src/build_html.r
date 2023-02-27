@@ -20,6 +20,7 @@ src.dir <- "src"
 ## --- compile all exercises
 exercises <- c("exercise_0", "exercise_1", "exercise_2")[2]
 
+exercises <- c("index", exercises)
 for(exer in exercises){
     source.file <- paste0(gsub("\\./", "", exer), ".Rmd")
     source <- file.path(src.dir, exer, source.file)
@@ -31,9 +32,11 @@ for(exer in exercises){
                       output_dir = out.dir,
                       params = list(showsolutions=FALSE))
     
-    ## compile wit solutions
-    rmarkdown::render(source,
-                      output_file = gsub("\\.Rmd", "_solution.html", source.file),
-                      output_dir = out.dir,
-                      params = list(showsolutions=TRUE))
+    ## compile with solutions
+    if(exer != "index"){
+        rmarkdown::render(source,
+                          output_file = gsub("\\.Rmd", "_solution.html", source.file),
+                          output_dir = out.dir,
+                          params = list(showsolutions=TRUE))
+    }
 }
