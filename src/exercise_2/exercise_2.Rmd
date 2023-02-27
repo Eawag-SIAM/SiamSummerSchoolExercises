@@ -11,6 +11,13 @@ params:
   showsolutions: TRUE
 ---
 
+```{julia, echo = FALSE, results = FALSE}
+import Pkg
+Pkg.activate("../.")
+Pkg.instantiate()
+Pkg.status()
+```
+
 **Objectives**
 
 * Implement the Metropolis algorithm for a one-parameter model, and
@@ -30,8 +37,8 @@ params:
 
 In this exercise, you will write your own code to implement the most
 elementary MCMC sampler, the Metropolis algorithm for one dimension.
-Recall that samplers
-can be used to sample from any distribution, and that they are not
+MCMC samplers
+can be used to sample from any distribution, and they are not
 linked to Bayesian concepts per se. In Bayesian inference, however, they
 are especially useful to sample from the posterior distribution. You
 will apply your self-coded sampler to sample from the posterior
@@ -59,25 +66,28 @@ barplot(data.survival$deaths, names=data.survival$time,
 
 #### Julia
 ```{julia}
-survival_data = CSV.read(joinpath("..", "..", "data", "model_survival.csv"),
-DataFrame);
+using DataFrames
+import CSV
+using Plots
+survival_data = CSV.read("../../data/model_survival.csv",
+                         DataFrame);
 
-deaths = survival_data[:, "deaths"];
-bar(deaths,
+bar(survival_data.deaths,
     labels = false,
     xlabel = "Times interval",
-    ylabel = "No of deaths",
+    ylabel = "No. of deaths",
     title = "Survival Model")
 ```
 
 ### Defining the likelihood, prior, and posterior
 
-In the next step we will need the posterior density (or more accurately: something that is
-proportional to the posterior density) for the model "survival". Remember that,
+In the next step we will need the posterior density (or more
+accurately: a function that is
+proportional to the posterior density) for the model "survival" because
 $$
-p(\lambda|y)\propto p(\lambda,y)=p(y|\lambda)p(\lambda)
+p(\lambda|y)\propto p(\lambda,y) = p(y|\lambda)p(\lambda) \; .
 $$
-This means that we first need the likelihood function $p(y|\lambda)$
+This means that we need the likelihood function $p(y|\lambda)$
 and the prior $p(\lambda)$.
 
 #### Likelihood {.tabset}
@@ -86,9 +96,6 @@ and the prior $p(\lambda)$.
 The likelihood is given below (copied from Exercise 1):
 ```{r}
 loglikelihood.survival <- function(y, N, t, par){
-
-    ## return -Inf, if par is negative:
-    if(any(par<0)) return(-Inf)
 
     ## Calculate survival probabilities at measurement points
     ## and add zero "at time-point infinity":
@@ -111,9 +118,16 @@ loglikelihood.survival <- function(y, N, t, par){
 ##### Julia
 The likelihood can be implemented like this, copied from Exercise 1.
 ```{julia, results = 'hide'}
-function loglikelihood_linear(beta, gamma, sigma, x, y)
-    y_det = beta .* x .+ gamma
-    return sum(logpdf.(Normal.(y_det, sigma), y))
+using Distributions
+
+function loglikelihood_survival(N::Int64, t, y::Vector, lambda)
+    S = exp.(-lambda .* t)
+    S = [1; S; 0]
+    p = -diff(S)
+    ## Add number of survivors at the end of the experiment:
+    push!(y, N-sum(y))
+
+    logpdf(Multinomial(N, p), y)
 end
 ```
 
@@ -127,7 +141,7 @@ The parameter $\lambda$  must be positive. Furthermore, we know
 that values around 0.3 are quite plausible, and that values below 0.1 and above 0.7 are pretty unlikely.
 Which distribution would you choose for the prior?
 
-Implement a function that returns the logarithm of the probability density of the prior distribution
+Implement a function that returns the logarithm of a probability density of the prior distribution
 for $\lambda$.
 
 #### R
@@ -144,11 +158,11 @@ logprior.survival <- function(par){
   sigma <- ??? # a value similar to mu will do
 
   # calculate the mean and standard deviation in the log-space
-  meanlog <- log(mu) - 1/2*log(1+(sigma/mu)^2) # R assumes that the mean is specified for the associated normal variable
-  sdlog <- sqrt(log(1+(sigma/mu)^2))           # R assumes that the st.dev. is specified for the associated normal variable
+  meanlog <- log(mu) - 1/2*log(1+(sigma/mu)^2) #
+  sdlog <- sqrt(log(1+(sigma/mu)^2))           #
 
   # Use these to parameterize the prior
-  dlnorm(???) # last line is returned by default by r-function, use ?dlnorm to get help in the console
+  dlnorm(???)
 }
 ```
 #### Julia
@@ -156,12 +170,12 @@ You can use a `lognormal` prior distribution by understanding and filling-in the
 ```{julia, eval = FALSE}
 function logprior_survival(λ)
     # a mean and standard deviation that approximate the prior information given above are:
-    μ = ??? # since the distribution is skewed, choose it higher than 0.3 (the mode)
-    σ = ??? # a value similar to mu will do
+    mean = ?     # since the distribution is skewed, choose it higher than 0.3 (the mode)
+    sd = ?      # a value similar to the mean will do
 
     # calculate the mean and standard deviation in the log-space
-    meanlog = log(μ) - 1/2*log(1+(σ/μ)^2)
-    sdlog = sqrt(log(1+(σ/μ)^2))
+    μ = log(m/sqrt(1+sd^2/m^2))
+    σ = sqrt(log(1+sd^2/m^2))
 
     # Use these to parameterize the prior
     return logpdf(Normal(???), ???)
@@ -174,7 +188,7 @@ end
 Finally,  define a function that evaluates the density of
 the log posterior distribution.
 
-This function should take the data `model_survival.dat` and a
+This function should take the data from the file `model_survival.scv` and a
 parameter value as inputs.
 
 #### R
@@ -201,32 +215,33 @@ can find a description of the steps needed in Carlo's slides.
 
 ```{r eval=FALSE}
 
-#manually set sample size (make it feasible)
+#  set sample size (make it feasible)
 sampsize <- 5000
 
-# Create an empty chain:
-survival.chain <- matrix( nrow=sampsize, ncol=2 )
-colnames(survival.chain) <- c("lambda","logposterior")
+# Create an empty matrix to hold the chain:
+chain <- matrix(nrow=sampsize, ncol=2)
+colnames(chain) <- c("lambda","logposterior")
 
 # Set start value for your parameter:
 par.start <- ???
 
-# compute posterior value of first chain by using your start value of the parameter, and the logprior and loglikelihood already defined
-survival.chain[1,] <- ???
+# compute logosterior value of of your start parameter
+survival[1,] <- ???
 
 # Run the MCMC:
-for (i in 2:sampsize){ # complete the loop below
+for (i in 2:sampsize){
 
-  # Propose new parameter value based on previous one (think of propsal distribution):
+  # Propose new parameter value based on previous one
+  # (choose a propsal distribution):
   par.prop <- ???
 
-  # Calculate logposterior of the proposed parameter value (use likelihood and prior):
+  # Calculate logposterior of the proposed parameter value:
   logpost.prop <- ???
 
-  # Calculate acceptance probability by using Metropolis criterion min(1, ... ):
+  # Calculate acceptance probability by using the Metropolis criterion min(1, ... ):
   acc.prob <- ???
 
-  # Store in survival.chain[i,] the new parameter value if accepted, or re-store old one if rejected:
+  # Store in chain[i,] the new parameter value if accepted, or re-use the old one if rejected:
   if (runif(1) < acc.prob){
     ???
    } else {
@@ -238,35 +253,36 @@ for (i in 2:sampsize){ # complete the loop below
 
 ### Julia
 ```{julia, eval = FALSE}
-#manually set your sampsize
+# set your sampsize
 sampsize = 5000
 
-#create an undef chain
-survival_chain = Array{Float64}(undef, sampsize, 2)
+# create empty vectors to hold the chain and the log posteriors values
+chain = Vector{Float64}(undef, sampsize)
+log_posts = Vector{Float64}(undef, sampsize)
 
 
-# Set start value for your parameter:
+# Set start value for your parameter
 par_start = ???
 
 
-# compute posterior value of first chain by using your start value of the parameter, 
-# and the logprior and loglikelihood already defined
-survival_chain[1,:] = ???
+# compute logosterior value of of your start parameter
+survival[1] = ???
+log_posts[1] = ???
 
 # Run the MCMC:
 for i in 2:sampsize
 
-  # Propose new parameter value based on previous one (think of proposal distribution):
+  # Propose new parameter value based on previous one (choose a propsal distribution):
   par_prop = ???
 
-  # Calculate logposterior of the proposed parameter value (use likelihood and prior):
+  # Calculate logposterior of the proposed parameter value:
   logpost_prop = ???
 
-  # Calculate acceptance probability:
+  # Calculate acceptance probability by using the Metropolis criterion min(1, ... ):
   acc_prob = ???
 
   # Store in survival_chain[i,] the new parameter value if accepted, or re-store old one if rejected:
-  if rand(Uniform(0,1)) < acc_prob
+  if rand() < acc_prob # rand() is the same as rand(Uniform(0,1))
     ???
   else # if not accepted, stay at the current parameter value
     ???
@@ -277,13 +293,14 @@ end
 
 Experiment with you sampler:
 - Plot the resulting chain. Does it look reasonable?
-- Test the effect  of different jump distribution.
+- Test the effect of different jump distribution.
 - Find the value of $\lambda$ within your sample, for which the posterior is maximal.
 - Create a histogram or density plot of the posterior sample. Look at
 the chain plots to decide how many the burn-in sample you need to remove.
 
 
-
+```{r, child = if(params$showsolutions){"exe_2_solution_1.Rmd"}}
+```
 
 # 2. Sample from the posterior for the monod model (recommended) {#task2}
 
@@ -353,14 +370,15 @@ logposterior.monod <- function(par) {
 
 ### Julia
 ```{julia, eval = FALSE}
+using ComponentArrays
+
 #set parameters
-r_max, K, sigma = 5, 3, 0.5
-par = [r_max, K, sigma]
+par = ComponentVector(r_max = 5, K=3, sigma=0.5]
 
 prior_monod_mean = 0.5 .* par
-prior_monod_sd = 0.25 .*par
+prior_monod_sd = 0.25 .* par
 
-# Logprior for model "monod": lognormal distribution
+# Use a lognormal distribution for all model parameters
 function logprior_monod(par, mean, sd)
     sdlog = ???
     meanlog = ???
@@ -369,21 +387,20 @@ end
 
 
 # Log-likelihood for model "monod"
-function loglikelihood_monod(r_max, K, sigma, C::Vector, Y::Vector)
+function loglikelihood_monod(par::ComponentVector, data::DataFrame)
     y_det = ???
     return sum(???)
 end
 
 # Log-posterior for model "monod"
-function logposterior_monod(par)
+function logposterior_monod(par::ComponentVector)
     logpri = logprior_monod(???)
     if logpri == -Inf
         return ???
     else
-        r_max, K, sigma = par
         return ???    # sum log-prior and log-likelihood
     end
-end 
+end
 ```
 
 
@@ -435,39 +452,9 @@ pairs(modod.chain$samples)
 ### Julia
 Example of manual implementation.
 ```{julia, eval = FALSE}
-#manually set parameters
-sampsize = 5000
-par_start = prior_monod_mean
-prop_sd = 0.1 .* par_start
-prop_cor = LinearAlgebra.I
 
+TODO
 
-#create an undef chain
-monod_chain = Array{Vector}(undef, sampsize, 2)
-monod_chain[1, :] = ???
-
-
-#run MCMC
-for i in 2:sampsize
-
-
-    # Propose new parameter value based on previous one (think of proposal distribution):
-    par_prop = ???
-
-    
-    # Calculate logposterior of the proposed parameter value:
-    logpost_prop = ???
-
-    # Calculate acceptance probability:
-    acc_prob = ???
-
-    # Store in monod_chain[i,] the new parameter value if accepted, or re-store old one if rejected:
-    if rand(Uniform(0,1)) < acc_prob
-        ???
-    else # if not accepted, stay at the current parameter value
-        ???
-    end
-end
 ```
 
 ## Improve jump distribution  {.tabset}
@@ -510,10 +497,10 @@ analyze the residuals.
    * Do you see any suspicious structure?
 
 ### R
-Use the function `qqnorm` and `acf` can be helpful.
+The function `qqnorm` and `acf` can be helpful.
 
 ### Julia
-TODO
+The function `StatsBase.autocor` and `StatPlots.qqnorm(x)` can be helpful.
 
 
 

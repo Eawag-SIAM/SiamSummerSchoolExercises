@@ -1,0 +1,133 @@
+# 1. Solution {.tabset}
+
+## R
+
+### Reading and plotting the data
+
+```{r}
+data.survival <- read.table("../../data/model_survival.csv", header=TRUE)
+barplot(data.survival$deaths, names=data.survival$time,
+        xlab="Time interval", ylab="No. of deaths",
+        main="Survival data")
+```
+
+
+### Defining the likelihood, prior, and posterior
+
+
+```{r}
+loglikelihood.survival <- function(y, N, t, par){
+
+    ## Calculate survival probabilities at measurement points
+    ## and add zero "at time-point infinity":
+    S <- exp(-par*c(0,t))
+    S <- c(S,0)
+
+    ## Calcute probabilities to die within observation windows:
+    p <- -diff(S)
+
+    ## Add number of survivors at the end of the experiment:
+    y <- c(y, N-sum(y))
+
+    ## Calculate log-likelihood of multinomial distribution at point y:
+    LL <- dmultinom(y, prob=p, log=TRUE)
+
+    return(LL)
+}
+```
+Using a log normal distribution as prior
+```{r}
+logprior.survival <- function(par){
+
+  # a mean and standard deviation that approximate the prior information given above are:
+  mu <- 0.6    # since the distribution is skewed, choose it higher than 0.3 (the mode)
+  sigma <- 0.7 # a value similar to mu will do
+
+  # calculate the mean and standard deviation in the log-space
+  meanlog <- log(mu) - 1/2*log(1+(sigma/mu)^2) #
+  sdlog <- sqrt(log(1+(sigma/mu)^2))           #
+
+  # Use these to parameterize the prior
+  dlnorm(par, meanlog=meanlog, sdlog=sdlog, log=TRUE)
+}
+
+```
+
+We also define a function for the log posterior
+```{r}
+logposterior.survival <- function(par, data) {
+    loglikelihood.survival(data$deaths, N=30, data$time, par) + logprior.survival(par)
+}
+```
+
+### Code your own Markov Chain Metropolis sampler
+
+Given the prior and the likelihood from [Task 1.2](#prilik), code your
+own elementary Markov Chain sampler and run it for a few thousand
+iterations. You can find a description of the steps needed in such a
+sampler [here](metropolis_procedure.pdf).
+**Hints**: Understand and fill-in the block below.
+```{r}
+
+# Set sample size (make it feasible)
+sampsize <- 5000
+
+# Create an empty matrixto hold the chain:
+chain <- matrix(nrow=sampsize, ncol=2)
+colnames(chain) <- c("lambda","logposterior")
+
+# Set start value for your parameter:
+par.start <- c("lambda"=0.5)
+
+# Compute posterior value of first chain by using your start value
+# of the parameter, and the logprior and loglikelihood already defined
+chain[1,] <- c(par.start,
+               logposterior.survival(par.start, data.survival))
+
+# Run the MCMC:
+for (i in 2:sampsize){
+
+  # Propose new parameter value based on previous one (think of propsal distribution):
+  par.prop <- chain[i-1,1] + rnorm(1, mean=0, sd=0.01)
+
+  # Calculate logposterior of the proposed parameter value (use likelihood and prior):
+  logpost.prop <- logposterior.survival(par.prop, data.survival)
+
+  # Calculate acceptance probability:
+  acc.prob <- min( 1, exp(logpost.prop - chain[i-1,2]))
+
+  # Store in chain[i,] the new parameter value if accepted, or re-use the old one if rejected:
+  if (runif(1) < acc.prob){
+    chain[i,] <- c(par.prop, logpost.prop)
+  } else {  # if not accepted, stay at the current parameter value
+    chain[i,] <-  chain[i-1,]
+  }
+}
+
+```
+
+Plot the resulting chain. Does it look reasonable? Have you selected an appropriate jump distribution?
+
+```{r}
+plot(chain[,"lambda"], ylab=expression(lambda), pch=19, cex=0.25, col='black')
+
+```
+
+Find the value of $\lambda$ within your sample, for which the posterior is maximal.
+
+```{r}
+# Find the parameter value corresponding to the maximum posterior density
+chain[which.max(chain[,2]),]
+```
+
+Create a density plot of the posterior sample using `plot(density())`,
+but remove the burn-in first. Inspect the chain in the figure above: how
+many samples would you discard as burn-in?
+
+```{r}
+# Create a density plot of the posterior sample using `plot(density())` without burn-in
+plot(density(chain[1000:nrow(chain),1]), xlab=expression(lambda), main="")
+```
+
+## Julia
+TODO
