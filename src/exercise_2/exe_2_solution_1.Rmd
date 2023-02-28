@@ -62,11 +62,6 @@ logposterior.survival <- function(par, data) {
 
 ### Code your own Markov Chain Metropolis sampler
 
-Given the prior and the likelihood from [Task 1.2](#prilik), code your
-own elementary Markov Chain sampler and run it for a few thousand
-iterations. You can find a description of the steps needed in such a
-sampler [here](metropolis_procedure.pdf).
-**Hints**: Understand and fill-in the block below.
 ```{r}
 
 # Set sample size (make it feasible)
@@ -129,5 +124,122 @@ many samples would you discard as burn-in?
 plot(density(chain[1000:nrow(chain),1]), xlab=expression(lambda), main="")
 ```
 
+
+
 ## Julia
-TODO
+
+
+### Reading and plotting the data
+
+```{julia}
+using DataFrames
+import CSV
+using Plots
+
+survival_data = CSV.read("../../data/model_survival.csv",
+                         DataFrame)
+
+bar(survival_data.deaths,
+    labels = false,
+    xlabel = "Times interval",
+    ylabel = "No. of deaths",
+    title = "Survival Model")
+```
+
+### Defining the likelihood, prior, and posterior
+
+```{julia}
+using Distributions
+
+function loglikelihood_survival(N::Int64, t, y::Vector, lambda)
+    S = exp.(-lambda .* t)
+    S = [1; S; 0]
+    p = -diff(S)
+    ## Add number of survivors at the end of the experiment:
+    y = [y; N-sum(y)]
+
+    logpdf(Multinomial(N, p), y)
+end
+
+function logprior_survival(λ)
+    # a mean and standard deviation that approximate the prior information given above:
+    m = 0.5     # since the distribution is skewed, choose it higher than 0.3 (the mode)
+    sd = 0.5    # a value similar to the mean will do
+
+    # calculate the mean and standard deviation in the log-space
+    μ = log(m/sqrt(1+sd^2/m^2))
+    σ = sqrt(log(1+sd^2/m^2))
+
+    # Use these to parameterize the prior
+    return logpdf(LogNormal(μ, σ), λ)
+end
+```
+
+Note, we check if a parameter value is possible before calling the
+likelihood function:
+```{julia}
+function logposterior_survival(λ, data)
+    lp = logprior_survival(λ)
+    if !isinf(lp)
+        lp += loglikelihood_survival(30, data.time, data.deaths, λ)
+    end
+    lp
+end
+```
+
+### Code your own Markov Chain Metropolis sampler
+
+
+```{julia, results="hide"}
+# set your sampsize
+sampsize = 5000
+
+# create empty vectors to hold the chain and the log posteriors values
+chain = Vector{Float64}(undef, sampsize);
+log_posts = Vector{Float64}(undef, sampsize);
+
+# Set start value for your parameter
+par_start = 0.5
+
+# compute logposterior value of of your start parameter
+chain[1] = par_start
+log_posts[1] = logposterior_survival(par_start, survival_data)
+
+# Run the MCMC:
+for i in 2:sampsize
+    # Propose new parameter value based on previous one (choose a propsal distribution):
+    par_prop = chain[i-1] + rand(Normal(0, 0.01))
+
+    # Calculate logposterior of the proposed parameter value:
+    logpost_prop = logposterior_survival(par_prop, survival_data)
+
+    # Calculate acceptance probability by using the Metropolis criterion min(1, ... ):
+    acc_prob = min(1, exp(logpost_prop - log_posts[i-1]))
+
+    # Store in chain[i] the new parameter value if accepted, or re-store old one if rejected:
+    if rand() < acc_prob # rand() is the same as rand(Uniform(0,1))
+        chain[i] = par_prop
+        log_posts[i] = logpost_prop
+    else # if not accepted, stay at the current parameter value
+        chain[i] = chain[i-1]
+        log_posts[i] = log_posts[i-1]
+    end
+end
+```
+
+The so called trace-plot can give us an idea how well the chain has converged:
+```{julia}
+plot(chain, label=false, xlab="iteration", ylab="λ")
+```
+
+Find the parameter value corresponding to the maximum posterior density
+```{julia}
+chain[argmax(log_posts)]
+log_posts[argmax(log_posts)]
+```
+
+A histogram of the posterior. Note, we removed the first 1000
+iterations as burn-in:
+```{julia}
+histogram(chain[1000:end], xlab="λ", label=false)
+```

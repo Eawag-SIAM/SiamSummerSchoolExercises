@@ -76,7 +76,7 @@ bar(survival_data.deaths,
     labels = false,
     xlabel = "Times interval",
     ylabel = "No. of deaths",
-    title = "Survival Model")
+    title = "Survival data
 ```
 
 ### Defining the likelihood, prior, and posterior
@@ -125,7 +125,7 @@ function loglikelihood_survival(N::Int64, t, y::Vector, lambda)
     S = [1; S; 0]
     p = -diff(S)
     ## Add number of survivors at the end of the experiment:
-    push!(y, N-sum(y))
+    y = [y; N-sum(y)]
 
     logpdf(Multinomial(N, p), y)
 end
@@ -170,7 +170,7 @@ You can use a `lognormal` prior distribution by understanding and filling-in the
 ```{julia, eval = FALSE}
 function logprior_survival(λ)
     # a mean and standard deviation that approximate the prior information given above are:
-    mean = ?     # since the distribution is skewed, choose it higher than 0.3 (the mode)
+    m = ?       # the distribution is skewed, choose a mean higher than 0.3 (the mode)
     sd = ?      # a value similar to the mean will do
 
     # calculate the mean and standard deviation in the log-space
@@ -191,6 +191,9 @@ the log posterior distribution.
 This function should take the data from the file `model_survival.scv` and a
 parameter value as inputs.
 
+Check what happens if you pass an "illegal", i.e. negative parameter
+value. The function must not crash in this case.
+
 #### R
 ```{r, eval=FALSE}
 log.posterior <- function(par, data) {
@@ -200,8 +203,8 @@ log.posterior <- function(par, data) {
 
 #### Julia
 ```{julia, eval = FALSE}
-function log_posterior(λ, data)
-    return ???
+function logposterior_survival(λ, data)
+    return ...
 end
 ```
 
@@ -257,16 +260,14 @@ for (i in 2:sampsize){
 sampsize = 5000
 
 # create empty vectors to hold the chain and the log posteriors values
-chain = Vector{Float64}(undef, sampsize)
-log_posts = Vector{Float64}(undef, sampsize)
-
+chain = Vector{Float64}(undef, sampsize);
+log_posts = Vector{Float64}(undef, sampsize);
 
 # Set start value for your parameter
 par_start = ???
 
-
 # compute logosterior value of of your start parameter
-survival[1] = ???
+chain[1] = ???
 log_posts[1] = ???
 
 # Run the MCMC:
@@ -281,7 +282,8 @@ for i in 2:sampsize
   # Calculate acceptance probability by using the Metropolis criterion min(1, ... ):
   acc_prob = ???
 
-  # Store in survival_chain[i,] the new parameter value if accepted, or re-store old one if rejected:
+  # Store in chain[i] the new parameter value if accepted,
+  # or re-store old one if rejected:
   if rand() < acc_prob # rand() is the same as rand(Uniform(0,1))
     ???
   else # if not accepted, stay at the current parameter value
