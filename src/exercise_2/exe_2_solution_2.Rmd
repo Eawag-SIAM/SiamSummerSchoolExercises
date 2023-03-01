@@ -40,7 +40,7 @@ loglikelihood.monod <- function(y, C, par){
 logposterior.monod <- function(par) {
     lp <- logprior.monod(par, prior.monod.mean, prior.monod.sd)
     if(is.finite(lp)){
-        return( lp + loglikelihood.monod(data.monod$y, L.monod$y, par) )
+        return( lp + loglikelihood.monod(data.monod$r, data.monod$C, par) )
     } else {
         return(-Inf)
     }
@@ -49,10 +49,102 @@ logposterior.monod <- function(par) {
 
 ### Create initial chain
 
+```{r}
+library(adaptMCMC)
+
+## As start values for the Markov chain we can use the mean of the prior
+par.init <- c(r_max=2.5, K=1.5, sigma=0.25)
+
+## sample
+monod.chain <- adaptMCMC::MCMC(p = logposterior.monod,
+                               n = 5000,
+                               init = par.init,
+                               scale = c(1,1,1),
+                               adapt = FALSE, # for this exercise we do not
+                                              # want to use automatic adaptation
+                               showProgressBar = FALSE
+                               )
+monod.chain.coda <- adaptMCMC::convert.to.coda(monod.chain) # this is useful for plotting
+summary(monod.chain.coda)
+```
+
+The acceptance rate is very low:
+```{r}
+monod.chain$acceptance.rate
+```
+
+Them poor mixing is also visible from the chain plots:
+```{r}
+plot(monod.chain.coda)
+```
+
+Here we see a strong correlation between $K$ and $r_{max}$:
+```{r}
+pairs(monod.chain$samples)
+```
+
 ### Improve jump distribution
+
+We use the first chain and estimates it's covariance matrix which we
+can use as jump distribution in a second run:
+```{r}
+Sigma.jump <- cov(monod.chain$samples) * (1/2)^2
+
+monod.chain2 <- adaptMCMC::MCMC(p = logposterior.monod,
+                                n = 5000,
+                                init = par.init,
+                                scale = Sigma.jump,
+                                adapt = FALSE,
+                                showProgressBar = FALSE
+                                )
+monod.chain.coda2 <- adaptMCMC::convert.to.coda(monod.chain2)
+summary(monod.chain.coda2)
+```
+
+Everything looks much better now!
+```{r}
+monod.chain2$acceptance.rate
+```
+
+```{r}
+plot(monod.chain.coda2)
+```
+
+```{r}
+pairs(monod.chain2$samples)
+```
 
 ### Residual Diagnostics
 
+
+First we compute the residuals with the 'best' parameters
+```{r, results=FALSE}
+# get maximum of posterior parameters
+par.max <- monod.chain2$samples[which.max(monod.chain2$log.p),]
+
+residuals <- data.monod$r - model.monod(par.max, C=data.monod$C)
+```
+
+Plotting the residuals. We hope not to find any structure, but this
+model is clearly not perfect:
+```{r}
+plot(data.monod$r, residuals, xlab="r")
+abline(h=0, col=2)
+```
+
+Quantile-quantile plots are great to see if the residuals are
+normal distributed (which was out assumption for the likelihood
+functions). Here we see that we have too heavy tails.
+```{r}
+qqnorm(residuals)
+qqline(residuals)
+```
+
+We also assumed independence of the observations, i.e. we should not
+see any auto-correlation. This looks good here:
+```{r}
+acf(residuals)
+```
 
 
 
@@ -214,7 +306,7 @@ Quantile-quantile plots are great to see if the residuals are
 normal distributed (which was out assumption for the likelihood
 functions). Here we see that we have too heavy tails.
 ```{julia}
-qqnorm(residuals)               # a bit heavy-tailed
+qqnorm(residuals, qqline = :R)               # a bit heavy-tailed
 ```
 
 We also assumed independence of the observations, i.e. we should not
