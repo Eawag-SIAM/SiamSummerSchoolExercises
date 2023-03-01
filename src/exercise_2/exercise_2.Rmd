@@ -7,6 +7,7 @@ output:
     number_sections: no
     toc: TRUE
     toc_depth: 2
+    toc_float: true
 params:
   showsolutions: TRUE
 ---
@@ -313,7 +314,6 @@ You can either generalize our own metropolis sampler to higher
 dimension or use a sampler from a package.
 
 
-
 ## Read data
 
 We use the data `model_monod_stoch.csv`:
@@ -372,35 +372,37 @@ logposterior.monod <- function(par) {
 
 ### Julia
 ```{julia, eval = FALSE}
+include("../../models/models.jl") # load monod model
 using ComponentArrays
+using Distributions
 
-#set parameters
-par = ComponentVector(r_max = 5, K=3, sigma=0.5]
+# set parameters
+par = ComponentVector(r_max = 5, K=3, sigma=0.5)
 
 prior_monod_mean = 0.5 .* par
 prior_monod_sd = 0.25 .* par
 
 # Use a lognormal distribution for all model parameters
-function logprior_monod(par, mean, sd)
-    sdlog = ???
-    meanlog = ???
-    return sum(???) #sum because we are in the log-space
+function logprior_monod(par, m, sd)
+    m = ...
+    σ = ...
+    return sum(...) # sum because we are in the log-space
 end
 
 
 # Log-likelihood for model "monod"
 function loglikelihood_monod(par::ComponentVector, data::DataFrame)
-    y_det = ???
-    return sum(???)
+    y_det = ...
+    return sum(...)
 end
 
 # Log-posterior for model "monod"
 function logposterior_monod(par::ComponentVector)
-    logpri = logprior_monod(???)
+    logpri = logprior_monod(...)
     if logpri == -Inf
-        return ???
+        return ...
     else
-        return ???    # sum log-prior and log-likelihood
+        return ...    # sum log-prior and log-likelihood
     end
 end
 ```
@@ -429,10 +431,10 @@ par.start <- c(r_max=2.5, K=1.5, sigma=0.25)
 
 
 ## sample
-monod.chain <- adaptMCMC::MCMC(p  = ???,
-                               n = ???,
-                               init = ???,
-                               adapt = FALSE # for this exercise we do not wat to use automatic adaptation
+monod.chain <- adaptMCMC::MCMC(p  = ...,
+                               n = ...,
+                               init = ...,
+                               adapt = FALSE # for this exercise we do not want to use automatic adaptation
                                )
 monod.chain.coda <- adaptMCMC::convert.to.coda(monod.chain) # this is useful for plotting
 
@@ -452,11 +454,89 @@ pairs(modod.chain$samples)
 ```
 
 ### Julia
-Example of manual implementation.
-```{julia, eval = FALSE}
 
-TODO
+You can use this implementation for the exercises
 
+```{julia, results = 'hide'}
+"""
+# Basic Metropolis Markov Chain sampler
+
+### Arguments
+
+- `lp`: A function that the log density (up to a constant). Takes only a single argument.
+
+- `θinit`: Inital value. Check if `lp(θinit)` gives a valid result.
+
+- `nsamples`: length of the Markov chain
+
+- `Σjump`: covariance matrix of the multivariate normal jump distribution
+
+### Value
+
+A names tuple with fields:
+
+- `chain`: the markov chain
+
+- `lp`: the corresponding log densities
+
+"""
+function metropolis_MCMC(lp::Function, θinit; nsamples = 1000,
+                        Σjump = diagm(ones(length(θinit))))
+
+    dims = length(θinit)        # get number of parameters
+
+    chain = Vector{typeof(par)}(undef, nsamples)
+    log_posts = Vector{Float64}(undef, nsamples)
+
+    # compute logposterior value of inits parameters
+    chain[1] = θinit
+    log_posts[1] = lp(θinit)
+
+    # Run the MCMC
+    for i in 2:nsamples
+        # Propose new parameter value
+        θprop = chain[i-1] .+ rand(MvNormal(zeros(dims), Σjump))
+
+        # Calculate logposterior of the proposed parameter value
+        logpost_prop = lp(θprop)
+
+        # Calculate acceptance probability
+        acc_prob = min(1, exp(logpost_prop - log_posts[i-1]))
+
+        # Store in chain[i] the new parameter value if accepted, or re-store old one if rejected:
+        if rand() < acc_prob #
+            chain[i] = θprop
+            log_posts[i] = logpost_prop
+        else # if not accepted, stay at the current parameter value
+            chain[i] = chain[i-1]
+            log_posts[i] = log_posts[i-1]
+        end
+    end
+
+    (chain = chain, lp = log_posts)
+end
+```
+
+For example
+```{julia, eval=FALSE}
+using LinearAlgebra
+using Distributions
+
+Σ = diagm(ones(3))
+res = metropolis_MCMC(logposterior_monod, par; nsampler=1000, Σjump = Σ);
+
+res.lp
+res.chain
+
+## for convenience we convert our samplers in a `MCMCChains.Chains`
+using MCMCChains
+using StatsPlots
+chn = Chains(res.chain, labels(par))
+
+plot(chn)
+corner(chn)
+
+Array(chn)                      # convert it to an normal Array
 ```
 
 ## Improve jump distribution  {.tabset}
@@ -464,11 +544,11 @@ TODO
 The plot of the previous chain give us some indication how a more
 efficient jump distribution could look like.
 
-- Try to manualy change the varianc eof the jump distribution. Can we
+- Try to manualy change the variance of the jump distribution. Can we
   get better chains?
 
-- Use the previous chain and estiamte it's covariance. Does a
-  correlated jump work better?
+- Use the previous chain and estimate it's covariance. Does a
+  correlated jump distribution work better?
 
 ### R
 The function `adaptMCMC::MCMC` takes argument `scale` to modify the
@@ -479,7 +559,10 @@ scale: vector with the variances _or_ covariance matrix of the jump
 ```
 
 ### Julia
-TODO
+
+If you use the function `metropolis_MCMC` as defined above, you can
+pass the covariance matrix of the jump
+distribution with the argument `Σjump`.
 
 
 ## Residual Diagnostics {.tabset}
@@ -504,7 +587,8 @@ The function `qqnorm` and `acf` can be helpful.
 ### Julia
 The function `StatsBase.autocor` and `StatPlots.qqnorm(x)` can be helpful.
 
-
+```{r, child = if(params$showsolutions){"exe_2_solution_2.Rmd"}}
+```
 
 # 3. Sample from the posterior for the growth model
 
