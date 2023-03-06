@@ -40,7 +40,7 @@ output:
 
 - [Exercises 3](exercise_3.html): Adaptive Bayesian computations, MCMC
 
-## Advances Topics
+#### Advances Topics
 
 - [Exercises 4](exercise_4.html): Inference for Hierarchical models
   with STAN and JAGS
