@@ -47,10 +47,10 @@ output:
 - [Solutions 2](exercise_2_solution.html)
 
 
-# I found a typo!
+# I've found a typo!
 
 If you find any typos, errors, confusing instructions, bad solutions,
-or general suggestions how to
+or you have general suggestions how to
 improve the exercises, please open an
 [issue here](https://github.com/scheidan/SiamSummerSchoolExercises/issues)
 (PRs are welcome too). Thanks a lot!

@@ -1,0 +1,34 @@
+<!-- JS Code -->
+
+```{js, echo=FALSE}
+// Swap all tabs with the same name together
+
+// make sure html is fully loaded
+document.addEventListener("DOMContentLoaded", function(){
+	// Add a click event listener to the document
+	document.addEventListener('click', function (event) {
+		// Check if the clicked element is a tab
+		if (event.target.getAttribute('data-toggle') === 'tab') {
+			// Get the ID of the clicked tab (withouth the number)
+			var clickedTabId = event.target.getAttribute('href').replace(/-[0-9]*/g, '');
+
+			// Get all tabs whos ID is the same (ignoring the number)
+			var tabs = document.querySelectorAll('[href^="' + clickedTabId + '"][data-toggle="tab"]')
+
+			// activate all tabs
+			// see: https://getbootstrap.com/docs/3.4/javascript/#tabs
+			for (var i = 0; i < tabs.length; i++) {
+				$(tabs[i]).tab('show');
+			}
+		}
+	})
+});
+```
+
+<!-- activate julia environment -->
+```{julia, echo = FALSE, results = FALSE}
+import Pkg
+Pkg.activate(".")
+Pkg.instantiate()
+Pkg.status()
+```
