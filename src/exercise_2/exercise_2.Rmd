@@ -407,16 +407,17 @@ end
 
 ## Create initial chain {.tabset}
 
-To create the initial chain, let us first define some of the necessary
-prerequisites. For the jump distribution, assume a diagonal covariance
-matrix with reasonable values. Recall that diagonal covariance matrices
+First run an initial chain, which most like has not yet a good mixing.
+
+For the jump distribution, assume a diagonal covariance
+matrix with reasonable values. The diagonal covariance matrices
 (with zero-valued off-diagonal entries) correspond to independent
-proposals.
+proposal distribution.
 
 ### R
 The code below used the function `adaptMCMC::MCMC`. If the adaptation
 is set to `FALSE` this corresponds to the basic metropolis sampler. Of
-course, feel free to use you own implementation instead!
+course, feel free to use your own implementation instead!
 
 ```{r eval=FALSE}
 
@@ -452,88 +453,35 @@ pairs(modod.chain$samples)
 
 ### Julia
 
-You can use this implementation for the exercises
+The package [`KissMCMC`](https://github.com/mauro3/KissMCMC.jl)
+provides a very basic metropolis sampler.  Of course, feel free to use
+your own implementation instead!
 
-```{julia, results = 'hide'}
-"""
-# Basic Metropolis Markov Chain sampler
-
-### Arguments
-
-- `lp`: A function that the log density (up to a constant). Takes only a single argument.
-
-- `θinit`: Inital value. Check if `lp(θinit)` gives a valid result.
-
-- `nsamples`: length of the Markov chain
-
-- `Σjump`: covariance matrix of the multivariate normal jump distribution
-
-### Value
-
-A names tuple with fields:
-
-- `chain`: the markov chain
-
-- `lp`: the corresponding log densities
-
-"""
-function metropolis_MCMC(lp::Function, θinit; nsamples = 1000,
-                        Σjump = diagm(ones(length(θinit))))
-
-    dims = length(θinit)        # get number of parameters
-
-    chain = Vector{typeof(par)}(undef, nsamples)
-    log_posts = Vector{Float64}(undef, nsamples)
-
-    # compute logposterior value of inits parameters
-    chain[1] = θinit
-    log_posts[1] = lp(θinit)
-
-    # Run the MCMC
-    for i in 2:nsamples
-        # Propose new parameter value
-        θprop = chain[i-1] .+ rand(MvNormal(zeros(dims), Σjump))
-
-        # Calculate logposterior of the proposed parameter value
-        logpost_prop = lp(θprop)
-
-        # Calculate acceptance probability
-        acc_prob = min(1, exp(logpost_prop - log_posts[i-1]))
-
-        # Store in chain[i] the new parameter value if accepted, or re-store old one if rejected:
-        if rand() < acc_prob #
-            chain[i] = θprop
-            log_posts[i] = logpost_prop
-        else # if not accepted, stay at the current parameter value
-            chain[i] = chain[i-1]
-            log_posts[i] = log_posts[i-1]
-        end
-    end
-
-    (chain = chain, lp = log_posts)
-end
-```
-
-For example
 ```{julia, eval=FALSE}
-using LinearAlgebra
+using KissMCMC: metropolis
 using Distributions
+using LinearAlgebra: diagm
 
-Σ = diagm(ones(3))
-res = metropolis_MCMC(logposterior_monod, par; nsampler=1000, Σjump = Σ);
+# define a function that generates a proposal given θ:
+Σjump = diagm(ones(3))
+sample_proposal(θ) = θ .+ rand(MvNormal(zeros(length(θ)), Σjump))
 
-res.lp
-res.chain
+# run sampler
+samples, acceptance_ratio, lp = metropolis(logposterior_monod,
+                                           sample_proposal,
+                                           par;
+                                           niter = 10_000,
+                                           nburnin = 0);
 
 ## for convenience we convert our samplers in a `MCMCChains.Chains`
 using MCMCChains
 using StatsPlots
-chn = Chains(res.chain, labels(par))
+chn = Chains(samples, labels(par))
 
 plot(chn)
 corner(chn)
 
-Array(chn)                      # convert it to an normal Array
+Array(chn)                      # convert it to normal Array
 ```
 
 ## Improve jump distribution  {.tabset}
@@ -557,9 +505,8 @@ scale: vector with the variances _or_ covariance matrix of the jump
 
 ### Julia
 
-If you use the function `metropolis_MCMC` as defined above, you can
-pass the covariance matrix of the jump
-distribution with the argument `Σjump`.
+Adapt the covariance matrix `Σjump` of the jump
+distribution that is used in the function `sample_proposal`.
 
 
 ## Residual Diagnostics {.tabset}

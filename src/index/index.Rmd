@@ -2,7 +2,7 @@
 title: Exercises and Resources
 number_sections: TRUE
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-author: "Eawag Summer School in Environmental Systems Analysis"
+author: "Eawag Summer School in Environmental Systems Analysis 2023"
 output:
   html_document:
     number_sections: FALSE
@@ -15,11 +15,11 @@ output:
 - How to approach the exercises?
 - Should I use R or Julia (or Python)?
 
-## R resources
+### R resources
 
 - how to install the packages
 
-## Julia resources
+### Julia resources
 
 - how to install the packages
 
@@ -60,7 +60,7 @@ output:
 - [Solutions 3](exercise_3_solution.html)
 
 
-# I've found a bug or typo!
+# I've found a bug or typo! 🐜
 
 If you find any typos, errors, confusing instructions, bad solutions,
 or you have general suggestions how to

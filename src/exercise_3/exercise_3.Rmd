@@ -118,14 +118,29 @@ end
 
 ## 1. Adaptive Metropolis with delayed rejection {.tabset}
 
-The adaptive Metropolis with delayed rejection, as described by
-Haario.
+We try the adaptive Metropolis with delayed rejection as described by
+([Haario, Saksman and Tamminen
+(2001)](https://projecteuclid.org/euclid.bj/1080222083).
+
+
+- What could you use as initial values?
+
+- What is a meaningful covariance matrix for the jump distribution?
+
+- Plot the chains and see how quick the convergence is.
+
+- Look at 2d marginal plots. What happens in these marginal plots if you don't cut off a burn-in or only use the beginning of the chain?
+
 
 ### R
 
-It is implemented in the function `modMCMC` of the package
-`FME`. Note, this function expects the _negative_ log density",
-which is sometimes called _energie_. See the `modMCMC` function documentation for details.
+It is implemented in the function
+[`modMCMC`](https://www.rdocumentation.org/packages/FME/versions/1.3.6.2/topics/modMCMC)
+of the package
+[`FME`](https://cran.r-project.org/web/packages/FME/index.html). Note,
+this function expects the _negative_ log density", which is sometimes
+called _energie_. See the `modMCMC` function [documentation](https://www.rdocumentation.org/packages/FME/versions/1.3.6.2/topics/modMCMC) for
+details.
 
 
 ```r
@@ -144,41 +159,65 @@ AMDR <- modMCMC(
 )
 ```
 
-- What could you use as initial values `par.init`?
-
-- What is a meaningful covariance matrix for the jump distribution?
-
-- Plot the chains and see how quick the convergence is.
-
-- Look at 2d marginal plots (you may use the function `ipairs` from
-  package `IDPmisc`). What happens in these marginal plots if you don't cut off a burn-in or only use the beginning of the chain?
-
-
 ### Julia
 
-TODO
+The package
+[`AdaptMCMC`](https://mvihola.github.io/docs/AdaptiveMCMC.jl/)
+provides multiple MCMC algorithms including the adaptive Metropolis.
 
+```Julia
+using ComponentArrays
+using AdaptiveMCMC
+using MCMCChains
+using Plots
+using StatsPlots
+
+θinit = ComponentVector(r_max=..., K=..., sigma=...)
+
+res = adaptive_rwm(θinit, logposterior_monod,
+                   10_000;
+                   algorithm = :am,
+                   b=1,   # length of burn-in. Set to 1 for no burn-in.
+                   );
+
+# convert to MCMCChains for summary and plotting
+chn = Chains(res.X', labels(θinit))
+
+plot(chn)
+corner(chn)
+```
+
+
+```{r, child = if(params$showsolutions){"exe_3_solution_1.Rmd"}}
+```
 
 ## 2. Robust adaptive Metropolis {.tabset}
 
-The robust adaptive Metropolis algorithm by proposed by Vihola is
+The robust adaptive Metropolis algorithm by proposed by [Vihola  (2012)](http://dx.doi.org/10.1007/s11222-011-9269-5) is
 often a good choice. It adapts the scale and rotation of the
 covariance matrix until it reached a predefined acceptance rate.
 
+
+- Did the algorithm reach the desired acceptance rate?
+
+- How is the covariance matrix after the adaptation different from the
+  initial covariance that you provided?
+
+
 ### R
 
-The package `adaptMCMC` which provides the function `MCMC`. If the
+The package [`adaptMCMC`](https://cran.r-project.org/web/packages/adaptMCMC/index.html) which provides the function `MCMC`. If the
 parameter `adapt` is set to `TRUE` it implements the adaptation
 propsoed by Vihola. Again examine the effect of the adaptation
 settings on the chains, in particular examining the first part of the
 chain to see how the adaptation works. Here the adaptation is
-determined by parameter ```acc.rate```. Try values between 0.1 and 1.
+determined by parameter `acc.rate`. Try values between 0.1 and 1.
 
 How is the influence on the burn-in? What happens, if you use a very
 bad initial value?
 
 ```r
-RAM   <- MCMC(
+RAM <- MCMC(
     p        = logposterior.monod,
     n        = 10000,
     init     = par.start,
@@ -190,28 +229,51 @@ RAM   <- MCMC(
 str(RAM)
 ```
 
-
-- Did the algorithm reach the desired acceptance rate?
-
-- How is the covariance matrix after the adaptation different from the
-  initial covariance that you provided?
-
-
 ### Julia
-TODO
+The package
+[`AdaptMCMC`](https://mvihola.github.io/docs/AdaptiveMCMC.jl/)
+provides multiple MCMC algorithms including the robust adaptive Metropolis.
 
+```Julia
+using ComponentArrays
+using AdaptiveMCMC
+using MCMCChains
+using Plots
+using StatsPlots
+
+θinit = ComponentVector(r_max=..., K=..., sigma=...)
+
+res = adaptive_rwm(θinit, logposterior_monod,
+                   10_000;
+                   algorithm = :ram,
+                   b=1,   # length of burn-in. Set to 1 for no burn-in.
+                   );
+
+# convert to MCMCChains for summary and plotting
+chn = Chains(res.X', labels(θinit))
+
+plot(chn)
+corner(chn)
+```
+
+
+```{r, child = if(params$showsolutions){"exe_3_solution_2.Rmd"}}
+```
 
 ## 3. Population based sampler {.tabset}
 
 Population based sampler do not have an explicit jump
-distribution. Instead, the run multiple chain (often called _particles_
-or _walkers_ in this context) in parallel and the proposals are generated based on
-the position of the other particles.
+distribution. Instead, the run multiple chain (often called
+_particles_ or _walkers_ in this context) in parallel and the
+proposals are generated based on the position of the other particles.
+
+A popular algorithm of this class is the Affine-Invariant MCMC
+population sampler proposed by [Goodman and Weare
+(2010)](https://msp.org/camcos/2010/5-1/camcos-v5-n1-p04-p.pdf).  The
+algorithm is often called _EMCEE_ based on the python package. with
+the same name.
 
 ### R
-
-The  Affine-Invariant MCMC population sampler proposed Goodman and
-Weare
 
 Population based samplers are is implemented in the package
 `mcmcensemble` as `MCMCEnsemble`. It has two methods: _stretch move_
@@ -222,7 +284,6 @@ Vrugt.
 
 
 ```r
-
 EMCEE <- MCMCEnsemble(
     f           = logposterior.monod,
     lower.inits = par.start.lower,
@@ -243,6 +304,46 @@ EMCEE <- MCMCEnsemble(
 
 ### Julia
 
+We use the package [`KissMCMC`](https://github.com/mauro3/KissMCMC.jl) which provides a function `emcee`:
+
+```julia
+using ComponentArrays
+using KissMCMC: emcee
+using Plots
+using StatsPlots
+
+# number of walkers (parallel chains)
+n_walkers = 10
+
+## We need a vector inital calues, one for each walkers.
+## Make sure tha they do not start all at the same point.
+θinits = [θinit .* rand(3) for _ in 1:n_walkers]
+
+# Run sampler
+samples, acceptance_rate, lp = emcee(logposterior_monod,
+                                     θinits;
+                                     niter = 10_000, # total number of density evaluations
+                                     nburnin = 0);
+
+# This looks a bit ugly. It just converts the result into
+# a MCMCChains.Chains object for plotting.
+X = permutedims(
+    cat((hcat(samples[i]...) for i in 1:n_walkers)..., dims=3),
+    [2, 1, 3]);
+chn = Chains(X, labels(θinit))
+
+# plotting
+plot(chn)
+corner(chn)
+```
+
+- How do you define the initial values? Very similar or very different?
+
+- What is the influence of the number of walkers?
+
+
+```{r, child = if(params$showsolutions){"exe_3_solution_3.Rmd"}}
+```
 
 ## 4. TODO Comparing different chains (optional)
 
@@ -254,6 +355,10 @@ to compare them against one another.
 - compare burn-in length
 
 - compare effective sampling size
+
+
+```{r, child = if(params$showsolutions){"exe_3_solution_4.Rmd"}}
+```
 
 ## 5. TODO Gradient based samplers (Julia only)
 
@@ -268,3 +373,7 @@ that compute the gradient by analyzing the code.
 
 - HMC, NUTS
 - BarkerMCMC
+
+
+```{r, child = if(params$showsolutions){"exe_3_solution_5.Rmd"}}
+```

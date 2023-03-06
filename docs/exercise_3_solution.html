@@ -1614,14 +1614,26 @@ end</code></pre>
 </div>
 <div id="adaptive-metropolis-with-delayed-rejection" class="section level2 tabset">
 <h2 class="tabset">1. Adaptive Metropolis with delayed rejection</h2>
-<p>The adaptive Metropolis with delayed rejection, as described by
-Haario.</p>
+<p>We try the adaptive Metropolis with delayed rejection as described by
+(<a href="https://projecteuclid.org/euclid.bj/1080222083">Haario,
+Saksman and Tamminen (2001)</a>.</p>
+<ul>
+<li><p>What could you use as initial values?</p></li>
+<li><p>What is a meaningful covariance matrix for the jump
+distribution?</p></li>
+<li><p>Plot the chains and see how quick the convergence is.</p></li>
+<li><p>Look at 2d marginal plots. What happens in these marginal plots
+if you don’t cut off a burn-in or only use the beginning of the
+chain?</p></li>
+</ul>
 <div id="r-1" class="section level3">
 <h3>R</h3>
-<p>It is implemented in the function <code>modMCMC</code> of the package
-<code>FME</code>. Note, this function expects the <em>negative</em> log
-density”, which is sometimes called <em>energie</em>. See the
-<code>modMCMC</code> function documentation for details.</p>
+<p>It is implemented in the function <a href="https://www.rdocumentation.org/packages/FME/versions/1.3.6.2/topics/modMCMC"><code>modMCMC</code></a>
+of the package <a href="https://cran.r-project.org/web/packages/FME/index.html"><code>FME</code></a>.
+Note, this function expects the <em>negative</em> log density”, which is
+sometimes called <em>energie</em>. See the <code>modMCMC</code> function
+<a href="https://www.rdocumentation.org/packages/FME/versions/1.3.6.2/topics/modMCMC">documentation</a>
+for details.</p>
 <pre class="r"><code>neg.log.post &lt;- function(par) -logposterior.monod(par)</code></pre>
 <p>Now call the <code>modMCMC</code> function and investigate the
 effects of the <code>updatecov</code> parameter (try values of 10, 100
@@ -1638,40 +1650,65 @@ part of the chain and see how the adaptation works.</p>
     updatecov = 10,
     ntrydr    = 3
 )</code></pre>
-<ul>
-<li><p>What could you use as initial values
-<code>par.init</code>?</p></li>
-<li><p>What is a meaningful covariance matrix for the jump
-distribution?</p></li>
-<li><p>Plot the chains and see how quick the convergence is.</p></li>
-<li><p>Look at 2d marginal plots (you may use the function
-<code>ipairs</code> from package <code>IDPmisc</code>). What happens in
-these marginal plots if you don’t cut off a burn-in or only use the
-beginning of the chain?</p></li>
-</ul>
 </div>
 <div id="julia-1" class="section level3">
 <h3>Julia</h3>
+<p>The package <a href="https://mvihola.github.io/docs/AdaptiveMCMC.jl/"><code>AdaptMCMC</code></a>
+provides multiple MCMC algorithms including the adaptive Metropolis.</p>
+<pre class="julia"><code>using ComponentArrays
+using AdaptiveMCMC
+using MCMCChains
+using Plots
+using StatsPlots
+
+θinit = ComponentVector(r_max=..., K=..., sigma=...)
+
+res = adaptive_rwm(θinit, logposterior_monod,
+                   10_000;
+                   algorithm = :am,
+                   b=1,   # length of burn-in. Set to 1 for no burn-in.
+                   );
+
+# convert to MCMCChains for summary and plotting
+chn = Chains(res.X&#39;, labels(θinit))
+
+plot(chn)
+corner(chn)</code></pre>
+</div>
+</div>
+<div id="solution" class="section level1 tabset">
+<h1 class="tabset">1. Solution</h1>
+<div id="r-2" class="section level2">
+<h2>R</h2>
 <p>TODO</p>
 </div>
+<div id="julia-2" class="section level2">
+<h2>Julia</h2>
+<p>TODO</p>
 </div>
 <div id="robust-adaptive-metropolis" class="section level2 tabset">
 <h2 class="tabset">2. Robust adaptive Metropolis</h2>
-<p>The robust adaptive Metropolis algorithm by proposed by Vihola is
+<p>The robust adaptive Metropolis algorithm by proposed by <a href="http://dx.doi.org/10.1007/s11222-011-9269-5">Vihola (2012)</a> is
 often a good choice. It adapts the scale and rotation of the covariance
 matrix until it reached a predefined acceptance rate.</p>
-<div id="r-2" class="section level3">
+<ul>
+<li><p>Did the algorithm reach the desired acceptance rate?</p></li>
+<li><p>How is the covariance matrix after the adaptation different from
+the initial covariance that you provided?</p></li>
+</ul>
+<div id="r-3" class="section level3">
 <h3>R</h3>
-<p>The package <code>adaptMCMC</code> which provides the function
-<code>MCMC</code>. If the parameter <code>adapt</code> is set to
-<code>TRUE</code> it implements the adaptation propsoed by Vihola. Again
-examine the effect of the adaptation settings on the chains, in
-particular examining the first part of the chain to see how the
-adaptation works. Here the adaptation is determined by parameter
-<code>acc.rate</code>. Try values between 0.1 and 1.</p>
+<p>The package <a href="https://cran.r-project.org/web/packages/adaptMCMC/index.html"><code>adaptMCMC</code></a>
+which provides the function <code>MCMC</code>. If the parameter
+<code>adapt</code> is set to <code>TRUE</code> it implements the
+adaptation propsoed by Vihola. Again examine the effect of the
+adaptation settings on the chains, in particular examining the first
+part of the chain to see how the adaptation works. Here the adaptation
+is determined by parameter <code>acc.rate</code>. Try values between 0.1
+and 1.</p>
 <p>How is the influence on the burn-in? What happens, if you use a very
 bad initial value?</p>
-<pre class="r"><code>RAM   &lt;- MCMC(
+<pre class="r"><code>RAM &lt;- MCMC(
     p        = logposterior.monod,
     n        = 10000,
     init     = par.start,
@@ -1681,16 +1718,43 @@ bad initial value?</p>
 )
 
 str(RAM)</code></pre>
-<ul>
-<li><p>Did the algorithm reach the desired acceptance rate?</p></li>
-<li><p>How is the covariance matrix after the adaptation different from
-the initial covariance that you provided?</p></li>
-</ul>
 </div>
-<div id="julia-2" class="section level3">
+<div id="julia-3" class="section level3">
 <h3>Julia</h3>
+<p>The package <a href="https://mvihola.github.io/docs/AdaptiveMCMC.jl/"><code>AdaptMCMC</code></a>
+provides multiple MCMC algorithms including the robust adaptive
+Metropolis.</p>
+<pre class="julia"><code>using ComponentArrays
+using AdaptiveMCMC
+using MCMCChains
+using Plots
+using StatsPlots
+
+θinit = ComponentVector(r_max=..., K=..., sigma=...)
+
+res = adaptive_rwm(θinit, logposterior_monod,
+                   10_000;
+                   algorithm = :ram,
+                   b=1,   # length of burn-in. Set to 1 for no burn-in.
+                   );
+
+# convert to MCMCChains for summary and plotting
+chn = Chains(res.X&#39;, labels(θinit))
+
+plot(chn)
+corner(chn)</code></pre>
+</div>
+</div>
+</div>
+<div id="solution-1" class="section level1 tabset">
+<h1 class="tabset">1. Solution</h1>
+<div id="r-4" class="section level2">
+<h2>R</h2>
 <p>TODO</p>
 </div>
+<div id="julia-4" class="section level2">
+<h2>Julia</h2>
+<p>TODO</p>
 </div>
 <div id="population-based-sampler" class="section level2 tabset">
 <h2 class="tabset">3. Population based sampler</h2>
@@ -1698,10 +1762,12 @@ the initial covariance that you provided?</p></li>
 Instead, the run multiple chain (often called <em>particles</em> or
 <em>walkers</em> in this context) in parallel and the proposals are
 generated based on the position of the other particles.</p>
-<div id="r-3" class="section level3">
+<p>A popular algorithm of this class is the Affine-Invariant MCMC
+population sampler proposed by <a href="https://msp.org/camcos/2010/5-1/camcos-v5-n1-p04-p.pdf">Goodman
+and Weare (2010)</a>. The algorithm is often called <em>EMCEE</em> based
+on the python package. with the same name.</p>
+<div id="r-5" class="section level3">
 <h3>R</h3>
-<p>The Affine-Invariant MCMC population sampler proposed Goodman and
-Weare</p>
 <p>Population based samplers are is implemented in the package
 <code>mcmcensemble</code> as <code>MCMCEnsemble</code>. It has two
 methods: <em>stretch move</em> (<code>method = &quot;stretch&quot;</code>) (the
@@ -1709,8 +1775,7 @@ Affine-Invariant MCMC population sampler proposed Goodman and Weare) and
 <em>differential evolution</em>
 (<code>method = &quot;differential.evolution&quot;</code>) proposed by ter Braak
 and Vrugt.</p>
-<pre class="r"><code>
-EMCEE &lt;- MCMCEnsemble(
+<pre class="r"><code>EMCEE &lt;- MCMCEnsemble(
     f           = logposterior.monod,
     lower.inits = par.start.lower,
     upper.inits = par.start.upper,
@@ -1726,9 +1791,55 @@ EMCEE &lt;- MCMCEnsemble(
 <li><p>Which method works better in this case?</p></li>
 </ul>
 </div>
-<div id="julia-3" class="section level3">
+<div id="julia-5" class="section level3">
 <h3>Julia</h3>
+<p>We use the package <a href="https://github.com/mauro3/KissMCMC.jl"><code>KissMCMC</code></a>
+which provides a function <code>emcee</code>:</p>
+<pre class="julia"><code>using ComponentArrays
+using KissMCMC: emcee
+using Plots
+using StatsPlots
+
+# number of walkers (parallel chains)
+n_walkers = 10
+
+## We need a vector inital calues, one for each walkers.
+## Make sure tha they do not start all at the same point.
+θinits = [θinit .* rand(3) for _ in 1:n_walkers]
+
+# Run sampler
+samples, acceptance_rate, lp = emcee(logposterior_monod,
+                                     θinits;
+                                     niter = 10_000, # total number of density evaluations
+                                     nburnin = 0);
+
+# This looks a bit ugly. It just converts the result into
+# a MCMCChains.Chains object for plotting.
+X = permutedims(
+    cat((hcat(samples[i]...) for i in 1:n_walkers)..., dims=3),
+    [2, 1, 3]);
+chn = Chains(X, labels(θinit))
+
+# plotting
+plot(chn)
+corner(chn)</code></pre>
+<ul>
+<li><p>How do you define the initial values? Very similar or very
+different?</p></li>
+<li><p>What is the influence of the number of walkers?</p></li>
+</ul>
 </div>
+</div>
+</div>
+<div id="solution-2" class="section level1 tabset">
+<h1 class="tabset">1. Solution</h1>
+<div id="r-6" class="section level2">
+<h2>R</h2>
+<p>TODO</p>
+</div>
+<div id="julia-6" class="section level2">
+<h2>Julia</h2>
+<p>TODO</p>
 </div>
 <div id="todo-comparing-different-chains-optional" class="section level2">
 <h2>4. TODO Comparing different chains (optional)</h2>
@@ -1739,6 +1850,17 @@ to compare them against one another.</p>
 <li><p>compare burn-in length</p></li>
 <li><p>compare effective sampling size</p></li>
 </ul>
+</div>
+</div>
+<div id="solution-3" class="section level1 tabset">
+<h1 class="tabset">1. Solution</h1>
+<div id="r-7" class="section level2">
+<h2>R</h2>
+<p>TODO</p>
+</div>
+<div id="julia-7" class="section level2">
+<h2>Julia</h2>
+<p>TODO</p>
 </div>
 <div id="todo-gradient-based-samplers-julia-only" class="section level2">
 <h2>5. TODO Gradient based samplers (Julia only)</h2>
@@ -1753,6 +1875,18 @@ that compute the gradient by analyzing the code.</p>
 <li>HMC, NUTS</li>
 <li>BarkerMCMC</li>
 </ul>
+</div>
+</div>
+<div id="solution-4" class="section level1 tabset">
+<h1 class="tabset">1. Solution</h1>
+<div id="r-8" class="section level2">
+<h2>R</h2>
+<p>TODO</p>
+</div>
+<div id="julia-8" class="section level2">
+<h2>Julia</h2>
+<p>TODO</p>
+</div>
 </div>
 
 

@@ -200,60 +200,31 @@ end
 
 ### Create initial chain
 
-```{julia, result="hide", echo=FALSE}
-using LinearAlgebra
-using Distributions
-
-function metropolis_MCMC(lp::Function, θinit; nsamples = 1000,
-                         Σjump = diagm(ones(length(θinit))))
-
-    dims = length(θinit)        # get number of parameters
-
-    chain = Vector{typeof(par)}(undef, nsamples)
-    log_posts = Vector{Float64}(undef, nsamples)
-
-    # compute logposterior value of inits parameters
-    chain[1] = θinit
-    log_posts[1] = lp(θinit)
-
-    # Run the MCMC
-    for i in 2:nsamples
-        # Propose new parameter value
-        θprop = chain[i-1] .+ rand(MvNormal(zeros(dims), Σjump))
-
-        # Calculate logposterior of the proposed parameter value
-        logpost_prop = lp(θprop)
-
-        # Calculate acceptance probability
-        acc_prob = min(1, exp(logpost_prop - log_posts[i-1]))
-
-        # Store in chain[i] the new parameter value if accepted, or re-store old one if rejected:
-        if rand() < acc_prob #
-            chain[i] = θprop
-            log_posts[i] = logpost_prop
-        else # if not accepted, stay at the current parameter value
-            chain[i] = chain[i-1]
-            log_posts[i] = log_posts[i-1]
-        end
-    end
-
-    (chain = chain, lp = log_posts)
-end
-```
-
-We use the little function `metropolis_MCMC` that we have defined above.
+We use the [`KissMCMC`](https://github.com/mauro3/KissMCMC.jl) package
+which provides a very basic metropolis sampler.
 
 ```{julia}
+using KissMCMC: metropolis
+using Distributions
+using LinearAlgebra: diagm
 using MCMCChains
-using StatsPlots
 
-Σ = diagm(ones(3))          # covariance of uncorrelated jump distribution
-res = metropolis_MCMC(logposterior_monod, par; Σjump = Σ, nsamples=5000);
+# define a function that generates a proposal given θ:
+Σjump = diagm(ones(3))
+sample_proposal(θ) = θ .+ rand(MvNormal(zeros(length(θ)), Σjump))
+
+# run sampler
+samples, acceptance_ratio, lp = metropolis(logposterior_monod,
+                                           sample_proposal,
+                                           par;
+                                           niter = 5_000,
+                                           nburnin = 0);
+
 
 # We convert the sampeles in a `MCMCChains.Chains` object to
 # get plotting and summary functions
 
-chn = Chains(res.chain, labels(par))
+chn = Chains(samples, labels(par))
 
 plot(chn)
 corner(chn)
@@ -270,13 +241,16 @@ then used as new jump distribution.
 
 ```{julia}
 # take covariance for previous chain
-Σ2 = cov(Array(chn)) * (1/2)^2
+Σjump = cov(Array(chn)) * (1/2)^2
+sample_proposal(θ) = θ .+ rand(MvNormal(zeros(length(θ)), Σjump))
 
-res2 = metropolis_MCMC(logposterior_monod, par;
-                       nsamples=5000,
-                               Σjump = Σ2);
+samples2, acceptance_ratio2, lp2 = metropolis(logposterior_monod,
+                                              sample_proposal,
+                                              par;
+                                              niter = 5_000,
+                                              nburnin = 0);
 
-chn2 = Chains(res2.chain, labels(par))
+chn2 = Chains(samples2, labels(par))
 
 plot(chn2)
 corner(chn2)
@@ -289,7 +263,7 @@ Much better!
 First we compute the residuals with the 'best' parameters
 ```{julia, results=FALSE}
 # get maximum of posterior parameters
-par_max = res2.chain[argmax(res2.lp)]
+par_max = samples2[argmax(lp2)]
 
 # compute residuals
 residuals = monod_data.r .- model_monod(monod_data.C, par_max)
