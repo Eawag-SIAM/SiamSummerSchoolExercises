@@ -60,10 +60,32 @@ output:
 - [Solutions 3](exercise_3_solution.html)
 
 
-# I've found a typo!
+# I've found a bug or typo!
 
 If you find any typos, errors, confusing instructions, bad solutions,
 or you have general suggestions how to
 improve the exercises, please open an
 [issue here](https://github.com/scheidan/SiamSummerSchoolExercises/issues)
 (PRs are welcome too). Thanks a lot!
+
+# Version info {.tabset}
+
+The solutions have been compiled with the follow versions:
+
+## R
+```{r, echo=FALSE}
+sI <- sessionInfo()
+print(sI, RNG = FALSE, locale = FALSE)
+```
+
+## Julia
+```{julia, echo=FALSE}
+using InteractiveUtils: versioninfo
+versioninfo()
+```
+
+```{julia , echo=FALSE}
+import Pkg
+Pkg.activate("../.")
+Pkg.status()
+```
