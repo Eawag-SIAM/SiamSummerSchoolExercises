@@ -600,3 +600,7 @@ provide less guidance.
    distribution
 5. Perform residual diagnostics. Are the assumption of the likelihood
    function ok?
+
+
+```{r, child = if(params$showsolutions){"exe_2_solution_3.Rmd"}}
+```

@@ -1,0 +1,172 @@
+---
+title: 'Exercise 5: TODO! Approximative Bayesian Computation (ABC)'
+author: "Eawag Summer School in Environmental Systems Analysis"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    number_sections: no
+    toc: TRUE
+    toc_depth: 2
+    toc_float: true
+params:
+  showsolutions: TRUE
+---
+
+<!-- setup Julia environmental and JS Code -->
+```{r, child = "../header.Rmd"}
+```
+
+```{r}
+# Do not evaluate any code. This needs to be removed!
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+
+Objectives
+
+* Understand when to use Approximate Bayes Computations and when not.
+* Understand the fundamental difference between ABC and (adaptive) Metropolis algorithms.
+* Learn how to use the `SABC` function in the `EasyABC` package.
+* Understand why and how to use summary statistics in ABC.
+
+In this exercise, we run the Simulated Annealing ABC (SABC), for a Bayesian inference of the parameter of the model "survival", with a flat prior. In practice, we wouldn't use an ABC algorithm for this problem (why?).
+
+# Define prior and a function to sampler from the likelihood
+
+We use the R package `EasyABC`, which contains multiple sampling schemes for Approximate Bayes Computations. In addition, we need two other packages for some auxiliary tasks.
+```{r message=FALSE, warning=FALSE}
+library(EasyABC)
+library(FME)
+library(MASS)
+```
+
+As a next step, let's read the data that we observed, and which we try to explain by the model survival.
+```{r}
+data.survival.frame <- read.table("model_survival.dat",header=T)  # read as data frame
+t <- data.survival.frame[,2]                                           # observation time points
+data.survival <- data.survival.frame[,3]                          # data values
+
+```
+
+The data we just read for the model "survival" is visible in Figure \@ref(fig:datsurv). The death counts are the number of individuals which die during a certain time interval.
+
+```{r datsurv, fig.cap = "Observed death counts used as data for the model survival."}
+# plot the death counts
+barplot(data.survival, names.arg=t, xlab="Time interval", ylab="No. of deaths")
+```
+
+For Approximate Bayes Computations, we always need a function that evaluates the prior density, a function that samples from the prior, and a function that generates model output (our model). **Note that we do not need a function which evaluates the likelihood**. We just need to be able to produce model output. The functions that we need are defined in the following:
+```{r}
+d.prior <- function(par) dunif(par, min=0.01, max=0.6) # density of prior
+r.prior <- function() runif(1, min=0.01, max=0.6) # sampler from prior
+
+survival.sampler <- function(par){ # produce model output
+  if(par<0) return(rep(0,length(t))) # return "no deaths" if par is negative:
+  S <- exp(-par*c(0,t)) # and add zero "at time-point infinity"
+  S <- c(S,0)
+  p <- -diff(S) # probabilities to die within observation windows
+  y <- rmultinom(1, 30, p)[-(length(t)+1) ] # sample from multinomial distribution
+                                            # (assume that there are 30 individuals
+                                            # at the beginning of the experiment).
+  return(y)
+}
+
+```
+
+
+# 1. ABC without summary statistics {#task1}
+
+Use the `SABC` function of the `EasyABC` package, without summary statistics, to get an approximate sample from the posterior.
+
+Remember that in ABC, we need a distance measure to compare the model output to the observations, in order to judge the plausibility of the parameters that generated this model output. Since we do not apply summary statistics in Task 1, we compare the model output and the observations directly in the original space:
+
+```{r}
+f.dist <- function(par) sum(abs(survival.sampler(par) - data.survival))
+```
+
+Now we can run the SABC without summary statistics, using the distance in the original space given by `f.dist`:
+```{r results='hide'}
+SABC.res <- SABC(
+  r.model       = f.dist,  # function that directly returns scalar
+                           # distance between model output and data
+  r.prior       = r.prior, # sampler from prior
+  d.prior       = d.prior, # density evaluator of prior
+  n.sample      = 2000,
+  eps.init      = 20,
+  iter.max      = 60000,
+  v             = 1.2,
+  beta          = 0.8
+)
+```
+
+# 2. ABC with summary statistics {#task2}
+
+Use the `SABC` function, with semi-automatically generated summary statistics, to get an approximate sample from the posterior. "Semi-automatically" means that the user needs to provide the function `f.summarystats` that transforms model outputs. The algorithm then employs a linear regression from the transformed outputs to the model parameters to define the summary statistics (Fearnhead and Prangle (2012)). For this exercise, use the identity `f.summarystats(y)=y`. This means that we do not transform the output before the function construcs a linear regression to summarize the output w.r.t. the parameters.
+```{r results='hide'}
+f.summarystats <- function(y) {y}
+
+SABC.SS.res <- SABC(
+  r.model       = survival.sampler, # function that returns model output
+  r.prior       = r.prior,           # sampler from prior
+  d.prior       = d.prior,           # density evaluator of prior
+  n.sample      = 2000,
+  eps.init      = 20,
+  iter.max      = 60000,
+  summarystats  = TRUE,
+  y             = data.survival,
+  f.summarystats= f.summarystats,
+  v             = 1.2,
+  beta          = 0.8
+)
+
+```
+
+# 3. Compare the previously generated posterior samples to a sample from the true posterior
+
+In this toy exercise, the true posterior is available in closed form and we can sample directly from it. This allows us to compare the two samples generated in the previous tasks to a sample of the true posterior. Note that we would have used the true posterior to generate the sample in the first place, the application of ABC is actually not necessary here and is performed just for teaching purposes. To generate a sample of the true posterior, we first define the posterior function:
+```{r}
+logposterior <- function( par ){ # logposterior for the model "survival" (see Ex.1):
+  if(par<0) return(-Inf)
+  S <- exp(-par*c(0,t)) # and add zero "at time-point infinity"
+  S <- c(S,0)
+  p <- -diff(S)   # probabilities to die within observation windows
+  LL <- dmultinom(y, prob=p, log=TRUE)  # likelihood is the density of a multinomial distribution
+  return(LL+d.prior(par))
+}
+```
+
+In the following, we use an adaptive Metropolis algorithm to generate a sample from the true posterior:
+```{r}
+par.start <- c("lambda"=0.5)
+jump.cov  <- 0.01
+ntrydr     <- 3       # number of trials for Delayed Rejection
+acc.rate   <- 0.23    # Desired acceptance rate for the Robust Adaptive Metropolis
+iterations <- 10000   # length of the chain
+
+y <- c(data.survival, 30-sum(data.survival))
+
+# Run the Adaptive Metropolis Algorithm with Delayed Rejection:
+obj.funct <- function(par) -2*logposterior(par)
+AMDR <- modMCMC(
+  f         = obj.funct,
+  p         = par.start,
+  jump      = jump.cov,
+  niter     = 10000,
+  updatecov = 10,
+  covscale  = 2.4^2,
+  ntrydr    = ntrydr
+)
+
+# Cut off burn-in and adaptation phase:
+AMDR.chain  <- AMDR$pars[-(1:1000),]
+```
+
+Let us now compare the posterior samples generated with the Approximate Bayes Computation with and without summary statistics, and the sample of the true posterior. In Figure \@ref(fig:wosummary), you can see that not using summary statistics can lead to slow convergence: many proposals will be rejected since in high dimensions it is very unlikely to match the data with sufficient accuracy. However, the sample seems to converge to the true distribution. Figure \@ref(fig:wsummary) on the other hand, shows that summary statistics speed up convergence, but this comes at the cost of a loss of information, which leads to biased results. The the more of the information w.r.t. the parameters is captured by the summary statistics, the smaller is the resulting bias.
+```{r wosummary, fig.cap = "True posterior (line) and sample generated via ABC **without** summary statistics (histogram)."}
+plot(density(AMDR.chain), main="", xlab=expression(lambda))
+hist(SABC.res$E[,1],add=TRUE,probability=TRUE,breaks=50)
+```
+```{r wsummary, fig.cap = "True posterior (line) and sample generated via ABC **with** summary statistics (histogram)."}
+plot(density(AMDR.chain), main="", xlab=expression(lambda))
+hist(SABC.SS.res$E[,1],add=TRUE,probability=TRUE,breaks=100)
+```

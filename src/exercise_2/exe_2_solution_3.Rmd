@@ -1,0 +1,32 @@
+# 2. Solution {.tabset}
+
+## R
+
+TODO
+
+### Read data
+
+### Define likelihood, prior, and posterior
+
+### Run MCMC sampler
+
+### Check convergence and mixing
+
+### Residual diagnostics
+
+
+
+
+## Julia
+
+TODO
+
+### Read data
+
+### Define likelihood, prior, and posterior
+
+### Run MCMC sampler
+
+### Check convergence and mixing
+
+### Residual diagnostics

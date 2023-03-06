@@ -38,6 +38,17 @@ output:
 
 - [Exercises 2](exercise_2.html): Bayesian computations, MCMC
 
+- [Exercises 3](exercise_3.html): Adaptive Bayesian computations, MCMC
+
+## Advances Topics
+
+- [Exercises 4](exercise_4.html): Inference for Hierarchical models
+  with STAN and JAGS
+
+- [Exercises 5](exercise_5.html): Approximative Bayesian Computation
+  (ABC)
+
+
 # Solutions
 
 - [Solutions 0](exercise_0_solution.html)
@@ -45,6 +56,8 @@ output:
 - [Solutions 1](exercise_1_solution.html)
 
 - [Solutions 2](exercise_2_solution.html)
+
+- [Solutions 3](exercise_3_solution.html)
 
 
 # I've found a typo!
