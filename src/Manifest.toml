@@ -2,7 +2,7 @@
 
 julia_version = "1.8.1"
 manifest_format = "2.0"
-project_hash = "2054298f4e01573fa69fd18cebc920096fd278da"
+project_hash = "5f7cdf0d8dae5c1c49d2af12f391a92ab2d8af0e"
 
 [[deps.AbstractFFTs]]
 deps = ["ChainRulesCore", "LinearAlgebra"]
@@ -32,6 +32,12 @@ deps = ["LinearAlgebra", "Pkg", "Random", "StaticArrays", "Statistics", "Test"]
 git-tree-sha1 = "0b0eccbb503fcc8edfb003ec3f9b6134dbea41df"
 uuid = "717c3277-546c-407d-8270-09a39a0919a0"
 version = "0.1.3"
+
+[[deps.AdvancedHMC]]
+deps = ["AbstractMCMC", "ArgCheck", "DocStringExtensions", "InplaceOps", "LinearAlgebra", "LogDensityProblems", "LogDensityProblemsAD", "ProgressMeter", "Random", "Requires", "Setfield", "Statistics", "StatsBase", "StatsFuns", "UnPack"]
+git-tree-sha1 = "c4a73dfdcce33e17c27b8063eae825fc15631cf8"
+uuid = "0bf59076-c3b1-5ca4-86bd-e02cd72cde3d"
+version = "0.4.3"
 
 [[deps.ArgCheck]]
 git-tree-sha1 = "a3a402a35a2f7e0b87828ccabbd5ebfbebe356b4"
@@ -104,6 +110,12 @@ deps = ["Compat", "ConstructionBase", "Future", "InitialValues", "LinearAlgebra"
 git-tree-sha1 = "7fe6d92c4f281cf4ca6f2fba0ce7b299742da7ca"
 uuid = "198e06fe-97b7-11e9-32a5-e1d131e6ad66"
 version = "0.3.37"
+
+[[deps.BarkerMCMC]]
+deps = ["LinearAlgebra", "ProgressMeter"]
+git-tree-sha1 = "802018db3b3681f70b410549c0e98529a2ad99ca"
+uuid = "be4af45d-7920-418d-be3f-405e75a2263c"
+version = "0.1.1"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -652,6 +664,12 @@ git-tree-sha1 = "9cc2baf75c6d09f9da536ddf58eb2f29dedaf461"
 uuid = "842dd82b-1e85-43dc-bf29-5d0ee9dffc48"
 version = "1.4.0"
 
+[[deps.InplaceOps]]
+deps = ["LinearAlgebra", "Test"]
+git-tree-sha1 = "50b41d59e7164ab6fda65e71049fee9d890731ff"
+uuid = "505f98c9-085e-5b2c-8e89-488be7bf1f34"
+version = "0.3.0"
+
 [[deps.IntelOpenMP_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "d979e54b71da82f3a65b62553da4fc3d18c9004c"
@@ -914,6 +932,12 @@ deps = ["ArgCheck", "DocStringExtensions", "Random", "UnPack"]
 git-tree-sha1 = "05fdf369bd52030212a7c730645478dc5bcd67b6"
 uuid = "6fdf6af0-433a-55f7-b3ed-c6c6e0b8df7c"
 version = "2.1.0"
+
+[[deps.LogDensityProblemsAD]]
+deps = ["DocStringExtensions", "LogDensityProblems", "Requires", "UnPack"]
+git-tree-sha1 = "58e5de8b66f98aaca81678da238015ef23bc4d67"
+uuid = "996a588d-648d-4e1f-a8f0-a84b347e47b1"
+version = "1.2.2"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "ChangesOfVariables", "DocStringExtensions", "InverseFunctions", "IrrationalConstants", "LinearAlgebra"]
@@ -1665,6 +1689,12 @@ deps = ["Adapt", "ArgCheck", "BangBang", "Baselet", "CompositionsBase", "DefineS
 git-tree-sha1 = "c42fa452a60f022e9e087823b47e5a5f8adc53d5"
 uuid = "28d57a85-8fef-5791-bfe6-a80928e7c999"
 version = "0.4.75"
+
+[[deps.TransformVariables]]
+deps = ["ArgCheck", "ChangesOfVariables", "DocStringExtensions", "ForwardDiff", "InverseFunctions", "LinearAlgebra", "LogExpFunctions", "Pkg", "Random", "StaticArrays", "UnPack"]
+git-tree-sha1 = "f94f057462439de7216f136657155866f5d9d668"
+uuid = "84d833dd-6860-57f9-a1a7-6da5db126cff"
+version = "0.8.2"
 
 [[deps.TreeViews]]
 deps = ["Test"]

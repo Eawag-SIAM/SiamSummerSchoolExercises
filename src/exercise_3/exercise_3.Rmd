@@ -25,12 +25,12 @@ simple `monod` model. You are encouraged to play with each of the
 adaptation parameters of each algorithm and to check how it influences
 the resulting sample chain.
 
-### Define the posterior distribution {.tabset}
+# Define posterior distribution {.tabset}
 
 You can use you own code from exercises 2 or the functions defined
-below. Of course you can also do the exercises with the growth model.
+below. And of course you can also do the exercises with the growth model.
 
-#### R
+## R
 
 ```{r, results=FALSE}
 ## load the monod model
@@ -71,7 +71,7 @@ logposterior.monod <- function(par) {
 }
 ```
 
-#### Julia
+## Julia
 
 
 ```{julia, results=FALSE}
@@ -116,7 +116,7 @@ end
 ```
 
 
-## 1. Adaptive Metropolis with delayed rejection {.tabset}
+# 1. Adaptive Metropolis with delayed rejection {.tabset}
 
 We try the adaptive Metropolis with delayed rejection as described by
 ([Haario, Saksman and Tamminen
@@ -132,7 +132,7 @@ We try the adaptive Metropolis with delayed rejection as described by
 - Look at 2d marginal plots. What happens in these marginal plots if you don't cut off a burn-in or only use the beginning of the chain?
 
 
-### R
+## R
 
 It is implemented in the function
 [`modMCMC`](https://www.rdocumentation.org/packages/FME/versions/1.3.6.2/topics/modMCMC)
@@ -159,7 +159,7 @@ AMDR <- modMCMC(
 )
 ```
 
-### Julia
+## Julia
 
 The package
 [`AdaptMCMC`](https://mvihola.github.io/docs/AdaptiveMCMC.jl/)
@@ -191,7 +191,7 @@ corner(chn)
 ```{r, child = if(params$showsolutions){"exe_3_solution_1.Rmd"}}
 ```
 
-## 2. Robust adaptive Metropolis {.tabset}
+# 2. Robust adaptive Metropolis {.tabset}
 
 The robust adaptive Metropolis algorithm by proposed by [Vihola  (2012)](http://dx.doi.org/10.1007/s11222-011-9269-5) is
 often a good choice. It adapts the scale and rotation of the
@@ -204,7 +204,7 @@ covariance matrix until it reached a predefined acceptance rate.
   initial covariance that you provided?
 
 
-### R
+## R
 
 The package [`adaptMCMC`](https://cran.r-project.org/web/packages/adaptMCMC/index.html) which provides the function `MCMC`. If the
 parameter `adapt` is set to `TRUE` it implements the adaptation
@@ -229,7 +229,7 @@ RAM <- MCMC(
 str(RAM)
 ```
 
-### Julia
+## Julia
 The package
 [`AdaptMCMC`](https://mvihola.github.io/docs/AdaptiveMCMC.jl/)
 provides multiple MCMC algorithms including the robust adaptive Metropolis.
@@ -260,7 +260,7 @@ corner(chn)
 ```{r, child = if(params$showsolutions){"exe_3_solution_2.Rmd"}}
 ```
 
-## 3. Population based sampler {.tabset}
+# 3. Population based sampler {.tabset}
 
 Population based sampler do not have an explicit jump
 distribution. Instead, the run multiple chain (often called
@@ -273,7 +273,7 @@ population sampler proposed by [Goodman and Weare
 algorithm is often called _EMCEE_ based on the python package. with
 the same name.
 
-### R
+## R
 
 Population based samplers are is implemented in the package
 `mcmcensemble` as `MCMCEnsemble`. It has two methods: _stretch move_
@@ -295,14 +295,15 @@ EMCEE <- MCMCEnsemble(
 )
 ```
 
-- How do you define `par.start.lower` and `par.start.upper`?
+- How do you choose `par.start.lower` and `par.start.upper`? Better
+  wide or narrow?
 
 - What is the influence of the number of walkers?
 
 - Which method works better in this case?
 
 
-### Julia
+## Julia
 
 We use the package [`KissMCMC`](https://github.com/mauro3/KissMCMC.jl) which provides a function `emcee`:
 
@@ -326,7 +327,7 @@ samples, acceptance_rate, lp = emcee(logposterior_monod,
                                      nburnin = 0);
 
 # This looks a bit ugly. It just converts the result into
-# a MCMCChains.Chains object for plotting.
+# a `MCMCChains.Chains` object for plotting.
 X = permutedims(
     cat((hcat(samples[i]...) for i in 1:n_walkers)..., dims=3),
     [2, 1, 3]);
@@ -345,7 +346,7 @@ corner(chn)
 ```{r, child = if(params$showsolutions){"exe_3_solution_3.Rmd"}}
 ```
 
-## 4. TODO Comparing different chains (optional)
+# 4. TODO Comparing different chains (optional)
 
 Once you have generated chains for each of the methods, you may wish
 to compare them against one another.
@@ -360,7 +361,7 @@ to compare them against one another.
 ```{r, child = if(params$showsolutions){"exe_3_solution_4.Rmd"}}
 ```
 
-## 5. TODO Gradient based samplers (Julia only)
+# 5. TODO Gradient based samplers (Julia only)
 
 If we are able to compute the gradient of the log density, $\nabla
 \log p$, we can use much more efficient sampling methods. For small
@@ -371,8 +372,205 @@ Julia is particularly well suited for this applications, because many
 libraries for Automatic Differentiation (AD) are available - methods
 that compute the gradient by analyzing the code.
 
-- HMC, NUTS
-- BarkerMCMC
+## Parameter transformation
+
+Most gradient based sampler assume that all parameters are in
+$\mathbb{R}$. If we have a parameter that exist in a limited space,
+such as a standard deviation that is never negative, we need to
+transform the model parameter before sampling. For this we need three
+ingredients:
+
+- a function that maps every vector in $\mathbb{R}^n$ to our "normal"
+	model parameter space,
+
+-  the inverse of this function,
+
+-  the determinate of the Jacobin of this functions.
+
+The package
+[TransformVariables](https://github.com/tpapp/TransformVariables.jl)
+helps us with this transformations. We need a function that takes a
+ vector in $\mathbb{R}^n$ to evaluates the posterior.
+
+```julia
+using TransformVariables
+
+# defines the 'legal' parameter space, all parameter cannot be negative
+# due to the lognormal prior
+trans = as((r_max = asℝ₊, K = asℝ₊, sigma = asℝ₊))
+
+# define a function that takes a parameter vector in ℝ^n
+function logposterior_monod_Rn(par_Rn)
+    # transforms from ℝ^n to parameter space,
+    # and compute log of the determinante of the jacobian
+    par, logjac = TransformVariables.transform_and_logjac(trans, par_Rn)
+
+    # do not forget to add the log determinante!
+    logposterior_monod(ComponentVector(par)) + logjac
+end
+```
+
+We can now sample in $\mathbb{R}^n$ and later transform the samples
+in the parameter space with:
+```julia
+TransformVariables.transform(trans, [-1,-1,-1]) # -> (r_max=0.367, K=0.367, sigma=0.367)
+```
+
+## Automatic Differentation
+
+The last ingredient we need is a function that computes the gradient
+of `logposterior_monod_Rn`. To do so we need to differentiate through
+our model, the likelihood, the prior, the parameter transformation,
+and the determinate of the Jaccobian. Needles to say, even for our
+very simple model this would be very tedious to do manually!
+
+Instead we use  [Automatic Differentiation
+(AD)](https://en.wikipedia.org/wiki/Automatic_differentiation). Julia
+has [multiple packages](https://juliadiff.org/) for AD that make
+different trade-offs. We use
+[`ForwardDiff`](https://github.com/JuliaDiff/ForwardDiff.jl) that is
+well suited for smaller dimensions.
+
+```Julia
+import ForwardDiff
+
+# derive a function that computes the gradient
+∇logposterior_monod_Rn(par_Rn) = ForwardDiff.gradient(logposterior_monod_Rn, par_Rn)
+
+# make sure that we can run both out function for all values in ℝ^n
+par_test = randn(3)
+logposterior_monod_Rn(par_test)
+∇logposterior_monod_Rn(par_test)
+```
+
+
+## Hamiltonian Monte Carlo
+
+Hamiltonian Monte Carlo (HMC) is one of the most powerful methods to sample
+in high dimensions. The "No-U-Turn sampler" (NUTS) is a popular versions, for
+example it is used in [_STAN_](https://mc-stan.org/).
+
+The package
+[`AdvancedHMC`](https://github.com/TuringLang/AdvancedHMC.jl) provides
+ building blocks that can be combined to various HMC samplers. The
+ function is a wrapper that provides a NUTS sampler as implemented in STAN.
+
+
+`````julia
+using AdvancedHMC
+
+"""
+# NUTS HMC sampler as used by STAN
+Based on the documentation of AdvancedHMC.jl
+
+```Julia
+stanHMC(lp::Function, ∇lp::Function,  θ_init;
+        n_samples::Int=1000, n_adapts::Int=n_samples÷2)
+```
+
+### Arguments
+- `lp`:  log density to sample from (up to a constant)
+- `∇lp`: define how to get the log gradient of `lp`.
+- `n_samples::Int=1000`: number of samples
+- `n_adapts::Int=n_samples÷2`: length of adaptation
+
+### Return Value
+A named tuple with fields:
+- `samples`: array containing the samples
+- `stats`: contains various statistics form the sampler. See AdvancedHMc documentation.
+"""
+function stanHMC(lp::Function, ∇lp::Function,  θ_init,;
+                 n_samples::Int=1000, n_adapts::Int=n_samples÷2)
+
+    # Define a Hamiltonian system
+    D = length(θ_init)   # number of parameters
+    metric = DiagEuclideanMetric(D)
+    hamiltonian = Hamiltonian(metric, lp, θr -> (lp(θr), ∇lp(θr)))
+
+    # Define a leapfrog solver, with initial step size chosen heuristically
+    initial_ϵ = find_good_stepsize(hamiltonian, θ_init)
+    integrator = Leapfrog(initial_ϵ)
+
+    # Define an HMC sampler, with the following components
+    #   - multinomial sampling scheme,
+    #   - generalised No-U-Turn criteria, and
+    #   - windowed adaption for step-size and diagonal mass matrix
+    proposal = NUTS{MultinomialTS, GeneralisedNoUTurn}(integrator)
+    adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integrator))
+
+    # -- run sampler
+    samples, stats = sample(hamiltonian, proposal, θ_init, n_samples,
+                            adaptor, n_adapts; progress=true)
+
+    return (samples=samples, stats=stats)
+
+end
+`````
+
+HMC sampler need many density and gradient evaluations to produce a
+single proposal. However, the acceptance rate of a HMC sampler should
+be close to one.  We can use the wrapper function `stanHMC` like this:
+```julia
+par_init = [-1.0, -1.0, -1.0]   # in ℝⁿ
+res = stanHMC(logposterior_monod_Rn,
+              ∇logposterior_monod_Rn,
+              par_init;
+              n_samples = 100);
+
+res.samples                     # this are the samples in ℝⁿ !
+```
+
+The samples we get are in $\mathbb{R}^n$. Before we have a look, let's
+transform them in the "normal" parameter space:
+```julia
+# Transform the samples to the "normal" space and convert to `Chains`
+_chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i]))
+        for i in 1:size(res.samples, 1)];
+chn = Chains(_chn,  [:r_max, :K, :sigma])
+
+plot(chn)
+corner(chn)
+```
+
+
+## BarkerMCMC
+
+[Livingstone and  Zanella (2021)]( https://doi.org/10.1111/rssb.12482)
+proposed a simple MCMC algorithm that uses the gradient to adapt the
+jump distribution. The package
+[`BarkerMCMC.jl`](https://github.com/scheidan/BarkerMCMC.jl) implements
+it including an adaptation that aims at a given acceptance rate.
+
+
+```julia
+using BarkerMCMC: barker_mcmc
+
+par_init = [-1.0, -1.0, -1.0]   # in ℝⁿ
+
+# see `?barker_mcmc` for all options
+res = barker_mcmc(logposterior_monod_Rn,
+                  ∇logposterior_monod_Rn,
+                  par_init;
+                  n_iter = 1000,
+                  target_acceptance_rate=0.4);
+
+res.samples                     # this are the samples in ℝⁿ !
+res.log_p
+```
+The samples we get are in $\mathbb{R}^n$. Before we have a look, let's
+transform them in the "normal" parameter space:
+```julia
+using MCMCChains
+using StatsPlots
+
+# Transform the samples to the "normal" space and convert to `Chains`
+_chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i,:]))
+        for i in 1:size(res.samples, 1)];
+chn = Chains(_chn,  [:r_max, :K, :sigma])
+
+plot(chn)
+corner(chn)
+```
 
 
 ```{r, child = if(params$showsolutions){"exe_3_solution_5.Rmd"}}
