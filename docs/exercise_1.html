@@ -1709,19 +1709,9 @@ parameter values <span class="math inline">\(\mu = 4\)</span>, <span class="math
 </div>
 <div id="julia-3" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
-<p>For the model <em>Growth</em>, use the package
-<code>DifferentialEquations</code> and implement the
-<code>model.growth</code> ODE system. This could look like that:</p>
-<pre class="julia"><code>#ODE system given by model growth
-function growth!(du, u, p, t)
-    du[1] = ???
-    du[2] = ???
-end
-#solving
-u0 = ???
-tspan = ???
-prob = ODEProblem(growth!, u0, tspan)
-sol = solve(prob)</code></pre>
+<p>Both deterministic models are already implemented as
+<code>model_monod</code> and <code>model_growth</code> in the file
+<code>models.jl</code> .</p>
 </div>
 </div>
 </div>

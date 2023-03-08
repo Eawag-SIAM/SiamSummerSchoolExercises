@@ -6,7 +6,7 @@
 ## -------------------------------------------------------
 
 
-using DifferentialEquations
+using OrdinaryDiffEq
 
 using ComponentArrays           # for parameter handling
 using UnPack                    #  ""
