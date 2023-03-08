@@ -1,15 +1,15 @@
-# 2. Solution {.tabset}
+## Solution {.tabset}
 
-## R
+### R
 
-### Read data
+#### Read data
 
 ```{r}
 data.monod <- read.table("../../data/model_monod_stoch.csv", header=T)
 plot(data.monod$C, data.monod$r, xlab="C", ylab="r", main='"model_monod_stoch.csv"')
 ```
 
-### Define likelihood, prior, and posterior
+#### Define likelihood, prior, and posterior
 ```{r}
 source("../../models/models.r") # load the monod model
 
@@ -47,7 +47,7 @@ logposterior.monod <- function(par) {
 }
 ```
 
-### Create initial chain
+#### Create initial chain
 
 ```{r}
 library(adaptMCMC)
@@ -83,7 +83,7 @@ Here we see a strong correlation between $K$ and $r_{max}$:
 pairs(monod.chain$samples)
 ```
 
-### Improve jump distribution
+#### Improve jump distribution
 
 We use the first chain and estimates it's covariance matrix which we
 can use as jump distribution in a second run:
@@ -114,7 +114,7 @@ plot(monod.chain.coda2)
 pairs(monod.chain2$samples)
 ```
 
-### Residual Diagnostics
+#### Residual Diagnostics
 
 
 First we compute the residuals with the 'best' parameters
@@ -148,9 +148,9 @@ acf(residuals)
 
 
 
-## Julia
+### Julia
 
-### Read data
+#### Read data
 
 ```{julia}
 using DataFrames
@@ -163,7 +163,7 @@ scatter(monod_data.C, monod_data.r,
         label=false, xlab="C", ylab="r")
 ```
 
-### Define likelihood, prior, and posterior
+#### Define likelihood, prior, and posterior
 
 ```{julia}
 include("../../models/models.jl"); # load the definition of `model_monod`
@@ -198,7 +198,7 @@ function logposterior_monod(par::ComponentVector)
 end
 ```
 
-### Create initial chain
+#### Create initial chain
 
 We use the [`KissMCMC`](https://github.com/mauro3/KissMCMC.jl) package
 which provides a very basic metropolis sampler.
@@ -208,6 +208,7 @@ using KissMCMC: metropolis
 using Distributions
 using LinearAlgebra: diagm
 using MCMCChains
+using StatsPlots
 
 # define a function that generates a proposal given θ:
 Σjump = diagm(ones(3))
@@ -230,7 +231,7 @@ plot(chn)
 corner(chn)
 ```
 
-### Improve jump distribution
+#### Improve jump distribution
 
 The corner plot showed that the parameters $k$ and $r_{max}$ are
 clearly correlated and the chain plots that the jump distribution is
@@ -258,7 +259,7 @@ corner(chn2)
 
 Much better!
 
-### Residual Diagnostics
+#### Residual Diagnostics
 
 First we compute the residuals with the 'best' parameters
 ```{julia, results=FALSE}

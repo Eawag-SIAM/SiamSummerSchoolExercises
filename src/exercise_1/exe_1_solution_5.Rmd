@@ -1,11 +1,11 @@
 
-# 5. Solutions  !!TODO!!
+## Solutions  !!TODO!!
 
-## Local sensitivity analysis
+### Local sensitivity analysis
 
-## Variance-based sensitivity {.tabset}
+### Variance-based sensitivity {.tabset}
 
-### R
+#### R
 ```R{eval=FALSE}
 library(sensitivity)
 
@@ -30,7 +30,7 @@ for ( i in 1:nrow(res.fast$X) )
 res <- tell(res.fast,y = ressamp.growth[,j])
 ```
 
-### Julia
+#### Julia
 
 ```Julia {eval=FALSE}
 using GlobalSensitivity

@@ -6,7 +6,7 @@ output:
   html_document:
     number_sections: no
     toc: TRUE
-    toc_depth: 2
+    toc_depth: 3
     toc_float: true
 params:
   showsolutions: TRUE

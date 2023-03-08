@@ -1,8 +1,8 @@
-# 1. Solution {.tabset}
+## Solution {.tabset}
 
-## R
+### R
 
-### Reading and plotting the data
+#### Reading and plotting the data
 
 ```{r}
 data.survival <- read.table("../../data/model_survival.csv", header=TRUE)
@@ -12,7 +12,7 @@ barplot(data.survival$deaths, names=data.survival$time,
 ```
 
 
-### Defining the likelihood, prior, and posterior
+#### Defining the likelihood, prior, and posterior
 
 
 ```{r}
@@ -60,7 +60,7 @@ logposterior.survival <- function(par, data) {
 }
 ```
 
-### Code your own Markov Chain Metropolis sampler
+#### Code your own Markov Chain Metropolis sampler
 
 ```{r}
 
@@ -126,10 +126,10 @@ plot(density(chain[1000:nrow(chain),1]), xlab=expression(lambda), main="")
 
 
 
-## Julia
+### Julia
 
 
-### Reading and plotting the data
+#### Reading and plotting the data
 
 ```{julia}
 using DataFrames
@@ -146,7 +146,7 @@ bar(survival_data.deaths,
     title = "Survival Model")
 ```
 
-### Defining the likelihood, prior, and posterior
+#### Defining the likelihood, prior, and posterior
 
 ```{julia}
 using Distributions
@@ -187,7 +187,7 @@ function logposterior_survival(λ, data)
 end
 ```
 
-### Code your own Markov Chain Metropolis sampler
+#### Code your own Markov Chain Metropolis sampler
 
 
 ```{julia, results="hide"}

@@ -1,6 +1,6 @@
-# 4. Solutions
+## Solutions
 
-## Analytical expression for the likelihood
+### Analytical expression for the likelihood
 
 The probability for an individual with mortality rate $\lambda$ to survive until time $t$ is given by the exponential
 $$
@@ -30,9 +30,9 @@ L_{\text{survival}}(\lambda,{\bf y})
 $$
 
 
-## Forward simulation {.tabset}
+### Forward simulation {.tabset}
 
-### R
+#### R
 The simplest way to simulate a model output is to use the R function `rmultinom`.
 Alternatively, we can simulate the death time, for each individual, drawing from the exponential distribution
 $$
@@ -93,7 +93,7 @@ for (i in 1:n.sample){
 boxplot(pred.survival, xlab="time", ylab="# death")
 ```
 
-### Julia
+#### Julia
 Create a function survival, whose arguments are:
 
 * `N,` the number of individuals,
@@ -136,17 +136,9 @@ boxplot(pred_survival,
 
 ```
 
+### Likelihood evaluation {.tabset}
 
-
-
-
-
-
-
-
-## Likelihood evaluation {.tabset}
-
-### R
+#### R
 
 ```{r}
 
@@ -176,7 +168,7 @@ y.sim <- model.survival(N,t,par.survival)
 loglikelihood.survival(y.sim,N,t,par.survival)
 ```
 
-### Julia
+#### Julia
 ```{julia, results = 'hide'}
 function loglikelihood_survival(N::Int64, t, y::Vector, lambda)
     S = exp.(-lambda .* t)

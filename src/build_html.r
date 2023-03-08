@@ -19,13 +19,13 @@ src.dir <- "src"
 
 ## --- compile all exercises
 exercises <- c("exercise_0", "exercise_1", "exercise_2",
-               "exercise_3", "exercise_4", "exercise_5")[4]
+               "exercise_3", "exercise_4", "exercise_5")[1]
 
 exercises <- c(exercises, "index")
 for(exer in exercises){
     source.file <- paste0(gsub("\\./", "", exer), ".Rmd")
     source <- file.path(src.dir, exer, source.file)
-    print(paste("Comile:", source))
+    print(paste("Compile:", source))
     
     ## compile without solutions
     rmarkdown::render(source,

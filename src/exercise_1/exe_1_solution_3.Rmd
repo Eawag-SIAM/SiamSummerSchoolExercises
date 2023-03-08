@@ -1,9 +1,9 @@
-# 3. Solutions
+## Solutions
 
-## Deterministic model simulation {.tabset}
+### Deterministic model simulation {.tabset}
 
-### R
-#### Monod Model
+#### R
+##### Monod Model
 ```{r }
 source("../../models/models.r") # load the model
 
@@ -18,7 +18,7 @@ r.det <- model.monod(par.monod, C.monod)
 plot(C.monod, r.det, col=2, type="l", ylab="r")
 ```
 
-#### Growth Model
+##### Growth Model
 ```{r }
 source("../../models/models.r") # load the model
 
@@ -43,8 +43,8 @@ legend("topright", legend=c("microorganisms", "substrate"),
        col=c(3,4), lty=1)
 ```
 
-### Julia
-#### Monod model
+#### Julia
+##### Monod model
 ```{julia, results = 'hide'}
 using ComponentArrays
 include("../../models/models.jl") # load the model
@@ -66,7 +66,7 @@ plot(C_monod, Y_monod,
 
 
 
-#### Growth model
+##### Growth model
 ```{julia, results = 'hide'}
 using ComponentArrays
 include("../../models/models.jl") # load the model
@@ -92,9 +92,7 @@ plot!(res.time, res.C_S, label="C_S")
 ```
 
 
-
-
-## Stochastic model simulation  {.tabset}
+### Stochastic model simulation  {.tabset}
 
 The growth model takes the input variables  $\mathbf{C} =
 (C_1,...,C_{n})$ and returns the deterministic growth rate $\mathbf{r}_{\mathrm{det}} = \mathbf{r}(\mathbf{C},r_{\mathrm{max}},K) = \{r(C_1,r_{\mathrm{max}},K),\dots,r(C_n,r_{\mathrm{max}},K)\}$.
@@ -102,7 +100,7 @@ We simulate the measurement errors by generating $n$ random
 normal values with mean $0$ and standard deviation $\sigma$ and add
 them to the deterministic model output.
 
-### R
+#### R
 ```{r }
 source("../../models/models.r") # load the model
 
@@ -135,7 +133,7 @@ polygon(c(C.monod,rev(C.monod)), c(quant[1,],rev(quant[2,])), col = "grey85")
 lines(C.monod, r.det, col=2, lwd=2, ylab="r")
 ```
 
-### Julia
+#### Julia
 ```{julia, results = 'hide'}
 using ComponentArrays
 include("../../models/models.jl") # load the deterministic model

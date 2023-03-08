@@ -6,7 +6,7 @@ output:
   html_document:
     number_sections: no
     toc: TRUE
-    toc_depth: 2
+    toc_depth: 3
     toc_float: true
 params:
   showsolutions: TRUE
@@ -50,11 +50,13 @@ date `model_survival.csv` to test our sampler. The
 experiment was started done with `N=30` individuals (this information
 is not contained in the data set).
 
-### Reading and plotting the data {.tabset}
+### Reading and plotting the data
 
 It's always a good idea to look at the data first.
 
-#### R
+#### Hints {.tabset}
+
+##### R
 ```{r}
 data.survival <- read.table("../../data/model_survival.csv", header=TRUE)
 barplot(data.survival$deaths, names=data.survival$time,
@@ -62,7 +64,7 @@ barplot(data.survival$deaths, names=data.survival$time,
         main="Survival data")
 ```
 
-#### Julia
+##### Julia
 ```{julia}
 using DataFrames
 import CSV

@@ -1,6 +1,6 @@
-# 2. Solutions
+## Solutions
 
-## Analytical expression
+### Analytical expression
 
 For the model "Monod" with additive normal i.i.d. noise, constructing the likelihood follows exactly the same procedure as in the linear case (Exercise 1.1), only with a simple change in the deterministic part of the model. So again, our complete probabilistic model is given by the deterministic part plus a Gaussian noise term,
 
@@ -29,10 +29,10 @@ $$
 
 
 
-## Likelihood evaluation {.tabset}
+### Likelihood evaluation {.tabset}
 
 
-### R
+#### R
 The implementation then looks like this:
 
 
@@ -76,7 +76,7 @@ plot(C, r)
 lines(C, r.det, col=2)
 ```
 
-### Julia
+#### Julia
 Implementing the loglikelihood
 ```{julia, results = 'hide'}
 using ComponentArrays
