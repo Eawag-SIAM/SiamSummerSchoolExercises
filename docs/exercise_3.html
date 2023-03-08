@@ -1612,7 +1612,7 @@ end</code></pre>
 </div>
 </div>
 <div id="adaptive-metropolis-with-delayed-rejection" class="section level1">
-<h1>1. Adaptive Metropolis with delayed rejection</h1>
+<h1>1. Adaptive Metropolis with delayed rejection ★</h1>
 <p>We try the adaptive Metropolis with delayed rejection as described by
 (<a href="https://projecteuclid.org/euclid.bj/1080222083">Haario,
 Saksman and Tamminen (2001)</a>.</p>
@@ -1679,7 +1679,7 @@ corner(chn)</code></pre>
 </div>
 </div>
 <div id="robust-adaptive-metropolis" class="section level1">
-<h1>2. Robust adaptive Metropolis</h1>
+<h1>2. Robust adaptive Metropolis ★</h1>
 <p>The robust adaptive Metropolis algorithm by proposed by <a href="http://dx.doi.org/10.1007/s11222-011-9269-5">Vihola (2012)</a> is
 often a good choice. It adapts the scale and rotation of the covariance
 matrix until it reached a predefined acceptance rate.</p>
@@ -1741,7 +1741,7 @@ corner(chn)</code></pre>
 </div>
 </div>
 <div id="population-based-sampler" class="section level1">
-<h1>3. Population based sampler</h1>
+<h1>3. Population based sampler ★</h1>
 <p>Population based sampler do not have an explicit jump distribution.
 Instead, the run multiple chain (often called <em>particles</em> or
 <em>walkers</em> in this context) in parallel and the proposals are
@@ -1827,15 +1827,18 @@ to compare them against one another.</p>
 <li><p>compare effective sampling size</p></li>
 </ul>
 </div>
-<div id="gradient-based-samplers-julia-only" class="section level1">
-<h1>5. Gradient based samplers (Julia only)</h1>
+<div id="gradient-based-samplers" class="section level1">
+<h1>5. Gradient based samplers ⚡</h1>
 <p>If we are able to compute the gradient of the log density, <span class="math inline">\(\nabla \log p\)</span>, we can use much more
 efficient sampling methods. For small number of parameters this may not
 be relevant, for lager problems (more than 20 dimension) the differences
 can be huge.</p>
 <p>Julia is particularly well suited for this applications, because many
 libraries for Automatic Differentiation (AD) are available - methods
-that compute the gradient of a function by analyzing the code.</p>
+that compute the gradient of (almost) any Julia function by analyzing
+the code.</p>
+<p>Because there is no equally powerful AD available in R, we can do
+this exercise only with Julia.</p>
 <div id="parameter-transformation" class="section level2">
 <h2>Parameter transformation</h2>
 <p>Most gradient based sampler assume that all parameters are in <span class="math inline">\(\mathbb{R}\)</span>. If we have a parameter that

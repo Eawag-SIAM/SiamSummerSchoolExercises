@@ -30,7 +30,7 @@ params:
 
 
 
-# 1. Implement an elementary Markov Chain sampler (recommended)
+# 1. Implement an elementary Markov Chain sampler ★
 
 
 In this exercise, you will write your own code to implement the most
@@ -304,7 +304,7 @@ the chain plots to decide how many the burn-in sample you need to remove.
 ```{r, child = if(params$showsolutions){"exe_2_solution_1.Rmd"}}
 ```
 
-# 2. Sample from the posterior for the monod model (recommended) {#task2}
+# 2. Sample from the posterior for the monod model ★ {#task2}
 
 The main difference of the "Monod" compared to the "Survival" model is
 that it has more than on parameter that we would like to infer.

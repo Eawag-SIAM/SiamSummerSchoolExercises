@@ -115,7 +115,7 @@ end
 ```
 
 
-# 1. Adaptive Metropolis with delayed rejection
+# 1. Adaptive Metropolis with delayed rejection ★
 
 We try the adaptive Metropolis with delayed rejection as described by
 ([Haario, Saksman and Tamminen
@@ -190,7 +190,7 @@ corner(chn)
 ```{r, child = if(params$showsolutions){"exe_3_solution_1.Rmd"}}
 ```
 
-# 2. Robust adaptive Metropolis
+# 2. Robust adaptive Metropolis ★
 
 The robust adaptive Metropolis algorithm by proposed by [Vihola  (2012)](http://dx.doi.org/10.1007/s11222-011-9269-5) is
 often a good choice. It adapts the scale and rotation of the
@@ -259,7 +259,7 @@ corner(chn)
 ```{r, child = if(params$showsolutions){"exe_3_solution_2.Rmd"}}
 ```
 
-# 3. Population based sampler
+# 3. Population based sampler ★
 
 Population based sampler do not have an explicit jump
 distribution. Instead, the run multiple chain (often called
@@ -361,7 +361,7 @@ to compare them against one another.
 ```{r, child = if(params$showsolutions){"exe_3_solution_4.Rmd"}}
 ```
 
-# 5. Gradient based samplers (Julia only)
+# 5. Gradient based samplers ⚡
 
 If we are able to compute the gradient of the log density, $\nabla
 \log p$, we can use much more efficient sampling methods. For small
@@ -370,7 +370,11 @@ number of parameters this may not be relevant, for lager problems
 
 Julia is particularly well suited for this applications, because many
 libraries for Automatic Differentiation (AD) are available - methods
-that compute the gradient of a function by analyzing the code.
+that compute the gradient of (almost) any Julia function by analyzing
+the code.
+
+Because there is no equally powerful AD available in R, we can do this
+exercise only with Julia.
 
 
 ## Parameter transformation

@@ -12,6 +12,14 @@ params:
   showsolutions: TRUE
 ---
 
+::: {.alert .alert-danger}
+This is an alert!
+:::
+
+::: {.alert .alert-info}
+Only an information
+:::
+
 # Setup R, Julia, and Python environments {-}
 
 ### R  {-}

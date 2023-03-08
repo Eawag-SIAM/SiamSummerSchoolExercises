@@ -17,7 +17,8 @@ params:
 
 Note, for the first three exercises you need only pencil and paper.
 
-# 1. Joint, marginal and conditional distributions I
+
+# 1. Joint, marginal and conditional distributions I ★
 The joint discrete probability table of $P_{A,B}(a,b)$ is given below:
 
 ```{r echo=FALSE, results='asis'}
@@ -35,7 +36,7 @@ Derive the following probabilities:
 ```{r, child = if(params$showsolutions){"exe_0_solution_1.Rmd"}}
 ```
 
-# 2. Joint, marginal and conditional distributions II
+# 2. Joint, marginal and conditional distributions II ★
 
 
 Assume the  probability densities $p(E \mid B)$,
@@ -52,7 +53,7 @@ probabilities to visualize the independence structure.
 ```{r, child = if(params$showsolutions){"exe_0_solution_2.Rmd"}}
 ```
 
-# 3. Compound distribution
+# 3. Compound distribution ⚡
 Assume that:
 $$
   \mu \sim f_{\mu}(m) =
@@ -83,7 +84,7 @@ It is not the aim to find closed forms for the integrals.
 ```{r, child = if(params$showsolutions){"exe_0_solution_3.Rmd"}}
 ```
 
-# 4. Sampling vs. evaluating random variables {#distribution}
+# 4. Sampling vs. evaluating random variables ★ {#distribution}
 
 Assume two random variables $X$ and $Y$ with following distributions:
 $$
@@ -147,7 +148,7 @@ Histograms are generated with the function `histogram` from the package `Plots.j
 ```{r, child = if(params$showsolutions){"exe_0_solution_4.Rmd"}}
 ```
 
-# 5. Generating data {#generate}
+# 5. Generating data ★ {#generate}
 
 Generate two samples of fictional observations (each of class `matrix`) denoted as $\boldsymbol{Y}_\mathrm{obs,indep}$
 and $\boldsymbol{Y}_\mathrm{obs,dep}$. The former should contain 1000 realisations of two *independent* random
@@ -180,7 +181,7 @@ construct a multivariate normal distribution with  `MvNormal(μ, Σ)` from the p
 ```{r, child = if(params$showsolutions){"exe_0_solution_5.Rmd"}}
 ```
 
-# 6. Analyzing and visualizing data {#visualize}
+# 6. Analyzing and visualizing data ★ {#visualize}
 
 Perform some preliminary analysis of the data generated in [Task 5](#generate):
 
@@ -212,7 +213,7 @@ The package `Statistics.jl` provides functions to compute the covariance and cor
 ```{r, child = if(params$showsolutions){"exe_0_solution_6.Rmd"}}
 ```
 
-# 7. Working with dataframes {#dataframes}
+# 7. Working with dataframes ★ {#dataframes}
 
 Real data contain often columns of different data types (e.g. numbers and
 strings).  Dataframes are designed to work with this kind of data conveniently.

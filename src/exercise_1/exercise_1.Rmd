@@ -30,7 +30,7 @@ params:
 Some exercises will use the toy models "Monod", "Growth", or "Survival", which were introduced in the previous lectures. You can see their definitions for instance in the slides "Mathematical Representation and Construction of Models".
 
 
-# 1. Likelihood for a linear model (recommended) {#task1}
+# 1. Likelihood for a linear model ★ {#task1}
 
 ## Analytical expression
 
@@ -171,7 +171,7 @@ Use the function `lm` from the package `GLM.jl`(Generalized Linear Model) and th
 ```{r, child = if(params$showsolutions){"exe_1_solution_1.Rmd"}}
 ```
 
-# 2. Likelihood for model "Monod" (recommended) {#task2}
+# 2. Likelihood for model "Monod" ★ {#task2}
 
 
 ## Analytical expression
@@ -191,7 +191,7 @@ the file `model_monod_stoch.dat` and use them as "observation  data" to compute 
 ```{r, child = if(params$showsolutions){"exe_1_solution_2.Rmd"}}
 ```
 
-# 3. Forward model simulation (recommended)
+# 3. Forward model simulation ★
 
 
 ## Deterministic model simulation
@@ -220,20 +220,8 @@ Both deterministic models are already implemented as `model.monod` and
 `model.growth` in the file `models.R` .
 
 #### Julia {-}
-For the model *Growth*, use the package `DifferentialEquations` and implement
-the `model.growth` ODE system. This could look like that:
-```{julia, eval = FALSE}
-#ODE system given by model growth
-function growth!(du, u, p, t)
-    du[1] = ???
-    du[2] = ???
-end
-#solving
-u0 = ???
-tspan = ???
-prob = ODEProblem(growth!, u0, tspan)
-sol = solve(prob)
-```
+Both deterministic models are already implemented as `model_monod` and
+`model_growth` in the file `models.jl` .
 
 
 ## Probabilistic model simulation
@@ -268,7 +256,7 @@ For the computation of quantiles, you can use the function `quantile`.
 ```
 
 
-# 4. Likelihood and forward simulation for the model "Survival"
+# 4. Likelihood and forward simulation for the model "Survival" ⚡
 
 ## Analytical expression for the likelihood
 
