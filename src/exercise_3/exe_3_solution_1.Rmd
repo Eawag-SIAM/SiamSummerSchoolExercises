@@ -1,9 +1,41 @@
-# 1. Solution {.tabset}
+## Solution {.tabset}
 
-## R
+### R
 
-TODO
+```{r, results="hide"}
+library(FME)
+library(IDPmisc)
+neg.log.post <- function(par) -logposterior.monod(par)
+```
 
-## Julia
+The mean of the prior seems to be a reasonable point to start the
+sampler. Alternatively, we could try to find point of the maximum
+posterior density with an optimizer. For the covariance matrix of
+the jump distribution we use the standard deviation of the prior and assume independence.
+
+```{r}
+par.init <- prior.monod.mean
+jump.cov <- diag(prior.monod.sd/2)
+
+par.init <- prior.monod.mean
+jump.cov <- diag(prior.monod.sd/2)
+
+AMDR <- FME::modMCMC(f         = neg.log.post,
+                     p         = par.init,
+                     jump      = jump.cov,
+                     niter     = 10000,
+                     updatecov = 10,
+                     ntrydr    = 3
+                     )
+
+## plot chains
+plot(AMDR)
+
+## 2d marginals
+pairs(AMDR$pars)
+IDPmisc::ipairs(AMDR$pars)
+```
+
+### Julia
 
 TODO

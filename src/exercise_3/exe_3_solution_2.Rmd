@@ -1,9 +1,51 @@
-# 2. Solution {.tabset}
+## Solution {.tabset}
 
-## R
+### R
 
-TODO
+```{r, results="hide"}
+library(adaptMCMC)
+library(IDPmisc)
+```
+The mean of the prior seems to be a reasonable point to start the
+sampler. Alternatively, we could try to find point of the maximum
+posterior density with an optimizer. For the covariance matrix of
+the jump distribution we use the standard deviation of the prior and assume independence.
 
-## Julia
+```{r}
+par.init <- prior.monod.mean
+jump.cov <- diag(prior.monod.sd/2)
+
+RAM <- adaptMCMC::MCMC(p        = logposterior.monod,
+                       n        = 10000,
+                       init     = par.init,
+                       scale    = jump.cov,
+                       adapt    = TRUE,
+                       acc.rate = 0.5,
+                       showProgressBar = FALSE)
+```
+The acceptance rate is matched closely:
+```{r}
+RAM$acceptance.rate
+```
+
+The adapted covariance matrix has a lot of correlation between
+$r_{max}$ and $K$:
+```{r}
+RAM$cov.jump
+cov2cor(RAM$cov.jump) # rescale as correlation matrix
+```
+
+```{r}
+
+## plot chains
+samp.coda <- convert.to.coda(RAM)
+plot(samp.coda)
+
+
+## 2d marginals
+IDPmisc::ipairs(RAM$samples) # prettier versions of pairs()
+```
+
+### Julia
 
 TODO

@@ -1,9 +1,57 @@
-# 3. Solution {.tabset}
+## Solution {.tabset}
 
-## R
+### R
 
-TODO
+```{r}
+library(mcmcensemble)
+```
 
-## Julia
+For each walker (chain) a initial starting point must be defined. We
+make sure that the walkers are spread out wide and cover the
+high density posterior region.
+```{r}
+n.walkers <- 20
+par.inits <- data.frame(r.max = runif(n.walkers, 1, 10),
+                        K     = runif(n.walkers, 0, 5),
+                        sigma = runif(n.walkers, 0.05, 2))
+
+```
+
+```{r}
+EMCEE <- MCMCEnsemble(
+    f           = logposterior.monod,
+    inits       = par.inits,
+    max.iter    = 10000,
+    n.walkers   = n.walkers,
+    method      = "stretch",
+    coda        = TRUE
+)
+```
+
+```{r}
+plot(EMCEE$samples)
+```
+
+Note, the more walkers (chains) we have, the shorter the chains. This means we have to "pay" the burn in for every single
+chain. Therefore, going too extreme with the number of chains is not beneficial.
+```{r}
+n.walkers <- 1000
+par.inits <- data.frame(r.max = runif(n.walkers, 1, 10),
+                        K     = runif(n.walkers, 0, 5),
+                        sigma = runif(n.walkers, 0.05, 2))
+
+EMCEE <- MCMCEnsemble(
+    f           = logposterior.monod,
+    inits       = par.inits,
+    max.iter    = 10000,
+    n.walkers   = n.walkers,
+    method      = "stretch",
+    coda        = TRUE
+)
+
+plot(EMCEE$samples)
+```
+
+### Julia
 
 TODO
