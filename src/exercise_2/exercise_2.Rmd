@@ -1,13 +1,13 @@
 ---
 title: 'Exercise 2: Bayesian inference with elementary Markov Chain sampling'
 author: "Eawag Summer School in Environmental Systems Analysis"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     number_sections: no
     toc: TRUE
     toc_depth: 3
     toc_float: true
+    css: ../eawag.css
 params:
   showsolutions: TRUE
 ---

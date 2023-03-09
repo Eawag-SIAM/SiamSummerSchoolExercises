@@ -1,13 +1,13 @@
 ---
 title: "Exercise 3: Adaptive Monte Carlo Markov Chain samplers"
 author: "Eawag Summer School in Environmental Systems Analysis"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     number_sections: no
     toc: TRUE
     toc_depth: 2
     toc_float: true
+    css: ../eawag.css
 params:
   showsolutions: TRUE
 ---
@@ -361,7 +361,7 @@ to compare them against one another.
 ```{r, child = if(params$showsolutions){"exe_3_solution_4.Rmd"}}
 ```
 
-# 5. Gradient based samplers ⚡
+# 5. Gradient based samplers 🗲
 
 If we are able to compute the gradient of the log density, $\nabla
 \log p$, we can use much more efficient sampling methods. For small

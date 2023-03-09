@@ -1,0 +1,43 @@
+/* --- define fonts */
+
+/* @import url('https://www.fontify.me/wf/acb50a04aabeb4d5b691edf1c28e8f31'); /\*the serif Bold (from eawag.ch)*\/ */
+@import url('https://fonts.googleapis.com/css?family=Bree+Serif'); /*alternative to 'the serif Bold*/
+
+body {
+    font-family: "Arial";	/*as eawag.ch*/
+    background-color: #efefef;
+}
+
+/* --- headers */
+
+h1, h2, h3, h4, h5, h6 {
+    /* font-family: font82001;	/\*the serif Bold (original from eawag.ch)*\/ */
+    font-family: 'Bree Serif', serif;
+}
+
+h1 {
+    color: #118ec6;		/*eawag color*/
+}
+
+/* title should be larger */
+.title.toc-ignore {
+    font-size: 300%;
+    color: #333333
+}
+
+
+/* --- tabs */
+.nav.nav-tabs {
+    font-family: 'Bree Serif', serif;
+    /* border-style: none; */
+}
+
+/* floating TOC */
+.list-group-item {
+    /* font-family: 'Bree Serif', serif; */
+}
+
+.list-group-item.active {
+    font-family: 'Bree Serif', serif;
+    background-color: #118ec6;
+}

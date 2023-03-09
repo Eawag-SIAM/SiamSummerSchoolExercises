@@ -1,12 +1,12 @@
 ---
 title: "Introductory exercises"
 author: "Eawag Summer School in Environmental Systems Analysis"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     toc: TRUE
     toc_depth: 3
     toc_float: true
+    css: ../eawag.css
 params:
   showsolutions: TRUE
 ---
@@ -53,7 +53,7 @@ probabilities to visualize the independence structure.
 ```{r, child = if(params$showsolutions){"exe_0_solution_2.Rmd"}}
 ```
 
-# 3. Compound distribution ⚡
+# 3. Compound distribution 🗲
 Assume that:
 $$
   \mu \sim f_{\mu}(m) =

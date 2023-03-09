@@ -1,13 +1,13 @@
 ---
 title: 'Exercise 1: Probabilistic models and likelihood functions'
 author: "Eawag Summer School in Environmental Systems Analysis"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     number_sections: no
     toc: TRUE
     toc_depth: 3
     toc_float: true
+    css: ../eawag.css
 params:
   showsolutions: TRUE
 ---
@@ -256,7 +256,7 @@ For the computation of quantiles, you can use the function `quantile`.
 ```
 
 
-# 4. Likelihood and forward simulation for the model "Survival" ⚡
+# 4. Likelihood and forward simulation for the model "Survival" 🗲
 
 ## Analytical expression for the likelihood
 

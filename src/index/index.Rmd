@@ -8,11 +8,18 @@ output:
     number_sections: FALSE
     toc: TRUE
     toc_depth: 2
+    css: ../eawag.css
 ---
 
 # General information
 
-- How to approach the exercises?
+
+All participants have different backgrounds and interests. For this
+reason we provide more exercises than you can solve in this
+week. Exercises that cover fundamental concepts are marked with ★. We
+recommend that everyone has a look at them. Exercises that are more
+advanced are marked with 🗲.
+
 - Should I use R or Julia (or Python)?
 
 ### R resources
@@ -29,6 +36,7 @@ output:
 
 [`models.r`](../models/models.r){target="_blank"}
 [`models.jl`](../models/models.jl){target="_blank"}
+
 
 
 # Exercises
