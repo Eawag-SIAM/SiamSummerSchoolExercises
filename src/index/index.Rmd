@@ -19,13 +19,16 @@ output:
 
 - how to install the packages
 
+[A (very) short introduction to R](assets/A (very) short introduction to R.pdf){target="_blank"}
+
 ### Julia resources
 
 - how to install the packages
 
 # Example models and data
 
-...
+[`models.r`](../models/models.r){target="_blank"}
+[`models.jl`](../models/models.jl){target="_blank"}
 
 
 # Exercises
