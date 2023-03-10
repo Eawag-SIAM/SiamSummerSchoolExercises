@@ -18,10 +18,10 @@ using Distributions
 Σ_indep = [2^2 0; 0 5^2]
 Σ_dep = [4 8; 8 25]
 
-Y_obs_indep = MvNormal(μs, Σ_indep)
-Y_indep_sample = rand(Y_obs_indep, 1000)
+Y_1 = MvNormal(μs, Σ_indep)
+y_1_sample = rand(Y_1, 1000)
 
-Y_obs_dep = MvNormal(μs, Σ_dep)
-Y_dep_sample = rand(Y_obs_dep, 1000)
+Y_2 = MvNormal(μs, Σ_dep)
+y_2_sample = rand(Y_2, 1000)
 
 ```

@@ -61,34 +61,34 @@ a. Quantiles
 using Statistics
 using StatsBase
 
-interquartiles_indep = [iqr(Y_indep_sample[1, :]),
-                        iqr(Y_indep_sample[2, :])]
+interquartiles_indep = [iqr(y_1_sample[1, :]),
+                        iqr(y_1_sample[2, :])]
 
-interquartiles_dep = [iqr(Y_dep_sample[1, :]),
-                      iqr(Y_dep_sample[2, :])]
+interquartiles_dep = [iqr(y_2_sample[1, :]),
+                      iqr(y_2_sample[2, :])]
 
-inter_5_95_quantile_indep = [diff(quantile(Y_indep_sample[1, :], [0.05, 0.95])),
-                             diff(quantile(Y_indep_sample[2, :], [0.05, 0.95]))]
+inter_5_95_quantile_indep = [diff(quantile(y_1_sample[1, :], [0.05, 0.95])),
+                             diff(quantile(y_1_sample[2, :], [0.05, 0.95]))]
 
-inter_5_95_quantile_dep = [diff(quantile(Y_dep_sample[1, :], [0.05, 0.95])),
-                           diff(quantile(Y_dep_sample[2, :], [0.05, 0.95]))]
+inter_5_95_quantile_dep = [diff(quantile(y_2_sample[1, :], [0.05, 0.95])),
+                           diff(quantile(y_2_sample[2, :], [0.05, 0.95]))]
 ```
 
 b. Histograms and densities
 ```{julia, results = 'hide'}
 hist = [
-histogram(Y_indep_sample[1, :], nbins = 15,
-    xlabel="Y_1_indep sample",
-    title="Y_1 of Y_indep"),
-histogram(Y_indep_sample[2, :], nbins = 15,
-    xlabel="Y_2_indep sample",
-    title="Y_2 of Y_indep"),
-histogram(Y_dep_sample[1, :], nbins = 15,
-    xlabel="Y_1_dep sample",
-    title="Y_1 of Y_dep"),
-histogram(Y_dep_sample[2, :], nbins = 15,
-    xlabel="Y_2_dep sample",
-    title="Y_2 of Y_dep")
+    histogram(y_1_sample[1, :], nbins = 15,
+              xlabel="Y_1_indep sample",
+              title="Y_1 of Y_indep"),
+    histogram(y_1_sample[2, :], nbins = 15,
+              xlabel="Y_2_indep sample",
+              title="Y_2 of Y_indep"),
+    histogram(y_2_sample[1, :], nbins = 15,
+              xlabel="Y_1_dep sample",
+              title="Y_1 of Y_dep"),
+    histogram(y_2_sample[2, :], nbins = 15,
+              xlabel="Y_2_dep sample",
+              title="Y_2 of Y_dep")
 ]
 ```
 ```{julia}
@@ -97,47 +97,47 @@ plot(hist..., legend = false, ylabel = "Frequency")
 ```{julia, results = 'hide'}
 using StatsPlots
 dens = [
-density(Y_indep_sample[1,:],
-    xlabel="N=1000",
-    title="Y_1 of Y_indep"),
-density(Y_indep_sample[2,:],
-    xlabel="N=1000",
-    title="Y_2 of Y_indep"),
-density(Y_dep_sample[1,:],
-    xlabel="N=1000",
-    title="Y_1 of Y_dep"),
-density(Y_dep_sample[2,:],
-    xlabel="N=1000",
-    title="Y_2 of Y_dep")
+    density(y_1_sample[1,:],
+            xlabel="N=1000",
+            title="Y_1 of Y_indep"),
+    density(y_1_sample[2,:],
+            xlabel="N=1000",
+            title="Y_2 of Y_indep"),
+    density(y_2_sample[1,:],
+            xlabel="N=1000",
+            title="Y_1 of Y_dep"),
+    density(y_2_sample[2,:],
+            xlabel="N=1000",
+            title="Y_2 of Y_dep")
 ]
 ```
 ```{julia}
 plot(dens..., lengend = false, ylabel = "Density")
 ```
 
-Note, we could also have written a loop for the four plots.
+Alternatively, we could also have written a loop for the four plots.
 
 
 c. Scatterplots
 
 ```{julia}
-scatter(Y_indep_sample[1, :], Y_indep_sample[2, :],
-    labels=false,
-    xlabel="Y_indep_sample 1",
-    ylabel="Y_indep_sample 2",
-    title="Y_indep_sample")
-scatter(Y_dep_sample[1, :], Y_dep_sample[2, :],
-    labels=false,
-    xlabel="Y_dep_sample 1",
-    ylabel="Y_dep_sample 2",
-    title="Y_dep_sample")
+scatter(y_1_sample[1, :], y_1_sample[2, :],
+        labels=false,
+        xlabel="y_1_sample 1",
+        ylabel="y_1_sample 2",
+        title="y_1_sample")
+scatter(y_2_sample[1, :], y_2_sample[2, :],
+        labels=false,
+        xlabel="y_2_sample 1",
+        ylabel="y_2_sample 2",
+        title="y_2_sample")
 ```
 
 d. Covariance and correlation
 ```{julia}
 using Statistics
-Statistics.cov(Y_indep_sample, dims=2)
-Statistics.cov(Y_dep_sample, dims=2)
-Statistics.cor(Y_indep_sample, dims=2)
-Statistics.cor(Y_dep_sample, dims=2)
+Statistics.cov(y_1_sample, dims=2)
+Statistics.cov(y_2_sample, dims=2)
+Statistics.cor(y_1_sample, dims=2)
+Statistics.cor(y_2_sample, dims=2)
 ```

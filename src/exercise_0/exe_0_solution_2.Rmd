@@ -1,6 +1,6 @@
 ### Solution
 
-- ![](DAG.pdf){width=65%}
+![](DAG.png){width=20%}
 
 - $p(B, C, E) = p(C \mid B, E) \, p(E \mid B) \, p(B)$
 - The joint distribution is

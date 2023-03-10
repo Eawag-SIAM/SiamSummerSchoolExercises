@@ -202,12 +202,14 @@ the data; use `cov()`,`cor()` for the covariance and the correlation,
 respectively.
 
 #### Julia
-You can use the function `quntile` from the `Statistics.jl`package.
+You can use the function `quantile` from the
+[`Statistics.jl`](https://docs.julialang.org/en/v1/stdlib/Statistics/)
+module. It provides also functions to compute the covariance and correlation matrix.
 
-With package `Plots.jl` you can also scatter plots(`scatter`) and
-histograms (`histogram`). For densities plots, you use the function `density`from the package `StatsPlots.jl`.
+With package [`Plots.jl`](https://docs.juliaplots.org/stable/)
+provides basic plotting function such as `scatter` and `histogram`. For
+densities plots and other more specialized plots look at [`StatsPlots.jl`](https://docs.juliaplots.org/latest/generated/statsplots/).
 
-The package `Statistics.jl` provides functions to compute the covariance and correlation matrix.
 
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_6.Rmd"}}

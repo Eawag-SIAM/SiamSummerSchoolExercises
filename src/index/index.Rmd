@@ -34,8 +34,8 @@ advanced are marked with 🗲.
 
 # Example models and data
 
-[`models.r`](../models/models.r){target="_blank"}
-[`models.jl`](../models/models.jl){target="_blank"}
+- [`models.r`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/models/models.r){target="_blank"}
+- [`models.jl`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/models/models.jl){target="_blank"}
 
 
 
