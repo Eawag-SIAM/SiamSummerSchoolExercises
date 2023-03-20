@@ -68,7 +68,7 @@ X \sim f_{X|\mu=m}(x \mid m) = \frac{1}{\sqrt{2\pi}} \exp\left(-
 \frac{(x-m)^2}{2}\right)
 $$
 
-This means $X$ is normal distributed with mean $\mu$ and $\mu$
+This means $X$ is normally distributed with mean $\mu$, and $\mu$
 itself is exponentially distributed.
 
 Derive and interpret:
@@ -86,7 +86,7 @@ It is not the aim to find closed forms for the integrals.
 
 # 4. Sampling vs. evaluating random variables ★ {#distribution}
 
-Assume two random variables $X$ and $Y$ with following distributions:
+Take two random variables $X$ and $Y$ with the following distributions:
 $$
 X \sim \text{Uniform}(0, 1)\\
 Y \sim \text{Normal}(2, 10)
@@ -100,12 +100,12 @@ Another random variable is defined as a function of $X$ as follows:
 $$
 Z = \sin(2\pi X) \sqrt{X}
 $$
-While it is difficult to derive the probability density of $Z$,
+While it is difficult to derive the probability density $f_Z(z)$ analytically,
 sampling from it is easy.
 
 
-3) Generate 10000 samples from $Z$ by first sampling from $X$ and then
-     transforming the samples. Visualize as histogram.
+3) Visualize the density $f_Z(z)$. First generate 10000 samples from
+     $X$ and then transforming the samples. Visualize as histogram.
 
 ### Hints {.tabset}
 
@@ -131,16 +131,16 @@ The package `Distributions.jl` provides access to many probability
 distributions, see the [documentation](https://juliastats.org/Distributions.jl/stable/).
 
 Here are some useful functions you can apply to all distributions (not
-only normal):
+only `Normal`):
 ```{julia, eval = FALSE}
-π = Normal(0, 10) # define distritbution
+π = Normal(0, 10) # define distribution
 
 pdf(π, x)       # evaluate pdf at x
+logpdf(π, x)    # evaluate log pdf at x
 cdf(π, x)       # evaluate cdf at x
 quantile(π, p)  # evaluate the p-th quantile
 rand(π, n)      # sample n random numbers
 ```
-
 
 
 Histograms are generated with the function `histogram` from the package `Plots.jl`. You can adjust the number of bins with the argument `nbins`, e.g `histogram(rand(Uniform(0,5), 10000), nbins = 100)`.
@@ -206,9 +206,9 @@ You can use the function `quantile` from the
 [`Statistics.jl`](https://docs.julialang.org/en/v1/stdlib/Statistics/)
 module. It provides also functions to compute the covariance and correlation matrix.
 
-With package [`Plots.jl`](https://docs.juliaplots.org/stable/)
+The package [`Plots.jl`](https://docs.juliaplots.org/stable/)
 provides basic plotting function such as `scatter` and `histogram`. For
-densities plots and other more specialized plots look at [`StatsPlots.jl`](https://docs.juliaplots.org/latest/generated/statsplots/).
+density plots and other more specialized plots look at [`StatsPlots.jl`](https://docs.juliaplots.org/latest/generated/statsplots/).
 
 
 
@@ -217,14 +217,14 @@ densities plots and other more specialized plots look at [`StatsPlots.jl`](https
 
 # 7. Working with dataframes ★ {#dataframes}
 
-Real data contain often columns of different data types (e.g. numbers and
+Real data often contain columns of different data types (e.g. numbers and
 strings).  Dataframes are designed to work with this kind of data conveniently.
 
 a. Import the file `./data/model_growth.csv` as dataframe.  Perform some analyses similar to the ones in
 [Task 6](#visualize).
 
 b. Add a new column (say
-`C_new`) to the growth data frame to it that contains some random values .
+`C_new`) to the growth data frame that contains some random values .
 
 ### Hints {.tabset}
 
@@ -260,14 +260,13 @@ data.x
 
 # 8. Error propagation and functions {#errs}
 
-It is generally known that, if $f()$ is non-linear:
+If $f()$ is non-linear, generally,
 $$
 f(E[X]) \neq E[f(X)]
 $$
-where $E$ is the expected value and $X$ is a random variable. Define a non-linear function
-in R, e.g. $f(x) = \sin\sqrt{x}$. In order to avoid negative values, generate some realizations
-of a log-normally distributed random variable $X$.
-Calculate $f(E[X])$, $E[f(X)]$, $\mathrm{Var}[X]$, $\mathrm{Var}[f(X)]$ and compare them.
+where $E$ is the expected value and $X$ is a random
+variable. Implement the a non-linear function $f(x) = \sin\sqrt{x}$
+and assume that $X$ is log-normally distribute. Use samples to estimate $f(E[X])$, $E[f(X)]$, $\mathrm{Var}[X]$, $\mathrm{Var}[f(X)]$ and compare them.
 
 ### Hints {.tabset}
 
@@ -294,7 +293,7 @@ function choose_your_name(arg_1, arg_2)
     return res
 end
 ```
-Very short function can be defined as
+Very short functions can be defined as
 ```{julia, eval = FALSE}
 foo(a, b) = a + b
 ```
