@@ -1349,6 +1349,10 @@ h1 {
 color: #118ec6;	
 }
 
+a {
+color: #118ec6;
+}
+
 .title.toc-ignore {
 font-size: 300%;
 color: #333333
@@ -1828,8 +1832,8 @@ using StatsPlots
 # number of walkers (parallel chains)
 n_walkers = 10
 
-## We need a vector inital calues, one for each walkers.
-## Make sure tha they do not start all at the same point.
+## We need a vector of inital values, one for each walkers.
+## Make sure that they do not start from the same point.
 θinits = [θinit .* rand(3) for _ in 1:n_walkers]
 
 # Run sampler
@@ -1856,14 +1860,26 @@ different?</p></li>
 </div>
 </div>
 </div>
-<div id="todo-comparing-different-chains-optional" class="section level1">
-<h1>4. TODO Comparing different chains (optional)</h1>
-<p>Once you have generated chains for each of the methods, you may wish
-to compare them against one another.</p>
+<div id="posterior-predictions" class="section level1">
+<h1>4. Posterior Predictions ★</h1>
+<p>In many cases we want to make predictions for new model inputs. Lets
+say we have observed the data <span class="math inline">\((y,
+x)\)</span> and used it to infer the posterior <span class="math inline">\(p(\theta | y, x)\)</span>. We would now like to
+make prediction given a new inputs <span class="math inline">\(x^*\)</span> using the learned posterior
+distribution:</p>
+<p><span class="math display">\[ p(Y^* | x^*, y, x,)  = \int p(Y^* |
+x^*, \theta) \, p(\theta | y, x)
+\text{d}\theta \]</span></p>
 <ul>
-<li><p>compare marginals</p></li>
-<li><p>compare burn-in length</p></li>
-<li><p>compare effective sampling size</p></li>
+<li><p>For the monod model, what is <span class="math inline">\(p(Y^* |
+x^*, \theta)\)</span>?</p></li>
+<li><p>Produce predictions for the monod model for <span class="math inline">\(C = \{10, 12, 14, 16\}\)</span> using a posterior
+sample from a exercises. We only need samples form the predictive
+distribution. How can you do this without solving the integral
+analytically?</p></li>
+<li><p>Plot the result with 90% prediction interval.</p></li>
+<li><p>How much do you trust that the interval is correct? What
+assumptions did you made?</p></li>
 </ul>
 </div>
 <div id="gradient-based-samplers" class="section level1">

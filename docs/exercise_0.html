@@ -1605,7 +1605,7 @@ paper.</p>
 B)\)</span>, <span class="math inline">\(p(B)\)</span>, <span class="math inline">\(p(A, D \mid E)\)</span>, and <span class="math inline">\(p(C \mid B, E)\)</span> are known.</p>
 <ul>
 <li>Draw the corresponding directed acyclic graph of the conditional
-probabilities to visualize the independence structure.</li>
+probabilities to visualize the dependence structure.</li>
 <li>Derive <span class="math inline">\(p(B, C, E)\)</span></li>
 <li>Derive the joint distribution of <span class="math inline">\(A\)</span>, <span class="math inline">\(B\)</span>, <span class="math inline">\(C\)</span>, <span class="math inline">\(D\)</span>, and <span class="math inline">\(E\)</span>.</li>
 <li>Derive <span class="math inline">\(p(A, B \mid C, D,
@@ -1626,8 +1626,9 @@ E)\)</span></li>
 X \sim f_{X|\mu=m}(x \mid m) = \frac{1}{\sqrt{2\pi}} \exp\left(-
 \frac{(x-m)^2}{2}\right)
 \]</span></p>
-<p>This means <span class="math inline">\(X\)</span> is normal
-distributed with mean <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\mu\)</span> itself is exponentially
+<p>This means <span class="math inline">\(X\)</span> is normally
+distributed with mean <span class="math inline">\(\mu\)</span>, and
+<span class="math inline">\(\mu\)</span> itself is exponentially
 distributed.</p>
 <p>Derive and interpret:</p>
 <ul>
@@ -1642,8 +1643,8 @@ distribution.</li>
 </div>
 <div id="distribution" class="section level1">
 <h1>4. Sampling vs. evaluating random variables ★</h1>
-<p>Assume two random variables <span class="math inline">\(X\)</span>
-and <span class="math inline">\(Y\)</span> with following distributions:
+<p>Take two random variables <span class="math inline">\(X\)</span> and
+<span class="math inline">\(Y\)</span> with the following distributions:
 <span class="math display">\[
 X \sim \text{Uniform}(0, 1)\\
 Y \sim \text{Normal}(2, 10)
@@ -1655,12 +1656,12 @@ distributions as histograms.</li>
 </ol>
 <p>Another random variable is defined as a function of <span class="math inline">\(X\)</span> as follows: <span class="math display">\[
 Z = \sin(2\pi X) \sqrt{X}
-\]</span> While it is difficult to derive the probability density of
-<span class="math inline">\(Z\)</span>, sampling from it is easy.</p>
+\]</span> While it is difficult to derive the probability density <span class="math inline">\(f_Z(z)\)</span> analytically, sampling from it is
+easy.</p>
 <ol start="3" style="list-style-type: decimal">
-<li>Generate 10000 samples from <span class="math inline">\(Z\)</span>
-by first sampling from <span class="math inline">\(X\)</span> and then
-transforming the samples. Visualize as histogram.</li>
+<li>Visualize the density <span class="math inline">\(f_Z(z)\)</span>.
+First generate 10000 samples from <span class="math inline">\(X\)</span>
+and then transforming the samples. Visualize as histogram.</li>
 </ol>
 <div id="hints" class="section level3 tabset">
 <h3 class="tabset">Hints</h3>
@@ -1686,10 +1687,11 @@ e.g. <code>hist(rnorm(10000), breaks=100)</code>.</p>
 <p>The package <code>Distributions.jl</code> provides access to many
 probability distributions, see the <a href="https://juliastats.org/Distributions.jl/stable/">documentation</a>.</p>
 <p>Here are some useful functions you can apply to all distributions
-(not only normal):</p>
-<pre class="julia"><code>π = Normal(0, 10) # define distritbution
+(not only <code>Normal</code>):</p>
+<pre class="julia"><code>π = Normal(0, 10) # define distribution
 
 pdf(π, x)       # evaluate pdf at x
+logpdf(π, x)    # evaluate log pdf at x
 cdf(π, x)       # evaluate cdf at x
 quantile(π, p)  # evaluate the p-th quantile
 rand(π, n)      # sample n random numbers</code></pre>
@@ -1769,23 +1771,23 @@ the correlation, respectively.</p>
 <p>You can use the function <code>quantile</code> from the <a href="https://docs.julialang.org/en/v1/stdlib/Statistics/"><code>Statistics.jl</code></a>
 module. It provides also functions to compute the covariance and
 correlation matrix.</p>
-<p>With package <a href="https://docs.juliaplots.org/stable/"><code>Plots.jl</code></a>
+<p>The package <a href="https://docs.juliaplots.org/stable/"><code>Plots.jl</code></a>
 provides basic plotting function such as <code>scatter</code> and
-<code>histogram</code>. For densities plots and other more specialized
+<code>histogram</code>. For density plots and other more specialized
 plots look at <a href="https://docs.juliaplots.org/latest/generated/statsplots/"><code>StatsPlots.jl</code></a>.</p>
 </div>
 </div>
 </div>
 <div id="dataframes" class="section level1">
 <h1>7. Working with dataframes ★</h1>
-<p>Real data contain often columns of different data types (e.g. numbers
+<p>Real data often contain columns of different data types (e.g. numbers
 and strings). Dataframes are designed to work with this kind of data
 conveniently.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Import the file <code>./data/model_growth.csv</code> as
 dataframe. Perform some analyses similar to the ones in <a href="#visualize">Task 6</a>.</p></li>
 <li><p>Add a new column (say <code>C_new</code>) to the growth data
-frame to it that contains some random values .</p></li>
+frame that contains some random values .</p></li>
 </ol>
 <div id="hints-3" class="section level3 tabset">
 <h3 class="tabset">Hints</h3>
@@ -1822,13 +1824,14 @@ data.x</code></pre>
 </div>
 <div id="errs" class="section level1">
 <h1>8. Error propagation and functions</h1>
-<p>It is generally known that, if <span class="math inline">\(f()\)</span> is non-linear: <span class="math display">\[
+<p>If <span class="math inline">\(f()\)</span> is non-linear, generally,
+<span class="math display">\[
 f(E[X]) \neq E[f(X)]
 \]</span> where <span class="math inline">\(E\)</span> is the expected
 value and <span class="math inline">\(X\)</span> is a random variable.
-Define a non-linear function in R, e.g. <span class="math inline">\(f(x)
-= \sin\sqrt{x}\)</span>. In order to avoid negative values, generate
-some realizations of a log-normally distributed random variable <span class="math inline">\(X\)</span>. Calculate <span class="math inline">\(f(E[X])\)</span>, <span class="math inline">\(E[f(X)]\)</span>, <span class="math inline">\(\mathrm{Var}[X]\)</span>, <span class="math inline">\(\mathrm{Var}[f(X)]\)</span> and compare them.</p>
+Implement the a non-linear function <span class="math inline">\(f(x) =
+\sin\sqrt{x}\)</span> and assume that <span class="math inline">\(X\)</span> is log-normally distribute. Use samples
+to estimate <span class="math inline">\(f(E[X])\)</span>, <span class="math inline">\(E[f(X)]\)</span>, <span class="math inline">\(\mathrm{Var}[X]\)</span>, <span class="math inline">\(\mathrm{Var}[f(X)]\)</span> and compare them.</p>
 <div id="hints-4" class="section level3 tabset">
 <h3 class="tabset">Hints</h3>
 <div id="r-4" class="section level4">
@@ -1855,7 +1858,7 @@ create you own Julia functions following the syntax</p>
     res = arg_1 + arg_2
     return res
 end</code></pre>
-<p>Very short function can be defined as</p>
+<p>Very short functions can be defined as</p>
 <pre class="julia"><code>foo(a, b) = a + b</code></pre>
 </div>
 </div>

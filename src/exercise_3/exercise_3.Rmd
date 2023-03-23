@@ -316,8 +316,8 @@ using StatsPlots
 # number of walkers (parallel chains)
 n_walkers = 10
 
-## We need a vector inital calues, one for each walkers.
-## Make sure tha they do not start all at the same point.
+## We need a vector of inital values, one for each walkers.
+## Make sure that they do not start from the same point.
 θinits = [θinit .* rand(3) for _ in 1:n_walkers]
 
 # Run sampler
@@ -346,17 +346,28 @@ corner(chn)
 ```{r, child = if(params$showsolutions){"exe_3_solution_3.Rmd"}}
 ```
 
-# 4. TODO Comparing different chains (optional)
+# 4. Posterior Predictions ★
 
-Once you have generated chains for each of the methods, you may wish
-to compare them against one another.
 
-- compare marginals
+In many cases we want to make predictions for new model inputs. Lets
+say we have observed the data $(y, x)$ and used it to infer the
+posterior $p(\theta | y, x)$. We would now like to make prediction
+given a new inputs $x^*$ using the learned posterior distribution:
 
-- compare burn-in length
+$$ p(Y^* | x^*, y, x,)  = \int p(Y^* | x^*, \theta) \, p(\theta | y, x)
+\text{d}\theta $$
 
-- compare effective sampling size
+- For the monod model, what is $p(Y^* | x^*, \theta)$?
 
+- Produce predictions for the monod model for $C = \{10, 12, 14, 16\}$
+  using a posterior sample from a exercises. We only need samples form
+  the predictive distribution. How can you do this without solving the
+  integral analytically?
+
+- Plot the result with 90% prediction interval.
+
+- How much do you trust that the interval is correct? What assumptions
+  did you made?
 
 ```{r, child = if(params$showsolutions){"exe_3_solution_4.Rmd"}}
 ```

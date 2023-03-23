@@ -6,9 +6,9 @@
 library(mcmcensemble)
 ```
 
-For each walker (chain) a initial starting point must be defined. We
-make sure that the walkers are spread out wide and cover the
-high density posterior region.
+For each walker (chain) a initial starting point must be defined. In
+general it is better to in a region with high density. We could use an
+optimizer to fine the mode, but here we just use a rather wide coverage.
 ```{r}
 n.walkers <- 20
 par.inits <- data.frame(r.max = runif(n.walkers, 1, 10),
@@ -54,4 +54,39 @@ plot(EMCEE$samples)
 
 ### Julia
 
-TODO
+```{julia}
+using ComponentArrays
+using KissMCMC: emcee
+using Plots
+using StatsPlots
+
+# number of walkers (parallel chains)
+n_walkers = 10;
+
+## We need a vector of inital values, one for each walkers.
+θinit = ComponentVector(r_max = 2.5, K=1.4, sigma=0.25); # prior mean
+## We add some randomnesses to make sure that they do not start
+## from the same point.
+θinits = [θinit .* rand(Normal(0, 0.1), 3) for _ in 1:n_walkers];
+
+# Run sampler
+samples, acceptance_rate, lp = emcee(logposterior_monod,
+                                     θinits;
+                                     niter = 10_000, # total number of density evaluations
+                                     nburnin = 0);
+
+# Converting into `MCMCChains.Chains` object for plotting.
+X = permutedims(
+    cat((hcat(samples[i]...) for i in 1:n_walkers)..., dims=3),
+    [2, 1, 3]);
+chn = Chains(X, labels(θinit))
+```
+Note, that our chains are only of length 1000. So we have a lot of
+computation used for the burn-in phase.
+```{julia}
+# plotting
+plot(chn)
+corner(chn)
+# removing burn-in:
+corner(chn[250:end,:,:])
+```

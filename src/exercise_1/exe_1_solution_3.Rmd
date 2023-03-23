@@ -109,7 +109,7 @@ simulate.monod.stoch <- function(par, C){
     r.det <- model.monod(par, C)
 
     ## generate noise
-    z <- rnorm(length(C.monod), 0, par["sigma"])
+    z <- rnorm(length(C), 0, par["sigma"])
 
     return(r.det + z)
 }
@@ -141,7 +141,7 @@ include("../../models/models.jl") # load the deterministic model
 # function to simulate stochastic realisations
 function  simulate_monod_stoch(C, par)
     Ydet = model_monod(C, par)
-    z = rand(Normal(0, par.sigma)) # adding noise
+     z = rand(Normal(0, par.sigma), length(Ydet)) # adding noise
     Ydet .+ z
 end
 

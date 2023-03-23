@@ -1,9 +1,111 @@
 ## Solution {.tabset}
 
+- The expression $p(Y^* | x^*, \theta)$ is  our probabilistic
+model, so the distribution of $Y^*$ given some inputs and parameters
+(i.e. the likelihood function).
+
+- Typically we do not have the posterior distribution $p(\theta | y,
+x)$ as analytical form but a sample from it. Hence we cannot compute
+the integral over all $\theta$ (besides that this would be difficult
+anyway). Instead, we use an approach to obtain samples from $Y^*$:
+
+  1. Take a sample $\theta'$ from $p(\theta | y, x)$.
+  2. Take a sample from $p(Y^* | x^*, \theta')$.
+
+  Both steps are computationally cheap. For 1) we already have samples
+from the parameter inference, and 2) is simply a forward simulation
+of the model as we did in exercises 1. Hence, producing posterior
+predictions is much cheaper than inference.
+
+  (Technically we sample from the joint distribution $p(Y^*, \theta|
+  x^*, y, x)$). The  marginalization over $\theta$ is done by
+  simply ignoring the sampled $\theta$s and looking only at $Y^*$.)
+
+- It is important to keep on mind that the resulting prediction
+  intervals are only correct as long the underlying model is correct! For
+  example, it seems rather risky to extrapolate with the monod model
+  to large concentrations outside of the calibration data range.
+
 ### R
 
-TODO
+We take the function for forward simulations from exercises 1:
+```{r}
+simulate.monod.stoch <- function(par, C){
+    ## run model
+    r.det <- model.monod(par, C)
+
+    ## generate noise
+    z <- rnorm(length(C), 0, par["sigma"])
+
+    return(r.det + z)
+}
+```
+
+```{r}
+m <- 1000 # number of samples
+
+Cstar <- c(10, 12, 14, 16)               # new inputs
+
+## posterior samples, removing burn-in
+post.samples <- RAM$samples[1000:10000,]
+
+Ystar <- matrix(NA, ncol=length(Cstar), nrow=m)
+colnames(Ystar) <- paste0("C_", Cstar)
+for(k in 1:m){
+    ## 1) take a sample from posterior
+    i <- sample(ncol(post.samples), 1)
+    theta <- post.samples[i,]
+
+    ## 2) forward simulation from model
+    Ystar[k,] <- simulate.monod.stoch(theta, Cstar)
+}
+```
+
+We can also plots the predictions with uncertainty bands:
+```{r}
+Ystar.quants <- apply(Ystar, MARGIN=2, FUN=quantile, probs=c(0.05, 0.5, 0.95))
+
+## plot result
+plot(Cstar, Ystar.quants[2,], ylab="r", ylim=c(0, 5))
+polygon(c(Cstar,rev(Cstar)), c(Ystar.quants[1,],rev(Ystar.quants[3,])), col = "grey85")
+lines(Cstar, Ystar.quants[2,], col=2, lwd=2, type="b")
+```
 
 ### Julia
 
-TODO
+We take the function for forward simulations from exercises 1:
+```{julia}
+# function to simulate stochastic realisations
+function simulate_monod_stoch(C, par)
+    Ydet = model_monod(C, par)
+    z = rand(Normal(0, par.sigma), length(Ydet)) # adding noise
+    Ydet .+ z
+end
+```
+
+```{julia}
+m = 1000
+Cstar = [10,12,14,16]
+Ystar = Matrix{Float64}(undef, m, length(Cstar));
+θ = copy(θinit);
+for k in 1:m
+    i = rand(1000:10000)
+    θ .= res.X[:,i]
+    Ystar[k,:] = simulate_monod_stoch(Cstar, θ)
+end
+```
+
+```{julia}
+# compute quantile
+low_quantile = [quantile(Ystar[:,i], 0.05) for i in 1:length(Cstar)];
+med_quantile = [quantile(Ystar[:,i], 0.5) for i in 1:length(Cstar)];
+upper_quantile = [quantile(Ystar[:,i], 0.95) for i in 1:length(Cstar)];
+plot(Cstar, upper_quantile,
+     fillrange = low_quantile,
+     labels = false,
+     xlabel = "C",
+     ylabel = "r",
+     ylim=(0,5));
+plot!(Cstar, med_quantile, marker=:circle,
+      labels = false)
+```

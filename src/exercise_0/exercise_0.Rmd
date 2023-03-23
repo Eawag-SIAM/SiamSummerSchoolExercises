@@ -43,7 +43,7 @@ Assume the  probability densities $p(E \mid B)$,
 $p(B)$, $p(A, D \mid E)$, and $p(C \mid B, E)$ are known.
 
 - Draw the corresponding directed acyclic graph of the conditional
-probabilities to visualize the independence structure.
+probabilities to visualize the dependence structure.
 - Derive $p(B, C, E)$
 - Derive the joint distribution of $A$, $B$, $C$, $D$, and $E$.
 - Derive $p(A, B \mid C, D, E)$

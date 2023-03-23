@@ -38,4 +38,21 @@ IDPmisc::ipairs(AMDR$pars)
 
 ### Julia
 
-TODO
+```{julia}
+using ComponentArrays
+using AdaptiveMCMC
+using MCMCChains
+using Plots
+using StatsPlots
+
+θinit = ComponentVector(r_max = 2.5, K=1.4, sigma=0.25) # use prior mean
+res = adaptive_rwm(θinit, logposterior_monod,
+                   10_000;
+                   algorithm = :am,
+                   b=1,   # length of burn-in. Set to 1 for no burn-in.
+                   );
+# convert to MCMCChains for summary and plotting
+chn = Chains(res.X', labels(θinit))
+plot(chn)
+corner(chn)
+```

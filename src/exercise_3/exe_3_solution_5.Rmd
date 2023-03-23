@@ -2,4 +2,107 @@
 
 ### Julia
 
-TODO
+First we make sure, that we can sample in an unlimited space by using
+appropriate transformations:
+```{julia}
+using TransformVariables
+
+# defines the 'legal' parameter space, all parameter cannot be negative
+# due to the lognormal prior
+trans = as((r_max = asℝ₊, K = asℝ₊, sigma = asℝ₊))
+
+# define a function that takes a parameter vector in ℝ^n
+function logposterior_monod_Rn(par_Rn)
+    # transforms from ℝ^n to parameter space,
+    # and compute log of the determinante of the jacobian
+    par, logjac = TransformVariables.transform_and_logjac(trans, par_Rn)
+
+    # do not forget to add the log determinante!
+    logposterior_monod(ComponentVector(par)) + logjac
+end
+```
+
+We get the gradient of the logposterior with AD:
+```{julia}
+import ForwardDiff
+
+# derive a function that computes the gradient
+∇logposterior_monod_Rn(par_Rn) = ForwardDiff.gradient(logposterior_monod_Rn, par_Rn)
+```
+
+#### HMC
+
+```{julia, result=FALSE}
+using AdvancedHMC
+function stanHMC(lp::Function, ∇lp::Function,  θ_init,;
+                 n_samples::Int=1000, n_adapts::Int=n_samples÷2)
+
+    # Define a Hamiltonian system
+    D = length(θ_init)   # number of parameters
+    metric = DiagEuclideanMetric(D)
+    hamiltonian = Hamiltonian(metric, lp, θr -> (lp(θr), ∇lp(θr)))
+
+    # Define a leapfrog solver, with initial step size chosen heuristically
+    initial_ϵ = find_good_stepsize(hamiltonian, θ_init)
+    integrator = Leapfrog(initial_ϵ)
+
+    # Define an HMC sampler, with the following components
+    #   - multinomial sampling scheme,
+    #   - generalised No-U-Turn criteria, and
+    #   - windowed adaption for step-size and diagonal mass matrix
+    proposal = NUTS{MultinomialTS, GeneralisedNoUTurn}(integrator)
+    adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integrator))
+
+    # -- run sampler
+    samples, stats = sample(hamiltonian, proposal, θ_init, n_samples,
+                            adaptor, n_adapts; progress=true)
+
+    return (samples=samples, stats=stats)
+
+end
+```
+
+We use our wrapper function `stanHMC`. Note, that for HMC we typically
+need a much lower number of samples.
+```{julia}
+par_init = [-1.0, -1.0, -1.0]   # in ℝⁿ
+res = stanHMC(logposterior_monod_Rn,
+              ∇logposterior_monod_Rn,
+              par_init;
+              n_samples = 100);
+
+res.samples                     # this are the samples in ℝⁿ !
+```
+
+We need to back-transform the samples to the "normal" space. For
+ plotting we convert to `Chains`:
+```{julia}
+_chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i]))
+        for i in 1:size(res.samples, 1)];
+chn = Chains(_chn,  [:r_max, :K, :sigma])
+plot(chn)
+corner(chn)
+```
+
+#### BarkerMCMC
+
+The same steps are taken for the `BarkerMCMC`:
+```{julia}
+using BarkerMCMC: barker_mcmc
+
+par_init = [-1.0, -1.0, -1.0];   # in ℝⁿ
+
+# see `?barker_mcmc` for all options
+res = barker_mcmc(logposterior_monod_Rn,
+                  ∇logposterior_monod_Rn,
+                  par_init;
+                  n_iter = 1000,
+                  target_acceptance_rate=0.4);
+# Transform the samples to the "normal" space and convert to `Chains`
+_chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i,:]))
+        for i in 1:size(res.samples, 1)];
+chn = Chains(_chn,  [:r_max, :K, :sigma])
+
+plot(chn)
+corner(chn)
+```
