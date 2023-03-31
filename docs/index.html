@@ -396,7 +396,7 @@ display: none;
 <h1 class="title toc-ignore">Exercises and Resources</h1>
 <h4 class="author">Eawag Summer School in Environmental Systems Analysis
 2023</h4>
-<h4 class="date">23 March, 2023</h4>
+<h4 class="date">31 March, 2023</h4>
 
 </div>
 
@@ -404,14 +404,19 @@ display: none;
 <ul>
 <li><a href="#general-information" id="toc-general-information">General
 information</a></li>
+<li><a href="#software" id="toc-software">Software</a>
+<ul>
+<li><a href="#r" id="toc-r">R</a></li>
+<li><a href="#julia" id="toc-julia">Julia</a></li>
+</ul></li>
 <li><a href="#example-models-and-data" id="toc-example-models-and-data">Example models and data</a></li>
 <li><a href="#exercises" id="toc-exercises">Exercises</a></li>
 <li><a href="#solutions" id="toc-solutions">Solutions</a></li>
 <li><a href="#ive-found-a-bug-or-typo" id="toc-ive-found-a-bug-or-typo">I’ve found a bug or typo! 🐜</a></li>
 <li><a href="#version-info" id="toc-version-info">Version info</a>
 <ul>
-<li><a href="#r" id="toc-r">R</a></li>
-<li><a href="#julia" id="toc-julia">Julia</a></li>
+<li><a href="#r-1" id="toc-r-1">R</a></li>
+<li><a href="#julia-1" id="toc-julia-1">Julia</a></li>
 </ul></li>
 </ul>
 </div>
@@ -423,21 +428,83 @@ reason we provide more exercises than you can solve in this week.
 Exercises that cover fundamental concepts are marked with ★. We
 recommend that everyone has a look at them. Exercises that are more
 advanced are marked with 🗲.</p>
-<ul>
-<li>Should I use R or Julia (or Python)?</li>
-</ul>
+</div>
+<div id="software" class="section level1 tabset">
+<h1 class="tabset">Software</h1>
+<p>For most exercises we provide the hints and solutions in
+<strong>R</strong> and <strong>Julia</strong>. <strong>R</strong> is a
+popular free software environment for statistical computing, with an
+extensive range of packages for a extensive array of statistical
+procedures, plotting options, data handling, and more. See this <a href="https://cran.r-project.org/web/views/">overview</a>. However, as
+an interpreted language, R’s performance may be slow, and deploying it
+in a production environment can pose certain limitations.</p>
+<p><strong>Julia</strong> is a more recent, well designed language
+developed at MIT aiming at scientific computation. It utilizes a highly
+efficient just-in-time compilation for execution speeds comparable to
+those of C or Fortran. This makes Julia a great option for
+computationally intensive tasks like Bayesian inference. Being a newer
+language than R, you may find more rough edges in some libraries and
+less online resources. The core language, however, is stable and very
+well documented. Note, for the exercises in this course you will benefit
+a lot from the faster speed as all our example models are tiny. Julia
+may even appear slower than R in interactive use due to the compilation
+step, however, the faster execution speed of Julia makes this a
+worthwhile trade-off for larger problems.</p>
+<div id="r" class="section level2">
+<h2>R</h2>
+<div id="installation" class="section level3">
+<h3>Installation</h3>
+<ol style="list-style-type: decimal">
+<li><p>Install R from the official <a href="https://www.r-project.org/">webpage</a>.</p></li>
+<li><p>If you do not have a favorite text editor, we recommend to
+install <a href="https://posit.co/download/rstudio-desktop/">R
+Studio</a>, the most widely used IDE for R.</p></li>
+</ol>
+</div>
+<div id="install-the-packages-used-for-the-course" class="section level3">
+<h3>Install the packages used for the course</h3>
+<p>TODO</p>
+</div>
 <div id="r-resources" class="section level3">
-<h3>R resources</h3>
+<h3>R Resources</h3>
 <ul>
-<li>how to install the packages</li>
+<li><a href="assets/A%20(very)%20short%20introduction%20to%20R.pdf" target="_blank">A (very) short introduction to R</a></li>
 </ul>
-<p><a href="assets/A%20(very)%20short%20introduction%20to%20R.pdf" target="_blank">A (very) short introduction to R</a></p>
+</div>
+</div>
+<div id="julia" class="section level2">
+<h2>Julia</h2>
+<div id="installation-1" class="section level3">
+<h3>Installation</h3>
+<ol style="list-style-type: decimal">
+<li><p>Download and install the the latest stable Julia version form the
+<a href="https://julialang.org/">official webpage</a>. Read the platform
+specific instructions carefully.</p></li>
+<li><p>If you do not have a favorite text editor, we recommend to
+install <a href="https://code.visualstudio.com/">Visual Studio
+Code</a>.</p></li>
+<li><p>Install the Visual Studio Code <a href="https://www.julia-vscode.org/">Julia Plugin</a> following this <a href="https://www.julia-vscode.org/docs/dev/gettingstarted/#Installation-and-Configuration">instructions</a>.</p></li>
+</ol>
+</div>
+<div id="install-packages-used-for-the-course" class="section level3">
+<h3>Install packages used for the course</h3>
+<p>TODO</p>
 </div>
 <div id="julia-resources" class="section level3">
 <h3>Julia resources</h3>
 <ul>
-<li>how to install the packages</li>
+<li><p>Official <a href="https://julialang.org/">Julia webpage</a> with
+downloads and links to many other resources.</p></li>
+<li><p>Official <a href="https://docs.julialang.org/en/v1/">Julia
+documentation</a>, rather technical.</p></li>
+<li><p>A <a href="https://learnxinyminutes.com/docs/julia/">brief
+introduction</a> for programmers</p></li>
+<li><p><a href="https://discourse.julialang.org/">Julia forum</a>, where
+you find many questions answered.</p></li>
+<li><p><a href="https://docs.julialang.org/en/v1/manual/noteworthy-differences/">Noteworthy
+Differences from other Languages</a> such as Matlab, Python, R.</p></li>
 </ul>
+</div>
 </div>
 </div>
 <div id="example-models-and-data" class="section level1">
@@ -461,6 +528,7 @@ computations, MCMC</p></li>
 </ul>
 <div id="advances-topics" class="section level4">
 <h4>Advances Topics</h4>
+<p>This exercises may use specialized software packages.</p>
 <ul>
 <li><p><a href="exercise_4.html">Exercises 4</a>: Inference for
 Hierarchical models with STAN and JAGS</p></li>
@@ -488,7 +556,7 @@ here</a> (PRs are welcome too). Thanks a lot!</p>
 <div id="version-info" class="section level1 tabset">
 <h1 class="tabset">Version info</h1>
 <p>The solutions have been compiled with the follow versions:</p>
-<div id="r" class="section level2">
+<div id="r-1" class="section level2">
 <h2>R</h2>
 <pre><code>## R version 4.2.2 (2022-10-31)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
@@ -503,9 +571,9 @@ here</a> (PRs are welcome too). Thanks a lot!</p>
 ## [8] base     
 ## 
 ## other attached packages:
-##  [1] mvtnorm_1.1-3      mcmcensemble_3.0.0 adaptMCMC_1.4      Matrix_1.5-1      
-##  [5] IDPmisc_1.1.20     FME_1.3.6.2        coda_0.19-4        rootSolve_1.8.2.3 
-##  [9] deSolve_1.34       JuliaCall_0.17.5   knitr_1.39         rmarkdown_2.19    
+##  [1] mcmcensemble_3.0.0 adaptMCMC_1.4      Matrix_1.5-1       IDPmisc_1.1.20    
+##  [5] FME_1.3.6.2        coda_0.19-4        rootSolve_1.8.2.3  deSolve_1.34      
+##  [9] JuliaCall_0.17.5   knitr_1.39         rmarkdown_2.19    
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_1.0.9          progressr_0.13.0    bslib_0.4.2        
@@ -522,7 +590,7 @@ here</a> (PRs are welcome too). Thanks a lot!</p>
 ## [34] htmltools_0.5.4     MASS_7.3-58.1       future_1.32.0      
 ## [37] stringi_1.7.8       cachem_1.0.6</code></pre>
 </div>
-<div id="julia" class="section level2">
+<div id="julia-1" class="section level2">
 <h2>Julia</h2>
 <pre><code>## Julia Version 1.8.1
 ## Commit afb6c60d69a (2022-09-06 15:09 UTC)
@@ -554,7 +622,7 @@ here</a> (PRs are welcome too). Thanks a lot!</p>
 ## ⌃ [91a5bcdd] Plots v1.38.5
 ##   [2913bbd2] StatsBase v0.33.21
 ##   [f3b207a7] StatsPlots v0.15.4
-##   [84d833dd] TransformVariables v0.8.2
+## ⌃ [84d833dd] TransformVariables v0.8.2
 ##   [3a884ed6] UnPack v1.0.2
 ##   [37e2e46d] LinearAlgebra
 ##   [10745b16] Statistics

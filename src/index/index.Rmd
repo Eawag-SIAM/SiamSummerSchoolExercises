@@ -20,17 +20,87 @@ week. Exercises that cover fundamental concepts are marked with ★. We
 recommend that everyone has a look at them. Exercises that are more
 advanced are marked with 🗲.
 
-- Should I use R or Julia (or Python)?
 
-### R resources
 
-- how to install the packages
+# Software {.tabset}
 
-[A (very) short introduction to R](assets/A (very) short introduction to R.pdf){target="_blank"}
+For most exercises we provide the hints and solutions in **R** and
+**Julia**.
+**R** is a popular free software environment for statistical
+computing, with an extensive range of packages for a extensive array
+of statistical procedures, plotting options, data handling, and
+more. See this
+[overview](https://cran.r-project.org/web/views/). However, as an
+interpreted language, R's performance may be slow, and deploying it in
+a production environment can pose certain limitations.
+
+**Julia** is a more recent, well designed language developed at MIT
+aiming at scientific computation. It utilizes a highly efficient
+just-in-time compilation for execution speeds comparable to those of C
+or Fortran.  This makes Julia a great option for computationally
+intensive tasks like Bayesian inference. Being a newer language than
+R, you may find more rough edges in some libraries and less online
+resources. The core language, however, is stable and very well
+documented. Note, for the exercises in this course you will benefit a
+lot from the faster speed as all our example models are tiny. Julia
+may even appear slower than R in interactive use due to the
+compilation step, however, the faster execution speed of Julia makes
+this a worthwhile trade-off for larger problems.
+
+
+## R
+### Installation
+
+1. Install R from the  official [webpage](https://www.r-project.org/).
+
+2. If you do not have a favorite text editor, we recommend to install [R Studio](https://posit.co/download/rstudio-desktop/), the most
+    widely used IDE for R.
+
+### Install the packages used for the course
+TODO
+
+### R Resources
+
+- [A (very) short introduction to R](assets/A (very) short introduction to R.pdf){target="_blank"}
+
+
+## Julia
+
+### Installation
+
+1. Download and install the the latest stable Julia version form the  [
+  official webpage](https://julialang.org/). Read the platform
+  specific instructions carefully.
+
+2. If you do not have a favorite text editor, we recommend to install
+     [Visual Studio Code](https://code.visualstudio.com/).
+
+3. Install the Visual Studio Code [Julia
+     Plugin](https://www.julia-vscode.org/) following this [instructions](https://www.julia-vscode.org/docs/dev/gettingstarted/#Installation-and-Configuration).
+
+
+### Install packages used for the course
+TODO
 
 ### Julia resources
 
-- how to install the packages
+
+- Official [Julia webpage](https://julialang.org/) with downloads and
+  links to many other resources.
+
+- Official [Julia documentation](https://docs.julialang.org/en/v1/), rather
+  technical.
+
+- A [brief introduction](https://learnxinyminutes.com/docs/julia/) for
+programmers
+
+- [Julia forum](https://discourse.julialang.org/), where you find
+    many questions answered.
+
+- [Noteworthy Differences from other
+  Languages](https://docs.julialang.org/en/v1/manual/noteworthy-differences/)
+  such as Matlab, Python, R.
+
 
 # Example models and data
 
@@ -52,6 +122,8 @@ advanced are marked with 🗲.
 - [Exercises 3](exercise_3.html): Adaptive Bayesian computations, MCMC
 
 #### Advances Topics
+
+This exercises may use specialized software packages.
 
 - [Exercises 4](exercise_4.html): Inference for Hierarchical models
   with STAN and JAGS
