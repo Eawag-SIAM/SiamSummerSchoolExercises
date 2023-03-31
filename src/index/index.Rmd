@@ -1,7 +1,6 @@
 ---
 title: Exercises and Resources
 number_sections: TRUE
-date: "`r format(Sys.time(), '%d %B, %Y')`"
 author: "Eawag Summer School in Environmental Systems Analysis 2023"
 output:
   html_document:
@@ -18,7 +17,7 @@ output:
 
 
 All participants have different backgrounds and interests. For this
-reason we provide more exercises than you can solve in this
+reason we tend to provide more exercises than you can solve in this
 week. Exercises that cover fundamental concepts are marked with ★. We
 recommend that everyone has a look at them. Exercises that are more
 advanced are marked with 🗲.
@@ -27,8 +26,10 @@ advanced are marked with 🗲.
 
 # Software {.tabset}
 
-For most exercises we provide the hints and solutions in **R** and
-**Julia**.
+For most exercises we provide hints and solutions in **R** and
+**Julia**. You can attempt the exercises in any other language you are
+comfortable with, however, is some cases you may find it difficult to
+find corresponding packages (in particular for [Exercises 3](exercise_3.html)).
 
 **R** is a popular free software environment for statistical
 computing, with an extensive range of packages for a extensive array
@@ -72,7 +73,7 @@ TODO
 
 ### Installation
 
-1. Download and install the the latest stable Julia version form the  [
+1. Download and install the latest stable Julia version from the  [
   official webpage](https://julialang.org/). Read the platform
   specific instructions carefully.
 
@@ -110,7 +111,7 @@ programmers
 
 ### Data
 
-Download this [`zip` file](
+Download this [zip file](
 https://github.com/scheidan/SiamSummerSchoolExercises/blob/main/data/exercise_data.zip?raw=true) and extract it to convenient location. It
 contains all `csv` files needed in the exercises.
 
@@ -174,7 +175,8 @@ improve the exercises, please open an
 
 # Version info {.tabset}
 
-The solutions have been compiled with the follow versions:
+Here you find the exact package versions used to compile the solutions:
+<details>
 
 ## R
 ```{r, echo=FALSE}
@@ -193,3 +195,6 @@ import Pkg
 Pkg.activate("../.")
 Pkg.status()
 ```
+</details>
+
+Built at `r format(Sys.time(), '%d %B, %Y')`.
