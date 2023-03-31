@@ -109,8 +109,9 @@ programmers
 
 ### Data
 
-Download all `csv` files in a convenient location. We will use it for
-multiple exercises.
+Download this [`zip` file](
+https://github.com/scheidan/SiamSummerSchoolExercises/blob/main/data/exercise_data.zip?raw=true) and extract it to convenient location. It
+contains all `csv` files needed in the exercises.
 
 ### Models {.tabset}
 
