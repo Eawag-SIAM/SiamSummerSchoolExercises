@@ -29,6 +29,7 @@ advanced are marked with 🗲.
 
 For most exercises we provide the hints and solutions in **R** and
 **Julia**.
+
 **R** is a popular free software environment for statistical
 computing, with an extensive range of packages for a extensive array
 of statistical procedures, plotting options, data handling, and
@@ -109,8 +110,9 @@ programmers
 
 ### Data
 
-Download all `csv` files in a convenient location. We will use it for
-multiple exercises.
+Download this [`zip` file](
+https://github.com/scheidan/SiamSummerSchoolExercises/blob/main/data/exercise_data.zip?raw=true) and extract it to convenient location. It
+contains all `csv` files needed in the exercises.
 
 ### Models {.tabset}
 
