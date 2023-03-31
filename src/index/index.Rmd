@@ -11,6 +11,9 @@ output:
     css: ../eawag.css
 ---
 
+<!-- setup Julia environmental and JS Code -->
+```{r, child = "../header.Rmd"}
+```
 # General information
 
 
@@ -104,9 +107,25 @@ programmers
 
 # Example models and data
 
+### Data
+
+Download all `csv` files in a convenient location. We will use it for
+multiple exercises.
+
+### Models {.tabset}
+
+The example models are defined in this file. Save it in a convenient
+location.
+
+#### R
 - [`models.r`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/models/models.r){target="_blank"}
+
+You can load it with `source("path_to/models.r")` in your scripts.
+
+#### Julia
 - [`models.jl`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/models/models.jl){target="_blank"}
 
+You can load it with `include("path_to/models.r")` in your scripts.
 
 
 # Exercises

@@ -41,3 +41,9 @@ for(exer in exercises){
                           params = list(showsolutions=TRUE))
     }
 }
+
+
+## --- zip all data files for easy download
+
+files2zip <- dir('data', pattern="csv$", full.names = TRUE)
+zip(zipfile = 'data/exercise_data.zip', files = files2zip)

@@ -415,12 +415,39 @@ information</a></li>
 <li><a href="#ive-found-a-bug-or-typo" id="toc-ive-found-a-bug-or-typo">I’ve found a bug or typo! 🐜</a></li>
 <li><a href="#version-info" id="toc-version-info">Version info</a>
 <ul>
-<li><a href="#r-1" id="toc-r-1">R</a></li>
-<li><a href="#julia-1" id="toc-julia-1">Julia</a></li>
+<li><a href="#r-2" id="toc-r-2">R</a></li>
+<li><a href="#julia-2" id="toc-julia-2">Julia</a></li>
 </ul></li>
 </ul>
 </div>
 
+<!-- setup Julia environmental and JS Code -->
+<!-- JS Code -->
+<script type="text/javascript">
+// Swap all tabs with the same name together
+
+// make sure html is fully loaded
+document.addEventListener("DOMContentLoaded", function(){
+    // Add a click event listener to the document
+    document.addEventListener('click', function (event) {
+        // Check if the clicked element is a tab
+        if (event.target.getAttribute('data-toggle') === 'tab') {
+            // Get the ID of the clicked tab (withouth the number)
+            var clickedTabId = event.target.getAttribute('href').replace(/-[0-9]*/g, '');
+
+            // Get all tabs whos ID is the same (ignoring the number)
+            var tabs = document.querySelectorAll('[href^="' + clickedTabId + '"][data-toggle="tab"]')
+
+            // activate all tabs
+            // see: https://getbootstrap.com/docs/3.4/javascript/#tabs
+            for (var i = 0; i < tabs.length; i++) {
+                $(tabs[i]).tab('show');
+            }
+        }
+    })
+});
+</script>
+<!-- activate julia environment -->
 <div id="general-information" class="section level1">
 <h1>General information</h1>
 <p>All participants have different backgrounds and interests. For this
@@ -509,10 +536,32 @@ Differences from other Languages</a> such as Matlab, Python, R.</p></li>
 </div>
 <div id="example-models-and-data" class="section level1">
 <h1>Example models and data</h1>
+<div id="data" class="section level3">
+<h3>Data</h3>
+<p>Download all <code>csv</code> files in a convenient location. We will
+use it for multiple exercises.</p>
+</div>
+<div id="models" class="section level3 tabset">
+<h3 class="tabset">Models</h3>
+<p>The example models are defined in this file. Save it in a convenient
+location.</p>
+<div id="r-1" class="section level4">
+<h4>R</h4>
 <ul>
 <li><a href="https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/models/models.r" target="_blank"><code>models.r</code></a></li>
+</ul>
+<p>You can load it with <code>source(&quot;path_to/models.r&quot;)</code> in your
+scripts.</p>
+</div>
+<div id="julia-1" class="section level4">
+<h4>Julia</h4>
+<ul>
 <li><a href="https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/models/models.jl" target="_blank"><code>models.jl</code></a></li>
 </ul>
+<p>You can load it with <code>include(&quot;path_to/models.r&quot;)</code> in your
+scripts.</p>
+</div>
+</div>
 </div>
 <div id="exercises" class="section level1">
 <h1>Exercises</h1>
@@ -556,7 +605,7 @@ here</a> (PRs are welcome too). Thanks a lot!</p>
 <div id="version-info" class="section level1 tabset">
 <h1 class="tabset">Version info</h1>
 <p>The solutions have been compiled with the follow versions:</p>
-<div id="r-1" class="section level2">
+<div id="r-2" class="section level2">
 <h2>R</h2>
 <pre><code>## R version 4.2.2 (2022-10-31)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
@@ -590,7 +639,7 @@ here</a> (PRs are welcome too). Thanks a lot!</p>
 ## [34] htmltools_0.5.4     MASS_7.3-58.1       future_1.32.0      
 ## [37] stringi_1.7.8       cachem_1.0.6</code></pre>
 </div>
-<div id="julia-1" class="section level2">
+<div id="julia-2" class="section level2">
 <h2>Julia</h2>
 <pre><code>## Julia Version 1.8.1
 ## Commit afb6c60d69a (2022-09-06 15:09 UTC)
