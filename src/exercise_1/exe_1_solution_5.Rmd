@@ -1,36 +1,123 @@
 
-## Solutions  !!TODO!!
+## Solutions {.tabset}
 
-### Local sensitivity analysis
+### R
+#### Local sensitivity analysis
 
-### Variance-based sensitivity {.tabset}
+First we define some inputs and define a reference point in parameter
+space. Then we run the model with the changed parameters:
+```{r}
+source("../../models/models.r") # load the model
 
-#### R
-```R{eval=FALSE}
-library(sensitivity)
+## inputs
+C.monod <- seq(0, 10, 0.1)    # concentrations at which model output should be calculated
 
-## get sampling points
-res.fast <- fast99(model=NULL,factors=names(par.growth),n=100,
-                   q="qlnorm.trunc",
-                   q.arg=list(list(meanlog=meanlog[1],sdlog=sdlog[1]),
-                              list(meanlog=meanlog[2],sdlog=sdlog[2]),
-                              list(meanlog=meanlog[3],sdlog=sdlog[3]),
-                              list(meanlog=meanlog[4],sdlog=sdlog[4]),
-                              list(meanlog=meanlog[5],sdlog=sdlog[5]),
-                              list(meanlog=meanlog[6],sdlog=sdlog[6])))
+## define parameters
+par.monod <- c(r_max=5, K=3)   # reference point
+par.monod.10 <- par.monod * 1.1
+par.monod.50 <- par.monod * 1.5
 
-## calculate results for sample:
-ressamp.growth <- matrix(nrow=0,ncol=0)
-for ( i in 1:nrow(res.fast$X) )
-{
-    res.growth.new <- model.growth(t(res.fast$X[i,]),L.growth)
-}
+## run model
+r.det <- model.monod(par.monod, C.monod)
+r.det.10 <- model.monod(par.monod.10, C.monod)
+r.det.50 <- model.monod(par.monod.50, C.monod)
+```
+With this we compute the absolute
+indices for both parameters:
+```{r}
+## -- absolute
 
-## calculate results of variance-based regional sensitivity analysis:
-res <- tell(res.fast,y = ressamp.growth[,j])
+## for r_max
+S.rmax.10 <- (r.det.10 - r.det) / (par.monod.10["r_max"] - par.monod["r_max"])
+S.rmax.50 <- (r.det.50 - r.det) / (par.monod.50["r_max"] - par.monod["r_max"])
+
+## for K
+S.K.10 <- (r.det.10 - r.det) / (par.monod.10["K"] - par.monod["K"])
+S.K.50 <- (r.det.50 - r.det) / (par.monod.50["K"] - par.monod["K"])
+
+## plot result
+plot(C.monod, S.K.10, col=2, type="l", ylab="absolute sensitivity",
+     main="absolute sensitivities")
+lines(C.monod, S.K.50, col=2,  lty = 2)
+lines(C.monod, S.rmax.10, col=4,  lty = 1)
+lines(C.monod, S.rmax.50, col=4,  lty = 2)
+legend("topleft", col=c(2,2,4,4), lty=c(1,2),
+       legend=c("S_K 10%", "S_K 50%", "S_r.max 10%", "S_r.max 50%"))
 ```
 
-#### Julia
+We see that for larger concentrations the model is more sensitive.
+
+We do the same for the relative sensitivities:
+```{r}
+## -- relative
+S.rel.rmax.10 <- par.monod["r_max"] / r.det * S.rmax.10
+S.rel.rmax.50 <- par.monod["r_max"] / r.det * S.rmax.50
+
+S.rel.K.10 <- par.monod["K"] / r.det * S.K.10
+S.rel.K.50 <- par.monod["K"] / r.det * S.K.50
+
+
+plot(C.monod, S.rel.K.10, col=2, type="l", ylab="relative sensitivity",
+     main="Relative sensitivities", ylim=c(0,1))
+lines(C.monod, S.rel.K.50, col=2,  lty = 2)
+lines(C.monod, S.rel.rmax.10, col=4,  lty = 1)
+lines(C.monod, S.rel.rmax.50, col=4,  lty = 2)
+legend("topleft", col=c(2,2,4,4), lty=c(1,2),
+       legend=c("S_K 10%", "S_K 50%", "S_r.max 10%", "S_r.max 50%"))
+```
+
+Note, for this model the relative sensitivities are identical for both
+parameters!
+
+
+#### Variance-based sensitivity
+
+We use the function `fast99` to compute `2*n` parameter combinations
+for which we will evaluate the model:
+```{r}
+library(sensitivity)
+
+## sensitivity sampling points
+lower = par.monod * 0.7
+upper = par.monod * 1.3
+res.fast <- fast99(factors = names(par.monod),
+                   n = 100,
+                   q = "qunif",
+                   q.arg = list(list(min=lower[1], max=upper[1]),
+                                list(min=lower[2], max=upper[2]))
+                   )
+## all parameter combinations to run the model with
+head(res.fast$X)
+```
+
+We then run the model with all combinations in a loop. For slow
+models, this could be done in parallel.
+```{r}
+## calculate results for sample for all concentrations:
+res.SA.monod <- matrix(NA, nrow=nrow(res.fast$X), ncol=length(C.monod))
+for(i in 1:nrow(res.fast$X)){
+    res.SA.monod[i,] <- model.monod(unlist(res.fast$X[i,]), C.monod)
+}
+```
+
+After picking a concentration, we can then compute the sensitivity
+indices
+```{r}
+j <- 5 # chose a concentration
+C.monod[j]
+S <- tell(res.fast, y = res.SA.monod[, j])
+S
+
+plot(S)
+```
+
+### Julia
+
+TODO
+
+#### Local sensitivity analysis
+
+#### Variance-based sensitivity
 
 ```Julia {eval=FALSE}
 using GlobalSensitivity

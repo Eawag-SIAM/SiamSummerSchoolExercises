@@ -294,9 +294,9 @@ Check that your log-likelihood is implemented correctly by generating model outp
 ```
 
 
-# 5. Sensitivity analysis (NEEDS TO BE REWRITTEN!)
+# 5. Sensitivity analysis
 
-For the models "Monod" and "Growth" try and compare different sensitivity analysis
+For the "Monod" model try and compare different sensitivity analysis
 approaches.
 
 
@@ -304,6 +304,7 @@ approaches.
 
 Increase the model parameters by $10 \%$ and by $50 \%$, redo the forward simulations, and try to understand the effect of the parameter change on the model results.
 
+- Which input concentrations do you use?
 
 ## Local sensitivity analysis
 
@@ -318,19 +319,47 @@ s_{loc} = \frac{\theta}{Y} \frac{\Delta Y}{\Delta \theta}
 $$
 
 Set the ranges $\Delta \theta$ to  $10 \%$ and by $50 \%$ of the
-parameter values and interpret the results.
+parameter values and compute the values for different
+concentrations (inputs). What is your interpretation?
 
 
 ## Variance-based sensitivity
-Conduct a variance-based regional (global) sensitivity analyses with lognormal parameter distributions based on default mean values and standard deviations of $10 \%$ and $50 \%$ of the mean and interpret the results.
+Conduct a variance-based regional (global) sensitivity analyses with uniform parameter distributions.
 
 ### Hints {.tabset}
 
 #### R {-}
 
-Use the `fast99` function implemented in the package `sensitivity`.
+Use the `fast99` function implemented in the package
+`sensitivity`. The template below should get you started. For details look also the
+documentation of `fast99`.
 
+```r
+library(sensitivity)
 
+## 1) get sampling points in parameter space
+lower = ...
+upper = ...
+res.fast <- fast99(factors = names(par.monod),
+                   n = 100,
+                   q = "qunif",
+                   q.arg = list(list(min=lower[1], max=upper[1]),
+                                list(min=lower[2], max=upper[2]))
+                   )
+## all parameter combinations to run the model with
+head(res.fast$X)
+
+## 2) run the model for all parameter combinations:
+res.SA <- matrix(NA, nrow=nrow(res.fast$X), ncol=...)
+for(i in 1:nrow(res.fast$X)){
+    res.SA[i,] <- model(unlist(res.fast$X[i,]), ...)
+}
+
+## 3) compute sensitivity index
+S <- tell(res.fast, y = res.SA.monod[, j])
+S
+plot(S)
+```
 
 #### Julia {-}
 Use the package
@@ -339,11 +368,6 @@ and the method `eFAST`.
 
 
 
-
-## Comparing different sensitivity measures
-
-Compare the results of the different sensitivity approaches. Do the
-rankings agree? Which one would you trust?
 
 ```{r, child = if(params$showsolutions){"exe_1_solution_5.Rmd"}}
 ```

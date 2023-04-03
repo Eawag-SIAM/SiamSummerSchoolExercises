@@ -1831,16 +1831,19 @@ computing the likelihood for several parameters, including the one that
 you generated the data with.</p>
 </div>
 </div>
-<div id="sensitivity-analysis-needs-to-be-rewritten" class="section level1">
-<h1>5. Sensitivity analysis (NEEDS TO BE REWRITTEN!)</h1>
-<p>For the models “Monod” and “Growth” try and compare different
-sensitivity analysis approaches.</p>
+<div id="sensitivity-analysis" class="section level1">
+<h1>5. Sensitivity analysis</h1>
+<p>For the “Monod” model try and compare different sensitivity analysis
+approaches.</p>
 <div id="manual-sensitivity-analysis" class="section level2">
 <h2>Manual sensitivity analysis</h2>
 <p>Increase the model parameters by <span class="math inline">\(10
 \%\)</span> and by <span class="math inline">\(50 \%\)</span>, redo the
 forward simulations, and try to understand the effect of the parameter
 change on the model results.</p>
+<ul>
+<li>Which input concentrations do you use?</li>
+</ul>
 </div>
 <div id="local-sensitivity-analysis" class="section level2">
 <h2>Local sensitivity analysis</h2>
@@ -1851,22 +1854,45 @@ s_{loc} = \frac{\Delta Y}{\Delta \theta}
 s_{loc} = \frac{\theta}{Y} \frac{\Delta Y}{\Delta \theta}
 \]</span></p>
 <p>Set the ranges <span class="math inline">\(\Delta \theta\)</span> to
-<span class="math inline">\(10 \%\)</span> and by <span class="math inline">\(50 \%\)</span> of the parameter values and
-interpret the results.</p>
+<span class="math inline">\(10 \%\)</span> and by <span class="math inline">\(50 \%\)</span> of the parameter values and compute
+the values for different concentrations (inputs). What is your
+interpretation?</p>
 </div>
 <div id="variance-based-sensitivity" class="section level2">
 <h2>Variance-based sensitivity</h2>
 <p>Conduct a variance-based regional (global) sensitivity analyses with
-lognormal parameter distributions based on default mean values and
-standard deviations of <span class="math inline">\(10 \%\)</span> and
-<span class="math inline">\(50 \%\)</span> of the mean and interpret the
-results.</p>
+uniform parameter distributions.</p>
 <div id="hints-5" class="section level3 tabset">
 <h3 class="tabset">Hints</h3>
 <div id="r-5" class="section level4 unnumbered">
 <h4 class="unnumbered">R</h4>
 <p>Use the <code>fast99</code> function implemented in the package
-<code>sensitivity</code>.</p>
+<code>sensitivity</code>. The template below should get you started. For
+details look also the documentation of <code>fast99</code>.</p>
+<pre class="r"><code>library(sensitivity)
+
+## 1) get sampling points in parameter space
+lower = ...
+upper = ...
+res.fast &lt;- fast99(factors = names(par.monod),
+                   n = 100,
+                   q = &quot;qunif&quot;,
+                   q.arg = list(list(min=lower[1], max=upper[1]),
+                                list(min=lower[2], max=upper[2]))
+                   )
+## all parameter combinations to run the model with
+head(res.fast$X)
+
+## 2) run the model for all parameter combinations:
+res.SA &lt;- matrix(NA, nrow=nrow(res.fast$X), ncol=...)
+for(i in 1:nrow(res.fast$X)){
+    res.SA[i,] &lt;- model(unlist(res.fast$X[i,]), ...)
+}
+
+## 3) compute sensitivity index
+S &lt;- tell(res.fast, y = res.SA.monod[, j])
+S
+plot(S)</code></pre>
 </div>
 <div id="julia-5" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
@@ -1874,11 +1900,6 @@ results.</p>
 and the method <code>eFAST</code>.</p>
 </div>
 </div>
-</div>
-<div id="comparing-different-sensitivity-measures" class="section level2">
-<h2>Comparing different sensitivity measures</h2>
-<p>Compare the results of the different sensitivity approaches. Do the
-rankings agree? Which one would you trust?</p>
 </div>
 </div>
 
