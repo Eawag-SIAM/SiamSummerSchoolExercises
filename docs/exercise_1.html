@@ -1897,7 +1897,23 @@ plot(S)</code></pre>
 <div id="julia-5" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
 <p>Use the package <a href="https://docs.sciml.ai/GlobalSensitivity/stable/"><code>GlobalSensitivity.jl</code></a>
-and the method <code>eFAST</code>.</p>
+and the method <code>eFAST</code>. Try to visualize the sensitivities
+with a plot.</p>
+<pre class="julia"><code>using GlobalSensitivity
+
+# 1) Define a vector of tuples that give the lower and
+#    upper bound for each parameter:
+lower = ...
+upper = ...
+param_ranges = [(lower[i], upper[i]) for i in 1:2]
+
+# 2) Run SA. `gsa` can handle models with multible outputs (i.e. concentrations)
+res = gsa(θ -&gt; model_monod(C_monod, ComponentVector(r_max = θ[1], K = θ[2])),
+          eFAST(num_harmonics=6),
+          param_ranges,
+          samples = 200)
+res.S1                          # direct effect
+res.ST                          # total effect</code></pre>
 </div>
 </div>
 </div>

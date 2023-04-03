@@ -119,38 +119,23 @@ TODO
 
 #### Variance-based sensitivity
 
-```Julia {eval=FALSE}
+```{julia}
 using GlobalSensitivity
 
-res1 = gsa(model.growth,
-           eFAST(),
-           [(0,1),
-            (2, 5)
-            ],
-           samples=1500)
-```
-
-Or
-```Julia {eval=FALSE}
-using GlobalSensitivityAnalysis
-using Distributions
-using DataStructures
-
-
-# define the data
-data = SobolData(
-    params = OrderedDict(:x1 => Uniform(-3.14159265359, 3.14159265359),
-        :x2 => Uniform(-3.14159265359, 3.14159265359),
-        :x3 => Uniform(-3.14159265359, 3.14159265359)),
-    N = 1000
-)
-
-# generate samples using Sobol sequence
-samples = sample(data)
-
-# run model (example)
-Y = model.(samples)
-
-# perform Sobol Analysis
-analyze(data, Y)
+lower = par .* 0.7
+upper = par .* 1.3
+param_ranges = [(lower[i], upper[i]) for i in 1:2]
+# We can run multible outputs (i.e. different concetrations at once)
+res = gsa(θ -> model_monod(C_monod, ComponentVector(r_max = θ[1], K = θ[2])),
+          eFAST(num_harmonics=6),
+          param_ranges,
+          samples = 200)
+res.S1                          # direct effect
+res.ST                          # total effect
+p = plot(C_monod, res.ST[:,1], label="r_max, total effect",
+         xlab="concentration", ylab="sensitivity index");
+plot!(p, C_monod, res.S1[:,1], label="r_max, main effect");
+plot!(p, C_monod, res.ST[:,2], label="K, total effect");
+plot!(p, C_monod, res.S1[:,2], label="K, main effect");
+p
 ```
