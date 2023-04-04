@@ -166,7 +166,7 @@ plot(C_monod, [S_rmax_10.S_rel  S_rmax_50.S_rel  S_K_10.S_rel  S_K_50.S_rel],
 
 #### Variance-based sensitivity
 
-```{julia}
+```{julia fig.width = 5}
 using GlobalSensitivity
 lower = par .* 0.7;
 upper = par .* 1.3;
