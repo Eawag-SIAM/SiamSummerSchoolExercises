@@ -4,71 +4,69 @@
 ### R
 #### Local sensitivity analysis
 
-First we define some inputs and define a reference point in parameter
-space. Then we run the model with the changed parameters:
+Because we have to do the same calculations for every parameters, it is
+a good idea to write a little function that computes the
+absolute an relative local sensitivity indices. Note, that we use the
+three dots (`...`) to pass additional arguments to the `model`.
 ```{r}
+local.SA <- function(model, par.vector, par, delta.rel=0.1, ...){
+    ## change `par` by delta.rel
+    par.vector2 <- par.vector
+    par.vector2[par] <- par.vector2[par] * (1 + delta.rel)
+
+    ## run model
+    Y <- model(par.vector, ...)
+    Y2 <- model(par.vector2, ...)
+
+    ## compute sensitiviy indices
+    S.abs <- (Y - Y2) / (par.vector[par] - par.vector2[par])
+    S.rel <- par.vector[par] / Y * S.abs
+
+    list(S.abs = S.abs, S.rel=S.rel)
+}
+```
+
+We apply our function `local_SA` for both parameters with different `delta.rel`:
+```{r}
+
 source("../../models/models.r") # load the model
 
-## inputs
-C.monod <- seq(0, 10, 0.1)    # concentrations at which model output should be calculated
+## define inputs
+C.monod <- seq(0, 10, 0.1) # concentrations at which model output should be calculated
 
-## define parameters
-par.monod <- c(r_max=5, K=3)   # reference point
-par.monod.10 <- par.monod * 1.1
-par.monod.50 <- par.monod * 1.5
+## define parameters, the reference point
+par.monod <- c(r_max=5, K=3)
 
-## run model
-r.det <- model.monod(par.monod, C.monod)
-r.det.10 <- model.monod(par.monod.10, C.monod)
-r.det.50 <- model.monod(par.monod.50, C.monod)
+## compute sensitiviy indices
+S.rmax.10 <- local.SA(model.monod, par.monod, "r_max", delta.rel=0.1, C=C.monod)
+S.rmax.50 <- local.SA(model.monod, par.monod, "r_max", delta.rel=0.5, C=C.monod)
+S.K.10 <- local.SA(model.monod, par.monod, "K", delta.rel=0.1, C=C.monod)
+S.K.50 <- local.SA(model.monod, par.monod, "K", delta.rel=0.5, C=C.monod)
 ```
-With this we compute the absolute
-indices for both parameters:
+
+Plotting the absolute indices:
 ```{r}
-## -- absolute
-
-## for r_max
-S.rmax.10 <- (r.det.10 - r.det) / (par.monod.10["r_max"] - par.monod["r_max"])
-S.rmax.50 <- (r.det.50 - r.det) / (par.monod.50["r_max"] - par.monod["r_max"])
-
-## for K
-S.K.10 <- (r.det.10 - r.det) / (par.monod.10["K"] - par.monod["K"])
-S.K.50 <- (r.det.50 - r.det) / (par.monod.50["K"] - par.monod["K"])
-
-## plot result
-plot(C.monod, S.K.10, col=2, type="l", ylab="absolute sensitivity",
+plot(C.monod, S.K.10$S.abs, col=2, type="l", ylim=c(-0.5, 1),
+     ylab="absolute sensitivity",
      main="absolute sensitivities")
-lines(C.monod, S.K.50, col=2,  lty = 2)
-lines(C.monod, S.rmax.10, col=4,  lty = 1)
-lines(C.monod, S.rmax.50, col=4,  lty = 2)
+lines(C.monod, S.K.50$S.abs, col=2, lty = 2)
+lines(C.monod, S.rmax.10$S.abs, col=4, lty = 1)
+lines(C.monod, S.rmax.50$S.abs, col=4, lty = 2)
 legend("topleft", col=c(2,2,4,4), lty=c(1,2),
        legend=c("S_K 10%", "S_K 50%", "S_r.max 10%", "S_r.max 50%"))
 ```
 
-We see that for larger concentrations the model is more sensitive.
-
-We do the same for the relative sensitivities:
+Plotting the and relative indices:
 ```{r}
-## -- relative
-S.rel.rmax.10 <- par.monod["r_max"] / r.det * S.rmax.10
-S.rel.rmax.50 <- par.monod["r_max"] / r.det * S.rmax.50
-
-S.rel.K.10 <- par.monod["K"] / r.det * S.K.10
-S.rel.K.50 <- par.monod["K"] / r.det * S.K.50
-
-
-plot(C.monod, S.rel.K.10, col=2, type="l", ylab="relative sensitivity",
-     main="Relative sensitivities", ylim=c(0,1))
-lines(C.monod, S.rel.K.50, col=2,  lty = 2)
-lines(C.monod, S.rel.rmax.10, col=4,  lty = 1)
-lines(C.monod, S.rel.rmax.50, col=4,  lty = 2)
-legend("topleft", col=c(2,2,4,4), lty=c(1,2),
+plot(C.monod, S.K.10$S.rel, col=2, type="l", ylim=c(-1, 1),
+     ylab="relative sensitivity",
+     main="relative sensitivities")
+lines(C.monod, S.K.50$S.rel, col=2, lty = 2)
+lines(C.monod, S.rmax.10$S.rel, col=4, lty = 1)
+lines(C.monod, S.rmax.50$S.rel, col=4, lty = 2)
+legend("bottomright", col=c(2,2,4,4), lty=c(1,2),
        legend=c("S_K 10%", "S_K 50%", "S_r.max 10%", "S_r.max 50%"))
 ```
-
-Note, for this model the relative sensitivities are identical for both
-parameters!
-
 
 #### Variance-based sensitivity
 
@@ -113,17 +111,65 @@ plot(S)
 
 ### Julia
 
-TODO
-
 #### Local sensitivity analysis
+
+Because we have to do the same calculations for every parameters, it is
+a good idea to write a little function that computes  the
+absolute an relative local sensitivity indices:
+```{julia, result="hide"}
+function local_SA(model::Function, θ::ComponentVector,
+                  parameter::Symbol; Δrel=0.1)
+
+    # change `parameter` by `Δrel`:
+    θ2 = copy(θ*1.0)
+    θ2[parameter] = θ2[parameter] * (1 + Δrel)
+
+    # run model
+    Y = model(θ)
+    Y2 = model(θ2)
+
+    # compute sensitiviy indices
+    S_abs = (Y .- Y2) ./ (θ[parameter] - θ2[parameter])
+    S_rel = θ[parameter] ./ Y .* S_abs
+
+    (S_abs = S_abs, S_rel = S_rel)
+end
+```
+We apply our function `local_SA` for both parameters. Note the use of an
+anonymous functions to pass the additional parameters `C_monod`. This
+is a pattern commonly used in Julia.
+```{julia}
+include("../../models/models.jl"); # load the model
+
+# set concentrations
+C_monod = 0:0.1:10;
+
+# compute indices
+S_rmax_10 = local_SA(θ -> model_monod(C_monod, θ), par, :r_max, Δrel=0.1);
+S_rmax_50 = local_SA(θ -> model_monod(C_monod, θ), par, :r_max, Δrel=0.5);
+S_K_10 = local_SA(θ -> model_monod(C_monod, θ), par, :K, Δrel=0.1);
+S_K_50 = local_SA(θ -> model_monod(C_monod, θ), par, :K, Δrel=0.5);
+```
+
+Plotting the results
+```{julia}
+# plot absolute sensitivities
+plot(C_monod, [S_rmax_10.S_abs  S_rmax_50.S_abs  S_K_10.S_abs  S_K_50.S_abs],
+     labels = ["S_rmax_10"  "S_rmax_50"  "S_K_10"  "S_K_50"],
+     xlab = "concentration", ylab="absolute sensitiviy")
+# plot absolute sensitivities
+plot(C_monod, [S_rmax_10.S_rel  S_rmax_50.S_rel  S_K_10.S_rel  S_K_50.S_rel],
+     labels = ["S_rmax_10"  "S_rmax_50"  "S_K_10"  "S_K_50"],
+     xlab = "concentration", ylab="relative sensitiviy")
+```
+
 
 #### Variance-based sensitivity
 
 ```{julia}
 using GlobalSensitivity
-
-lower = par .* 0.7
-upper = par .* 1.3
+lower = par .* 0.7;
+upper = par .* 1.3;
 param_ranges = [(lower[i], upper[i]) for i in 1:2]
 # We can run multible outputs (i.e. different concetrations at once)
 res = gsa(θ -> model_monod(C_monod, ComponentVector(r_max = θ[1], K = θ[2])),

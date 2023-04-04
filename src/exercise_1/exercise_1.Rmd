@@ -331,7 +331,7 @@ Conduct a variance-based regional (global) sensitivity analyses with uniform par
 #### R {-}
 
 Use the `fast99` function implemented in the package
-`sensitivity`. The template below should get you started. For details look also the
+[`sensitivity`](https://cran.r-project.org/web/packages/sensitivity/index.html). The template below should get you started. For details look also the
 documentation of `fast99`.
 
 ```r
