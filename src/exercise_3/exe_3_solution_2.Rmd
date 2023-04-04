@@ -48,7 +48,7 @@ IDPmisc::ipairs(RAM$samples) # prettier versions of pairs()
 
 ### Julia
 
-```{julia}
+```{julia, out.width = '80%'}
 using ComponentArrays
 using AdaptiveMCMC
 using MCMCChains

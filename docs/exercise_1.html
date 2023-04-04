@@ -1650,7 +1650,7 @@ function loglikelihood_linear(theta, x, y)
 
         ## Calculate loglikelihood. use `logpdf(Normal(...))`
 
-        end</code></pre>
+end</code></pre>
 </div>
 </div>
 </div>
@@ -1664,22 +1664,21 @@ reasonable?</p>
 <h3 class="tabset">Hints</h3>
 <div id="r-1" class="section level4 unnumbered">
 <h4 class="unnumbered">R</h4>
-<p>You can use, for instance, use the <code>optim</code> function:</p>
+<p>You can use, for instance, the <code>optim</code> function:</p>
 <pre class="r"><code># Define starting parameters for optimisation (e.g. beta_init, gamma_init, and sigma_init),
 # then find maximising parameters using optim:
-par.max &lt;- optim(par = c(beta_init, gamma_init, sigma_init), fn = loglikelihood.linear, x=x, y=y)
+par.max &lt;- optim(par = c(beta_init, gamma_init, sigma_init), fn = beg.loglikelihood.linear, x=x, y=y)
 
                                         # You can look at the result like this:
 par.max$par</code></pre>
-<p><strong>Careful</strong>: <code>optim</code> does minimisation per
-default!</p>
+<p>Note that <code>optim</code> does minimization by default! You will
+have to create a negative-loglikelihood function to minimize.</p>
 </div>
 <div id="julia-1" class="section level4 unnumbered">
 <h4 class="unnumbered">Julia</h4>
 <p>Use the function <code>minimizer</code> from the package
-<code>Optim.jl</code>. As such, you will have to create a
-negative-loglikelihood function to minimize. This could look like
-this:</p>
+<code>Optim.jl</code>. You will have to create a negative-loglikelihood
+function to minimize. This could look like this:</p>
 <pre class="julia"><code>using Optim
 param = Optim.minimizer(optimize(???, ???));
 best_param = ???</code></pre>

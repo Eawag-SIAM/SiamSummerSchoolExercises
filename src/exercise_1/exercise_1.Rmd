@@ -109,7 +109,7 @@ function loglikelihood_linear(theta, x, y)
 
         ## Calculate loglikelihood. use `logpdf(Normal(...))`
 
-        end
+end
 ```
 
 
@@ -122,22 +122,24 @@ likelihood (the so called maximum likelihood estimator, MLE). Plot the resulting
 
 #### R {-}
 
-You can use, for instance, use the `optim` function:
+You can use, for instance, the `optim` function:
 
 ```{r  eval=FALSE}
 
 # Define starting parameters for optimisation (e.g. beta_init, gamma_init, and sigma_init),
 # then find maximising parameters using optim:
-par.max <- optim(par = c(beta_init, gamma_init, sigma_init), fn = loglikelihood.linear, x=x, y=y)
+par.max <- optim(par = c(beta_init, gamma_init, sigma_init), fn = beg.loglikelihood.linear, x=x, y=y)
 
                                         # You can look at the result like this:
 par.max$par
 ```
 
-**Careful**: `optim` does minimisation per default!
+Note that `optim` does minimization by default! You will have to
+create a negative-loglikelihood function to minimize.
+
 
 #### Julia {-}
-Use the function `minimizer` from the package `Optim.jl`. As such, you will have to create a negative-loglikelihood function to minimize. This could look like this:
+Use the function `minimizer` from the package `Optim.jl`. You will have to create a negative-loglikelihood function to minimize. This could look like this:
 ```{julia, eval = FALSE}
 using Optim
 param = Optim.minimizer(optimize(???, ???));

@@ -110,7 +110,7 @@ loglikelihood_monod(yobs, C, par2)
 
 ```
 Plotting
-```{julia, results = 'hide'}
+```{julia, out.width = '80%', results = 'hide'}
 # use the better parameters to compute the deterministic predictions
 y_det = model_monod(C, par1)
 

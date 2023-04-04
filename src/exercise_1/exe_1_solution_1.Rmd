@@ -213,7 +213,7 @@ param
 
 
 Plotting
-```{julia}
+```{julia, out.width = '80%'}
 using Plots
 
 scatter(x, y,

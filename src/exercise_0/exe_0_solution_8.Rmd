@@ -53,7 +53,7 @@ var(x)
 var(f.(x))
 ```
 Plotting
-```{julia}
+```{julia, out.width = '80%'}
 using Plots
 
 scatter(x, f.(x),

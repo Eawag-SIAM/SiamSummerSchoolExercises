@@ -152,7 +152,7 @@ S_K_50 = local_SA(θ -> model_monod(C_monod, θ), par, :K, Δrel=0.5);
 ```
 
 Plotting the results
-```{julia}
+```{julia, out.width = '80%'}
 # plot absolute sensitivities
 plot(C_monod, [S_rmax_10.S_abs  S_rmax_50.S_abs  S_K_10.S_abs  S_K_50.S_abs],
      labels = ["S_rmax_10"  "S_rmax_50"  "S_K_10"  "S_K_50"],
@@ -166,7 +166,7 @@ plot(C_monod, [S_rmax_10.S_rel  S_rmax_50.S_rel  S_K_10.S_rel  S_K_50.S_rel],
 
 #### Variance-based sensitivity
 
-```{julia fig.width = 5}
+```{julia, out.width = '80%'}
 using GlobalSensitivity
 lower = par .* 0.7;
 upper = par .* 1.3;

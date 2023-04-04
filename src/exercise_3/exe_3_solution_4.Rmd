@@ -95,7 +95,7 @@ for k in 1:m
 end
 ```
 
-```{julia}
+```{julia, out.width = '80%'}
 # compute quantile
 low_quantile = [quantile(Ystar[:,i], 0.05) for i in 1:length(Cstar)];
 med_quantile = [quantile(Ystar[:,i], 0.5) for i in 1:length(Cstar)];

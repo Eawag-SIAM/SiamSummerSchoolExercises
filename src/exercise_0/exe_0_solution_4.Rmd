@@ -42,28 +42,28 @@ Y = Normal(2, 10)
 Use the function `pdf`(Probability Density Function)
 ```{julia}
 pdf_X = pdf(X, 0.8)
-pdf_Y = pdf(Y, 0.8) 
+pdf_Y = pdf(Y, 0.8)
 ```
 
 2. Sample from distributions and plot them
 
 ```{julia, results = 'hide'}
-X_s = rand(X, 10000) 
+X_s = rand(X, 10000)
 Y_s = rand(Y, 10000)
 ```
 
-```{julia}
+```{julia, out.width = '80%'}
 using Plots
 p = [
-  histogram(X_s, nbins = 20, 
-    labels=false, 
-    xlabel="X sample", 
-    ylabel="Frequency", 
+  histogram(X_s, nbins = 20,
+    labels=false,
+    xlabel="X sample",
+    ylabel="Frequency",
     title="Histogram of X_s"),
-  histogram(Y_s, nbins = 20, 
-    labels=false, 
-    xlabel="Y sample", 
-    ylabel="Frequency", 
+  histogram(Y_s, nbins = 20,
+    labels=false,
+    xlabel="Y sample",
+    ylabel="Frequency",
     title="Histogram of Y_s")
 ];
 plot(p...)
@@ -74,10 +74,10 @@ plot(p...)
 Z_s = sin.(2*π*X_s).*sqrt.(X_s) #the dot symbol means that the operation is done component by component
 ```
 
-```{julia}
-histogram(Z_s, nbins = 75, 
-    labels=false, 
-    xlabel="Z sample", 
-    ylabel="Frequency", 
+```{julia, out.width = '80%'}
+histogram(Z_s, nbins = 75,
+    labels=false,
+    xlabel="Z sample",
+    ylabel="Frequency",
     title="Histogram of Z_s")
 ```

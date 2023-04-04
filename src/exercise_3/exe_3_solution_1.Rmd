@@ -38,7 +38,7 @@ IDPmisc::ipairs(AMDR$pars)
 
 ### Julia
 
-```{julia}
+```{julia, out.width = '80%'}
 using ComponentArrays
 using AdaptiveMCMC
 using MCMCChains

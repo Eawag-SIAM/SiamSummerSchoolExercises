@@ -75,7 +75,7 @@ inter_5_95_quantile_dep = [diff(quantile(y_2_sample[1, :], [0.05, 0.95])),
 ```
 
 b. Histograms and densities
-```{julia, results = 'hide'}
+```{julia, out.width = '80%', results = 'hide'}
 hist = [
     histogram(y_1_sample[1, :], nbins = 15,
               xlabel="Y_1_indep sample",
@@ -91,10 +91,10 @@ hist = [
               title="Y_2 of Y_dep")
 ]
 ```
-```{julia}
+```{julia, out.width = '80%'}
 plot(hist..., legend = false, ylabel = "Frequency")
 ```
-```{julia, results = 'hide'}
+```{julia, out.width = '80%', results = 'hide'}
 using StatsPlots
 dens = [
     density(y_1_sample[1,:],
@@ -111,7 +111,7 @@ dens = [
             title="Y_2 of Y_dep")
 ]
 ```
-```{julia}
+```{julia, out.width = '80%'}
 plot(dens..., lengend = false, ylabel = "Density")
 ```
 
@@ -120,7 +120,7 @@ Alternatively, we could also have written a loop for the four plots.
 
 c. Scatterplots
 
-```{julia}
+```{julia, out.width = '80%'}
 scatter(y_1_sample[1, :], y_1_sample[2, :],
         labels=false,
         xlabel="y_1_sample 1",
@@ -134,7 +134,7 @@ scatter(y_2_sample[1, :], y_2_sample[2, :],
 ```
 
 d. Covariance and correlation
-```{julia}
+```{julia, out.width = '80%'}
 using Statistics
 Statistics.cov(y_1_sample, dims=2)
 Statistics.cov(y_2_sample, dims=2)

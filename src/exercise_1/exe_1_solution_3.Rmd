@@ -57,7 +57,7 @@ C_monod = 0:0.1:10
 Y_monod = model_monod(C_monod, par)
 ```
 Plotting
-```{julia}
+```{julia, out.width = '80%'}
 plot(C_monod, Y_monod,
     labels = false,
     xlabel = "C",
@@ -81,7 +81,7 @@ res = model_growth(times, par)
 
 ```
 Plotting
-```{julia}
+```{julia, out.width = '80%'}
 plot(res.time, res.C_M,
      label = "C_M",
      xlabel = "time",
@@ -139,7 +139,7 @@ using ComponentArrays
 include("../../models/models.jl") # load the deterministic model
 
 # function to simulate stochastic realisations
-function  simulate_monod_stoch(C, par)
+function simulate_monod_stoch(C, par)
     Ydet = model_monod(C, par)
      z = rand(Normal(0, par.sigma), length(Ydet)) # adding noise
     Ydet .+ z
@@ -158,7 +158,7 @@ med_quantile = [quantile(monod_stoch[i,:], 0.5) for i in 1:length(C_monod)]
 upper_quantile = [quantile(monod_stoch[i,:], 0.975) for i in 1:length(C_monod)]
 ```
 Plotting
-```{julia}
+```{julia, out.width = '80%'}
 plot(C_monod, upper_quantile,
     fillrange = low_quantile,
     labels = false,

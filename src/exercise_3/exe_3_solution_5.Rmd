@@ -76,7 +76,7 @@ res.samples                     # this are the samples in ℝⁿ !
 
 We need to back-transform the samples to the "normal" space. For
  plotting we convert to `Chains`:
-```{julia}
+```{julia, out.width = '80%'}
 _chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i]))
         for i in 1:size(res.samples, 1)];
 chn = Chains(_chn,  [:r_max, :K, :sigma])
@@ -87,7 +87,7 @@ corner(chn)
 #### BarkerMCMC
 
 The same steps are taken for the `BarkerMCMC`:
-```{julia}
+```{julia, out.width = '80%'}
 using BarkerMCMC: barker_mcmc
 
 par_init = [-1.0, -1.0, -1.0];   # in ℝⁿ

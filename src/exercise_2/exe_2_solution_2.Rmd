@@ -152,7 +152,7 @@ acf(residuals)
 
 #### Read data
 
-```{julia}
+```{julia, out.width = '80%'}
 using DataFrames
 import CSV
 using Plots
@@ -203,7 +203,7 @@ end
 We use the [`KissMCMC`](https://github.com/mauro3/KissMCMC.jl) package
 which provides a very basic metropolis sampler.
 
-```{julia}
+```{julia, out.width = '80%'}
 using KissMCMC: metropolis
 using Distributions
 using LinearAlgebra: diagm
@@ -240,7 +240,7 @@ too large.
 We use the previous sample to estimate the covariance matrix which is
 then used as new jump distribution.
 
-```{julia}
+```{julia, out.width = '80%'}
 # take covariance for previous chain
 Σjump = cov(Array(chn)) * (1/2)^2
 sample_proposal(θ) = θ .+ rand(MvNormal(zeros(length(θ)), Σjump))
@@ -272,7 +272,7 @@ residuals = monod_data.r .- model_monod(monod_data.C, par_max)
 
 Plotting the residuals. We hope not to find any structure, but this
 model is clearly not perfect:
-```{julia}
+```{julia, out.width = '80%'}
 p = scatter(monod_data.r, residuals, label=false, xlab="r", ylab="residual");
 hline!(p, [0], label=false)
 ```
@@ -280,13 +280,13 @@ hline!(p, [0], label=false)
 Quantile-quantile plots are great to see if the residuals are
 normal distributed (which was out assumption for the likelihood
 functions). Here we see that we have too heavy tails.
-```{julia}
+```{julia, out.width = '80%'}
 qqnorm(residuals, qqline = :R)               # a bit heavy-tailed
 ```
 
 We also assumed independence of the observations, i.e. we should not
 see any auto-correlation. This looks good here:
-```{julia}
+```{julia, out.width = '80%'}
 using StatsBase
 acf = StatsBase.autocor(residuals);
 bar(0:(length(acf)-1), acf, label=false, xlab="lag", ylab="correlation")

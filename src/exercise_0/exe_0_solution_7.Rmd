@@ -56,7 +56,7 @@ time = growth_dat[:, "t"]
 time = growth_dat.t
 ```
 Plotting
-```{julia}
+```{julia, out.width = '80%'}
 plot(time, C_M,
     labels="Microorganisms",
     xlabel="Time",

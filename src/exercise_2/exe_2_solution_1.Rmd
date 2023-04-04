@@ -131,7 +131,7 @@ plot(density(chain[1000:nrow(chain),1]), xlab=expression(lambda), main="")
 
 #### Reading and plotting the data
 
-```{julia}
+```{julia, out.width = '80%'}
 using DataFrames
 import CSV
 using Plots
@@ -228,7 +228,7 @@ end
 ```
 
 The so called trace-plot can give us an idea how well the chain has converged:
-```{julia}
+```{julia, out.width = '80%'}
 plot(chain, label=false, xlab="iteration", ylab="λ")
 ```
 
@@ -240,6 +240,6 @@ log_posts[argmax(log_posts)]
 
 A histogram of the posterior. Note, we removed the first 1000
 iterations as burn-in:
-```{julia}
+```{julia, out.width = '80%'}
 histogram(chain[1000:end], xlab="λ", label=false)
 ```

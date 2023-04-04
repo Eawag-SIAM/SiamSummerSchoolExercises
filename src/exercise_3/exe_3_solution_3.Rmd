@@ -54,7 +54,7 @@ plot(EMCEE$samples)
 
 ### Julia
 
-```{julia}
+```{julia, out.width = '80%'}
 using ComponentArrays
 using KissMCMC: emcee
 using Plots
@@ -83,7 +83,7 @@ chn = Chains(X, labels(θinit))
 ```
 Note, that our chains are only of length 1000. So we have a lot of
 computation used for the burn-in phase.
-```{julia}
+```{julia, out.width = '80%'}
 # plotting
 plot(chn)
 corner(chn)
