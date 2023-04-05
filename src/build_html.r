@@ -19,7 +19,7 @@ src.dir <- "src"
 
 ## --- compile all exercises
 exercises <- c("exercise_0", "exercise_1", "exercise_2",
-               "exercise_3", "exercise_4", "exercise_5")[1:4]
+               "exercise_3", "exercise_4", "exercise_5")[0]
 
 exercises <- c(exercises, "index")
 for(exer in exercises){
@@ -41,7 +41,7 @@ for(exer in exercises){
                           params = list(showsolutions=TRUE))
     }
 }
-
+c
 
 ## --- zip all data files for easy download
 

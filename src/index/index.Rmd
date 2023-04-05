@@ -46,11 +46,13 @@ or Fortran.  This makes Julia a great option for computationally
 intensive tasks like Bayesian inference. Being a newer language than
 R, you may find more rough edges in some libraries and less online
 resources. The core language, however, is stable and very well
-documented. Note, for the exercises in this course you will benefit a
+documented. Note, for the exercises in this course you will not benefit a
 lot from the faster speed as all our example models are tiny. Julia
 may even appear slower than R in interactive use due to the
 compilation step, however, the faster execution speed of Julia makes
-this a worthwhile trade-off for larger problems.
+this a worthwhile trade-off for larger problems. Another distinct
+advantage of Julia is the availability of Automatic Differentiation
+that can help a lot with optimization and posterior sampling.
 
 
 ## R
@@ -62,7 +64,23 @@ this a worthwhile trade-off for larger problems.
     widely used IDE for R.
 
 ### Install the packages used for the course
-TODO
+
+Run this code once to install all required packages for this
+course. Check careful for any error messages!
+```r
+## all packages that we need to install
+pkgs <- c("mcmcensemble", "IDPmisc", "FME", "rootSolve",
+          "adaptMCMC", "mvtnorm", "sensitivity", "deSolve")
+
+## install packages if needed
+for(pkg in pkgs){
+    if(!(pkg %in% row.names(installed.packages()))){
+        print(paste("-- Install: ", pkg))
+        install.packages(pkg, dependencies = TRUE)
+    }
+}
+```
+
 
 ### R Resources
 
@@ -77,18 +95,41 @@ TODO
   official webpage](https://julialang.org/). Read the platform
   specific instructions carefully.
 
-2. If you do not have a favorite text editor, we recommend to install
-     [Visual Studio Code](https://code.visualstudio.com/).
-
-3. Install the Visual Studio Code [Julia
+2. If you do not have a favorite text editor, install
+     [Visual Studio Code](https://code.visualstudio.com/), and the Visual Studio Code [Julia
      Plugin](https://www.julia-vscode.org/) following this [instructions](https://www.julia-vscode.org/docs/dev/gettingstarted/#Installation-and-Configuration).
 
 
 ### Install packages used for the course
-TODO
+
+Julia has a build-in package manager that also handles environments
+(for Python users, think `pip` and `virtualenv` combined), see the documentation [here](https://pkgdocs.julialang.org/v1/). The required packages used in the exercises
+are defined in the files:
+
+- [`Project.toml`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/src/Project.toml){target="_blank"}
+  (defines the needed packages)
+- [`Manifest.toml`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/src/Manifest.toml){target="_blank"} (defines all indirect dependencies and exact versions)
+
+Save them at a convenient location and run
+the following code to install and precompile all packaged. Note, the
+precompilation may take several minutes!
+```julia
+import Pkg
+Pkg.activate("path to *directory* containing Manifest.toml")
+Pkg.instantiate()
+Pkg.status()
+```
+
+Later activate the environment at the beginning of every script
+(before `using` the packages) with:
+```julia
+import Pkg
+Pkg.activate("path to *directory* containing Manifest.toml")
+
+using ...
+```
 
 ### Julia resources
-
 
 - Official [Julia webpage](https://julialang.org/) with downloads and
   links to many other resources.
