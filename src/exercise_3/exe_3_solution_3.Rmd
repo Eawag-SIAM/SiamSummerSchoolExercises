@@ -6,8 +6,8 @@
 library(mcmcensemble)
 ```
 
-For each walker (chain) a initial starting point must be defined. In
-general it is better to in a region with high density. We could use an
+For each walker (chain) an initial starting point must be defined. In
+general, it is better to choose it in a region with high density. We could use an
 optimizer to fine the mode, but here we just use a rather wide coverage.
 ```{r}
 n.walkers <- 20

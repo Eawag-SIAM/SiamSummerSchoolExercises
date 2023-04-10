@@ -265,7 +265,7 @@ $$
 f(E[X]) \neq E[f(X)]
 $$
 where $E$ is the expected value and $X$ is a random
-variable. Implement the a non-linear function $f(x) = \sin\sqrt{x}$
+variable. Implement the non-linear function $f(x) = \sin\sqrt{x}$
 and assume that $X$ is log-normally distribute. Use samples to estimate $f(E[X])$, $E[f(X)]$, $\mathrm{Var}[X]$, $\mathrm{Var}[f(X)]$ and compare them.
 
 ### Hints {.tabset}

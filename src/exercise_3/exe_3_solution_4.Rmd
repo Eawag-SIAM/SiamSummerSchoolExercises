@@ -5,7 +5,7 @@ model, so the distribution of $Y^*$ given some inputs and parameters
 (i.e. the likelihood function).
 
 - Typically we do not have the posterior distribution $p(\theta | y,
-x)$ as analytical form but a sample from it. Hence we cannot compute
+x)$ in analytical form but a sample from it. Hence we cannot compute
 the integral over all $\theta$ (besides that this would be difficult
 anyway). Instead, we use an approach to obtain samples from $Y^*$:
 
@@ -21,7 +21,7 @@ predictions is much cheaper than inference.
   x^*, y, x)$). The  marginalization over $\theta$ is done by
   simply ignoring the sampled $\theta$s and looking only at $Y^*$.)
 
-- It is important to keep on mind that the resulting prediction
+- It is important to keep in mind that the resulting prediction
   intervals are only correct as long the underlying model is correct! For
   example, it seems rather risky to extrapolate with the monod model
   to large concentrations outside of the calibration data range.

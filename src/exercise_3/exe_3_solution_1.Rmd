@@ -9,7 +9,7 @@ neg.log.post <- function(par) -logposterior.monod(par)
 ```
 
 The mean of the prior seems to be a reasonable point to start the
-sampler. Alternatively, we could try to find point of the maximum
+sampler. Alternatively, we could try to find the point of the maximum
 posterior density with an optimizer. For the covariance matrix of
 the jump distribution we use the standard deviation of the prior and assume independence.
 

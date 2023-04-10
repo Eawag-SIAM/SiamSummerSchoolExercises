@@ -45,9 +45,9 @@ data in the file `model_survival.csv`.
 
 ## Before you get started
 
-We want to use the model "Survial" from yesterdays exercise and the
-date `model_survival.csv` to test our sampler. The
-experiment was started done with `N=30` individuals (this information
+We want to use the model "Survial" from yesterday's exercise and the
+data `model_survival.csv` to test our sampler. The
+experiment was started with `N=30` individuals (this information
 is not contained in the data set).
 
 ### Reading and plotting the data
@@ -307,10 +307,10 @@ the chain plots to decide how many the burn-in sample you need to remove.
 # 2. Sample from the posterior for the monod model ★ {#task2}
 
 The main difference of the "Monod" compared to the "Survival" model is
-that it has more than on parameter that we would like to infer.
+that it has more than one parameter that we would like to infer.
 
-You can either generalize our own metropolis sampler to higher
-dimension or use a sampler from a package.
+You can either generalize our own Metropolis sampler to higher
+dimensions or use a sampler from a package.
 
 
 ## Read data
@@ -326,7 +326,7 @@ plot(data.monod$C, data.monod$r, xlab="C", ylab="r", main='"model_monod_stoch.cs
 
 ## Define  likelihood, prior, and posterior {.tabset}
 
-Again, we need to prepare a function that evaluates the for the log
+Again, we need to prepare a function that evaluates the log
 posterior. You can use the templates below.
 
 ### R
@@ -409,7 +409,7 @@ end
 
 ## Create initial chain {.tabset}
 
-First run an initial chain, which most like has not yet a good mixing.
+First run an initial chain, which most likely has not yet a good mixing.
 
 For the jump distribution, assume a diagonal covariance
 matrix with reasonable values. The diagonal covariance matrices
@@ -417,8 +417,8 @@ matrix with reasonable values. The diagonal covariance matrices
 proposal distribution.
 
 ### R
-The code below used the function `adaptMCMC::MCMC`. If the adaptation
-is set to `FALSE` this corresponds to the basic metropolis sampler. Of
+The code below uses the function `adaptMCMC::MCMC`. If the adaptation
+is set to `FALSE`, this corresponds to the basic Metropolis sampler. Of
 course, feel free to use your own implementation instead!
 
 ```{r eval=FALSE}
@@ -456,7 +456,7 @@ pairs(modod.chain$samples)
 ### Julia
 
 The package [`KissMCMC`](https://github.com/mauro3/KissMCMC.jl)
-provides a very basic metropolis sampler.  Of course, feel free to use
+provides a very basic Metropolis sampler.  Of course, feel free to use
 your own implementation instead!
 
 ```{julia, eval=FALSE}
@@ -488,13 +488,13 @@ Array(chn)                      # convert it to normal Array
 
 ## Improve jump distribution  {.tabset}
 
-The plot of the previous chain give us some indication how a more
+The plot of the previous chain gives us some indication how a more
 efficient jump distribution could look like.
 
-- Try to manualy change the variance of the jump distribution. Can we
+- Try to manually change the variance of the jump distribution. Can we
   get better chains?
 
-- Use the previous chain and estimate it's covariance. Does a
+- Use the previous chain and estimate its covariance. Does a
   correlated jump distribution work better?
 
 ### R
@@ -522,7 +522,7 @@ largest posterior value (the so called maximum posterior estimate, MAP).
 
 - Run the deterministic "Monod" model with this parameters and
 analyze the residuals.
-   * Are they normal distributed?
+   * Are they normally distributed?
    * Are they independent
    * Are they centered around zero?
    * Do you see any suspicious structure?
