@@ -1594,10 +1594,10 @@ distribution of the one-parameter model “survival”, given the observed
 data in the file <code>model_survival.csv</code>.</p>
 <div id="before-you-get-started" class="section level2">
 <h2>Before you get started</h2>
-<p>We want to use the model “Survial” from yesterdays exercise and the
-date <code>model_survival.csv</code> to test our sampler. The experiment
-was started done with <code>N=30</code> individuals (this information is
-not contained in the data set).</p>
+<p>We want to use the model “Survial” from yesterday’s exercise and the
+data <code>model_survival.csv</code> to test our sampler. The experiment
+was started with <code>N=30</code> individuals (this information is not
+contained in the data set).</p>
 <div id="reading-and-plotting-the-data" class="section level3">
 <h3>Reading and plotting the data</h3>
 <p>It’s always a good idea to look at the data first.</p>
@@ -1839,9 +1839,9 @@ how many the burn-in sample you need to remove.</p>
 <div id="task2" class="section level1">
 <h1>2. Sample from the posterior for the monod model ★</h1>
 <p>The main difference of the “Monod” compared to the “Survival” model
-is that it has more than on parameter that we would like to infer.</p>
-<p>You can either generalize our own metropolis sampler to higher
-dimension or use a sampler from a package.</p>
+is that it has more than one parameter that we would like to infer.</p>
+<p>You can either generalize our own Metropolis sampler to higher
+dimensions or use a sampler from a package.</p>
 <div id="read-data" class="section level2">
 <h2>Read data</h2>
 <p>We use the data <code>model_monod_stoch.csv</code>:</p>
@@ -1851,7 +1851,7 @@ plot(data.monod$C, data.monod$r, xlab=&quot;C&quot;, ylab=&quot;r&quot;, main=&#
 </div>
 <div id="define-likelihood-prior-and-posterior" class="section level2 tabset">
 <h2 class="tabset">Define likelihood, prior, and posterior</h2>
-<p>Again, we need to prepare a function that evaluates the for the log
+<p>Again, we need to prepare a function that evaluates the log
 posterior. You can use the templates below.</p>
 <div id="r-5" class="section level3">
 <h3>R</h3>
@@ -1929,7 +1929,7 @@ end</code></pre>
 </div>
 <div id="create-initial-chain" class="section level2 tabset">
 <h2 class="tabset">Create initial chain</h2>
-<p>First run an initial chain, which most like has not yet a good
+<p>First run an initial chain, which most likely has not yet a good
 mixing.</p>
 <p>For the jump distribution, assume a diagonal covariance matrix with
 reasonable values. The diagonal covariance matrices (with zero-valued
@@ -1937,9 +1937,9 @@ off-diagonal entries) correspond to independent proposal
 distribution.</p>
 <div id="r-6" class="section level3">
 <h3>R</h3>
-<p>The code below used the function <code>adaptMCMC::MCMC</code>. If the
-adaptation is set to <code>FALSE</code> this corresponds to the basic
-metropolis sampler. Of course, feel free to use your own implementation
+<p>The code below uses the function <code>adaptMCMC::MCMC</code>. If the
+adaptation is set to <code>FALSE</code>, this corresponds to the basic
+Metropolis sampler. Of course, feel free to use your own implementation
 instead!</p>
 <pre class="r"><code>library(adaptMCMC)
 
@@ -1968,7 +1968,7 @@ pairs(modod.chain$samples)</code></pre>
 <div id="julia-6" class="section level3">
 <h3>Julia</h3>
 <p>The package <a href="https://github.com/mauro3/KissMCMC.jl"><code>KissMCMC</code></a>
-provides a very basic metropolis sampler. Of course, feel free to use
+provides a very basic Metropolis sampler. Of course, feel free to use
 your own implementation instead!</p>
 <pre class="julia"><code>using KissMCMC: metropolis
 using Distributions
@@ -1998,12 +1998,12 @@ Array(chn)                      # convert it to normal Array</code></pre>
 </div>
 <div id="improve-jump-distribution" class="section level2 tabset">
 <h2 class="tabset">Improve jump distribution</h2>
-<p>The plot of the previous chain give us some indication how a more
+<p>The plot of the previous chain gives us some indication how a more
 efficient jump distribution could look like.</p>
 <ul>
-<li><p>Try to manualy change the variance of the jump distribution. Can
+<li><p>Try to manually change the variance of the jump distribution. Can
 we get better chains?</p></li>
-<li><p>Use the previous chain and estimate it’s covariance. Does a
+<li><p>Use the previous chain and estimate its covariance. Does a
 correlated jump distribution work better?</p></li>
 </ul>
 <div id="r-7" class="section level3">
@@ -2032,7 +2032,7 @@ MAP).</p></li>
 <li><p>Run the deterministic “Monod” model with this parameters and
 analyze the residuals.</p>
 <ul>
-<li>Are they normal distributed?</li>
+<li>Are they normally distributed?</li>
 <li>Are they independent</li>
 <li>Are they centered around zero?</li>
 <li>Do you see any suspicious structure?</li>

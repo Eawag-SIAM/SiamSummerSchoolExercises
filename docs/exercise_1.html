@@ -1619,7 +1619,7 @@ dat$y
 
 ## plot the data:
 plot(dat$x, dat$y, xlab=&#39;x&#39;, ylab=&#39;y&#39;)</code></pre>
-<p>Here is an template for the log-likelihood implementation – you still
+<p>Here is a template for the log-likelihood implementation – you still
 need to fill in the important bits!</p>
 <pre class="r"><code>loglikelihood.linear &lt;- function(par, x, y){
     ## deterministic part:
@@ -1873,7 +1873,7 @@ uniform parameter distributions.</p>
 <div id="r-5" class="section level4 unnumbered">
 <h4 class="unnumbered">R</h4>
 <p>Use the <code>fast99</code> function implemented in the package <a href="https://cran.r-project.org/web/packages/sensitivity/index.html"><code>sensitivity</code></a>.
-The template below should get you started. For details look also the
+The template below should get you started. For details see also the
 documentation of <code>fast99</code>.</p>
 <pre class="r"><code>library(sensitivity)
 
@@ -1913,7 +1913,7 @@ lower = ...
 upper = ...
 param_ranges = [(lower[i], upper[i]) for i in 1:2]
 
-# 2) Run SA. `gsa` can handle models with multible outputs (i.e. concentrations)
+# 2) Run SA. `gsa` can handle models with multiple outputs (i.e. concentrations)
 res = gsa(θ -&gt; model_monod(C_monod, ComponentVector(r_max = θ[1], K = θ[2])),
           eFAST(num_harmonics=6),
           param_ranges,
