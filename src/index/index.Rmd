@@ -1,7 +1,7 @@
 ---
-title: Exercises and Resources
+title: "Environmental Systems Analysis"
+subtitle: "Summer School organized by Siam, Eawag"
 number_sections: TRUE
-author: "Eawag Summer School in Environmental Systems Analysis 2023"
 output:
   html_document:
     number_sections: FALSE
@@ -13,8 +13,10 @@ output:
 <!-- setup Julia environmental and JS Code -->
 ```{r, child = "../header.Rmd"}
 ```
-# General information
 
+
+
+# General information
 
 All participants have different backgrounds and interests. For this
 reason we tend to provide more exercises than you can solve in this
@@ -239,3 +241,8 @@ Pkg.status()
 </details>
 
 Built at `r format(Sys.time(), '%d %B, %Y')`.
+
+------------------
+
+[![license](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
+This work is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/).
