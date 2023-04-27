@@ -34,7 +34,7 @@ comfortable with, however, is some cases you may find it difficult to
 find corresponding packages (in particular for [Exercises 3](exercise_3.html)).
 
 **R** is a popular free software environment for statistical
-computing, with an extensive range of packages for a extensive array
+computing, with an wide range of packages for a extensive array
 of statistical procedures, plotting options, data handling, and
 more. See this
 [overview](https://cran.r-project.org/web/views/). However, as an
@@ -48,13 +48,14 @@ or Fortran.  This makes Julia a great option for computationally
 intensive tasks like Bayesian inference. Being a newer language than
 R, you may find more rough edges in some libraries and less online
 resources. The core language, however, is stable and very well
-documented. Note, for the exercises in this course you will not benefit a
-lot from the faster speed as all our example models are tiny. Julia
-may even appear slower than R in interactive use due to the
-compilation step, however, the faster execution speed of Julia makes
-this a worthwhile trade-off for larger problems. Another distinct
-advantage of Julia is the availability of Automatic Differentiation
-that can help a lot with optimization and posterior sampling.
+documented. Note, for the exercises in this course you will not
+benefit a lot from the faster speed as all our example models are
+tiny. Julia may even appear slower than R in interactive use due to
+the compilation step, however, the faster execution speed of Julia
+makes this a worthwhile trade-off for larger problems. Another
+distinct advantage of Julia is the availability of [Automatic
+Differentiation](https://juliadiff.org/) that can help a lot with
+optimization and posterior sampling.
 
 
 ## R
@@ -101,6 +102,13 @@ for(pkg in pkgs){
      [Visual Studio Code](https://code.visualstudio.com/), and the Visual Studio Code [Julia
      Plugin](https://www.julia-vscode.org/) following this [instructions](https://www.julia-vscode.org/docs/dev/gettingstarted/#Installation-and-Configuration).
 
+3. Optional: install packages for a better user experience. Packages
+   are installed by typing  `] packagename` in the Julia interpreter.
+   - [Revise.jl](https://timholy.github.io/Revise.jl/stable/). Applies
+     changes automatically when you save a file.
+   - [AbbreviatedStackTraces.jl](https://github.com/BioTurboNick/AbbreviatedStackTraces.jl). Shortens the sometimes very long error messages.
+   - [BenchmarkTools.jl](https://github.com/JuliaCI/BenchmarkTools.jl). Measure
+     the execution speed, very helpful if your care about fast code.
 
 ### Install packages used for the course
 
@@ -117,7 +125,7 @@ the following code to install and precompile all packaged. Note, the
 precompilation may take several minutes!
 ```julia
 import Pkg
-Pkg.activate("path to *directory* containing Manifest.toml")
+Pkg.activate("path to *directory* containing Manifest.toml and Project.toml")
 Pkg.instantiate()
 Pkg.status()
 ```
@@ -126,7 +134,7 @@ Later activate the environment at the beginning of every script
 (before `using` the packages) with:
 ```julia
 import Pkg
-Pkg.activate("path to *directory* containing Manifest.toml")
+Pkg.activate("path to *directory* containing Manifest.toml and Project.toml")
 
 using ...
 ```
@@ -140,7 +148,7 @@ using ...
   technical.
 
 - A [brief introduction](https://learnxinyminutes.com/docs/julia/) for
-programmers
+programmers.
 
 - [Julia forum](https://discourse.julialang.org/), where you find
     many questions answered.
@@ -156,7 +164,7 @@ programmers
 
 Download this [zip file](
 https://github.com/scheidan/SiamSummerSchoolExercises/blob/main/data/exercise_data.zip?raw=true) and extract it to convenient location. It
-contains all `csv` files needed in the exercises.
+contains all `csv` files needed for the exercises.
 
 ### Models {.tabset}
 
@@ -176,10 +184,10 @@ You can load it with `include("path_to/models.r")` in your scripts.
 
 # Exercises
 
-- [Exercises 0](exercise_0.html): review of probability
+- [Exercises 0](exercise_0.html): Review of probability
   calculus, basics of R and Julia
 
-- [Exercises 1](exercise_1.html): deriving and implementing likelihood
+- [Exercises 1](exercise_1.html): Deriving and implementing likelihood
   functions, sensitivity analysis
 
 - [Exercises 2](exercise_2.html): Bayesian computations, MCMC
@@ -188,7 +196,7 @@ You can load it with `include("path_to/models.r")` in your scripts.
 
 #### Advances Topics
 
-This exercises may use specialized software packages.
+This exercises may use additional software packages.
 
 - [Exercises 4](exercise_4.html): Inference for Hierarchical models
   with STAN and JAGS
