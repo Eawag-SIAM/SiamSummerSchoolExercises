@@ -103,7 +103,7 @@ for(pkg in pkgs){
      Plugin](https://www.julia-vscode.org/) following this [instructions](https://www.julia-vscode.org/docs/dev/gettingstarted/#Installation-and-Configuration).
 
 3. Optional: install packages for a better user experience. Packages
-   are installed by typing  `] packagename` in the Julia interpreter.
+   are installed by typing  `] add packagename` in the Julia interpreter.
    - [Revise.jl](https://timholy.github.io/Revise.jl/stable/). Applies
      changes automatically when you save a file.
    - [AbbreviatedStackTraces.jl](https://github.com/BioTurboNick/AbbreviatedStackTraces.jl). Shortens the sometimes very long error messages.
@@ -121,7 +121,7 @@ are defined in the files:
 - [`Manifest.toml`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/src/Manifest.toml){target="_blank"} (defines all indirect dependencies and exact versions)
 
 Save them at a convenient location and run
-the following code to install and precompile all packaged. Note, the
+the following code to install and precompile all packages. Note, the
 precompilation may take several minutes!
 ```julia
 import Pkg
@@ -147,7 +147,7 @@ using ...
 - Official [Julia documentation](https://docs.julialang.org/en/v1/), rather
   technical.
 
-- A [brief introduction](https://learnxinyminutes.com/docs/julia/) for
+- A [brief Julia introduction](https://learnxinyminutes.com/docs/julia/) for
 programmers.
 
 - [Julia forum](https://discourse.julialang.org/), where you find
@@ -157,6 +157,12 @@ programmers.
   Languages](https://docs.julialang.org/en/v1/manual/noteworthy-differences/)
   such as Matlab, Python, R.
 
+- [Juliahub](https://juliahub.com/ui/Home), search for packages and
+  documentation
+
+- [Introduction to computational
+  thinking](https://computationalthinking.mit.edu/) A very cool MIT
+  lecture using Julia and interactive notebooks.
 
 # Example models and data
 
