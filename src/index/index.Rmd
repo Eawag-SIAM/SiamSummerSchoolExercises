@@ -190,36 +190,36 @@ You can load it with `include("path_to/models.r")` in your scripts.
 
 # Exercises
 
-- [Exercises 0](exercise_0.html): Review of probability
+- [Sunday](exercise_0.html): Review of probability
   calculus, basics of R and Julia
 
-- [Exercises 1](exercise_1.html): Deriving and implementing likelihood
+- [Monday](exercise_1.html): Deriving and implementing likelihood
   functions, sensitivity analysis
 
-- [Exercises 2](exercise_2.html): Bayesian computations, MCMC
+- [Tuesday](exercise_2.html): Bayesian computations, MCMC
 
-- [Exercises 3](exercise_3.html): Adaptive Bayesian computations, MCMC
+- [Wednesday](exercise_3.html): Adaptive Bayesian computations, MCMC
 
 #### Advances Topics
 
 This exercises may use additional software packages.
 
-- [Exercises 4](exercise_4.html): Inference for Hierarchical models
+- [Thursday A](exercise_4.html): Inference for Hierarchical models
   with STAN and JAGS
 
-- [Exercises 5](exercise_5.html): Approximative Bayesian Computation
+- [Thursday B](exercise_5.html): Approximative Bayesian Computation
   (ABC)
 
 
 # Solutions
 
-- [Solutions 0](exercise_0_solution.html)
+- [Sunday](exercise_0_solution.html)
 
-- [Solutions 1](exercise_1_solution.html)
+- [Monday](exercise_1_solution.html)
 
-- [Solutions 2](exercise_2_solution.html)
+- [Tuesday](exercise_2_solution.html)
 
-- [Solutions 3](exercise_3_solution.html)
+- [Wednesday](exercise_3_solution.html)
 
 
 # I've found a bug or typo! 🐜
