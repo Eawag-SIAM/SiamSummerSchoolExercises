@@ -81,7 +81,7 @@ _chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i]))
         for i in 1:size(res.samples, 1)];
 chn = Chains(_chn,  [:r_max, :K, :sigma])
 plot(chn)
-corner(chn)
+corner(chn[25:end,:,:])
 ```
 
 #### BarkerMCMC
@@ -104,5 +104,5 @@ _chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i,:]))
 chn = Chains(_chn,  [:r_max, :K, :sigma])
 
 plot(chn)
-corner(chn)
+corner(chn[250:end,:,:])
 ```

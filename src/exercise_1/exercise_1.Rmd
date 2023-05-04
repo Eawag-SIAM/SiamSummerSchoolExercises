@@ -258,7 +258,7 @@ For the computation of quantiles, you can use the function `quantile`.
 ```
 
 
-# 4. Likelihood and forward simulation for the model "Survival" 🗲
+# 4. Likelihood and forward simulation for the model "Survival" ♛
 
 ## Analytical expression for the likelihood
 

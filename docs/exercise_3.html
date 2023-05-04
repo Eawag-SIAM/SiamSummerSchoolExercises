@@ -1572,7 +1572,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <!-- activate julia environment -->
 <p>In this exercise we will look at different adaptive Metropolis
 algorithms. The aim is to get an intuition for what their “adaptations”
-are doing, by examining testing the behaviour with our simple
+are doing, by examining their behaviour with our simple
 <code>monod</code> model. You are encouraged to play with each of the
 adaptation parameters of each algorithm and to check how it influences
 the resulting sample chain.</p>
@@ -1682,7 +1682,7 @@ chain?</p></li>
 <p>It is implemented in the function <a href="https://www.rdocumentation.org/packages/FME/versions/1.3.6.2/topics/modMCMC"><code>modMCMC</code></a>
 of the package <a href="https://cran.r-project.org/web/packages/FME/index.html"><code>FME</code></a>.
 Note, this function expects the <em>negative</em> log density”, which is
-sometimes called <em>energie</em>. See the <code>modMCMC</code> function
+sometimes called <em>energy</em>. See the <code>modMCMC</code> function
 <a href="https://www.rdocumentation.org/packages/FME/versions/1.3.6.2/topics/modMCMC">documentation</a>
 for details.</p>
 <pre class="r"><code>neg.log.post &lt;- function(par) -logposterior.monod(par)</code></pre>
@@ -1730,9 +1730,9 @@ corner(chn)</code></pre>
 </div>
 <div id="robust-adaptive-metropolis" class="section level1">
 <h1>2. Robust adaptive Metropolis ★</h1>
-<p>The robust adaptive Metropolis algorithm by proposed by <a href="http://dx.doi.org/10.1007/s11222-011-9269-5">Vihola (2012)</a> is
+<p>The robust adaptive Metropolis algorithm proposed by <a href="http://dx.doi.org/10.1007/s11222-011-9269-5">Vihola (2012)</a> is
 often a good choice. It adapts the scale and rotation of the covariance
-matrix until it reached a predefined acceptance rate.</p>
+matrix until it reaches a predefined acceptance rate.</p>
 <ul>
 <li><p>Did the algorithm reach the desired acceptance rate?</p></li>
 <li><p>How is the covariance matrix after the adaptation different from
@@ -1743,7 +1743,7 @@ the initial covariance that you provided?</p></li>
 <div id="r-2" class="section level3">
 <h3>R</h3>
 <p>The package <a href="https://cran.r-project.org/web/packages/adaptMCMC/index.html"><code>adaptMCMC</code></a>
-which provides the function <code>MCMC</code>. If the parameter
+provides the function <code>MCMC</code>. If the parameter
 <code>adapt</code> is set to <code>TRUE</code> it implements the
 adaptation propsoed by Vihola. Again examine the effect of the
 adaptation settings on the chains, in particular examining the first
@@ -1792,25 +1792,23 @@ corner(chn)</code></pre>
 </div>
 <div id="population-based-sampler" class="section level1">
 <h1>3. Population based sampler ★</h1>
-<p>Population based sampler do not have an explicit jump distribution.
-Instead, the run multiple chain (often called <em>particles</em> or
+<p>Population based samplers do not have an explicit jump distribution.
+Instead, they run multiple chains (often called <em>particles</em> or
 <em>walkers</em> in this context) in parallel and the proposals are
 generated based on the position of the other particles.</p>
 <p>A popular algorithm of this class is the Affine-Invariant MCMC
 population sampler proposed by <a href="https://msp.org/camcos/2010/5-1/camcos-v5-n1-p04-p.pdf">Goodman
 and Weare (2010)</a>. The algorithm is often called <em>EMCEE</em> based
-on the python package. with the same name.</p>
+on the python package with the same name.</p>
 <div id="hints-2" class="section level2 tabset">
 <h2 class="tabset">Hints</h2>
 <div id="r-3" class="section level3">
 <h3>R</h3>
-<p>Population based samplers are is implemented in the package
+<p>Population based samplers are implemented in the package
 <code>mcmcensemble</code> as <code>MCMCEnsemble</code>. It has two
-methods: <em>stretch move</em> (<code>method = &quot;stretch&quot;</code>) (the
-Affine-Invariant MCMC population sampler proposed Goodman and Weare) and
+methods: <em>stretch move</em> (<code>method = &quot;stretch&quot;</code>) and
 <em>differential evolution</em>
-(<code>method = &quot;differential.evolution&quot;</code>) proposed by ter Braak
-and Vrugt.</p>
+(<code>method = &quot;differential.evolution&quot;</code>).</p>
 <pre class="r"><code>EMCEE &lt;- MCMCEnsemble(
     f           = logposterior.monod,
     lower.inits = par.start.lower,
@@ -1869,10 +1867,10 @@ different?</p></li>
 </div>
 <div id="posterior-predictions" class="section level1">
 <h1>4. Posterior Predictions ★</h1>
-<p>In many cases we want to make predictions for new model inputs. Lets
+<p>In many cases we want to make predictions for new model inputs. Let’s
 say we have observed the data <span class="math inline">\((y,
 x)\)</span> and used it to infer the posterior <span class="math inline">\(p(\theta | y, x)\)</span>. We would now like to
-make prediction given a new inputs <span class="math inline">\(x^*\)</span> using the learned posterior
+make predictions given a new input <span class="math inline">\(x^*\)</span> using the learned posterior
 distribution:</p>
 <p><span class="math display">\[ p(Y^* | x^*, y, x,)  = \int p(Y^* |
 x^*, \theta) \, p(\theta | y, x)
@@ -1886,36 +1884,36 @@ distribution. How can you do this without solving the integral
 analytically?</p></li>
 <li><p>Plot the result with 90% prediction interval.</p></li>
 <li><p>How much do you trust that the interval is correct? What
-assumptions did you made?</p></li>
+assumptions did you make?</p></li>
 </ul>
 </div>
 <div id="gradient-based-samplers" class="section level1">
-<h1>5. Gradient based samplers 🗲</h1>
+<h1>5. Gradient based samplers ♛</h1>
 <p>If we are able to compute the gradient of the log density, <span class="math inline">\(\nabla \log p\)</span>, we can use much more
-efficient sampling methods. For small number of parameters this may not
-be relevant, for lager problems (more than 20 dimension) the differences
-can be huge.</p>
-<p>Julia is particularly well suited for this applications, because many
-libraries for Automatic Differentiation (AD) are available - methods
-that compute the gradient of (almost) any Julia function by analyzing
-the code.</p>
+efficient sampling methods. For small numbers of parameters this may not
+be relevant, for lager problems (more than 20 dimensions) the
+differences can be huge.</p>
+<p>Julia is particularly well suited for these applications, because
+many libraries for Automatic Differentiation (AD) are available -
+methods that compute the gradient of (almost) any Julia function by
+analyzing the code.</p>
 <p>Because there is no equally powerful AD available in R, we can do
 this exercise only with Julia.</p>
 <div id="parameter-transformation" class="section level2">
 <h2>Parameter transformation</h2>
-<p>Most gradient based sampler assume that all parameters are in <span class="math inline">\(\mathbb{R}\)</span>. If we have a parameter that
-exist in a limited space, such as a standard deviation that is never
-negative, we need to transform the model parameter before sampling. For
-this we need three ingredients:</p>
+<p>Most gradient based samplers assume that all parameters are in <span class="math inline">\(\mathbb{R}\)</span>. If we have a parameter that
+is only defined on an interval, such as a standard deviation that is
+never negative, we need to transform the model parameter before
+sampling. For this we need three ingredients:</p>
 <ul>
 <li><p>a function that maps every vector in <span class="math inline">\(\mathbb{R}^n\)</span> to our “normal” model
 parameter space,</p></li>
 <li><p>the inverse of this function,</p></li>
-<li><p>the determinate of the Jacobian of this functions.</p></li>
+<li><p>the determinant of the Jacobian of this function.</p></li>
 </ul>
 <p>The package <a href="https://github.com/tpapp/TransformVariables.jl">TransformVariables</a>
-helps us with this transformations. We need a function that takes a
-vector in <span class="math inline">\(\mathbb{R}^n\)</span> to evaluates
+helps us with these transformations. We need a function that takes a
+vector in <span class="math inline">\(\mathbb{R}^n\)</span> to evaluate
 the posterior.</p>
 <pre class="julia"><code>using TransformVariables
 
@@ -1933,7 +1931,7 @@ function logposterior_monod_Rn(par_Rn)
     logposterior_monod(ComponentVector(par)) + logjac
 end</code></pre>
 <p>We can now sample in <span class="math inline">\(\mathbb{R}^n\)</span> and later transform the
-samples in the model parameter space with:</p>
+samples to the model parameter space with:</p>
 <pre class="julia"><code>TransformVariables.transform(trans, [-1,-1,-1]) # -&gt; (r_max=0.367, K=0.367, sigma=0.367)</code></pre>
 </div>
 <div id="automatic-differentation" class="section level2">
@@ -1941,17 +1939,17 @@ samples in the model parameter space with:</p>
 <p>The last ingredient we need is a function that computes the gradient
 of <code>logposterior_monod_Rn</code>. To do so we need to differentiate
 through our model, the likelihood, the prior, the parameter
-transformation, and the determinate of the Jaccobian. Needles to say,
+transformation, and the determinant of the Jaccobian. Needles to say,
 even for our very simple model this would be very tedious to do
 manually!</p>
 <p>Instead we use <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic
 Differentiation (AD)</a>. Julia has <a href="https://juliadiff.org/">multiple packages</a> for AD that make
 different trade-offs. We use <a href="https://github.com/JuliaDiff/ForwardDiff.jl"><code>ForwardDiff</code></a>
 that is well suited for smaller dimensions.</p>
-<p>For AD requires that all your model code is implemented in pure
-Julia! Otherwise there are few restrictions. For example, you can
-compute the gradient of the <em>growth</em> model even though it uses an
-advances adaptive ODE solver internally.</p>
+<p>AD requires all your model code to be implemented in pure Julia!
+Otherwise there are few restrictions. For example, you can compute the
+gradient of the <em>growth</em> model even though it uses an advanced
+adaptive ODE solver internally.</p>
 <pre class="julia"><code>import ForwardDiff
 
 # derive a function that computes the gradient
@@ -1966,7 +1964,7 @@ logposterior_monod_Rn(par_test)
 <h2>Hamiltonian Monte Carlo</h2>
 <p>Hamiltonian Monte Carlo (HMC) is one of the most powerful methods to
 sample in high dimensions. The “No-U-Turn Sampler” (NUTS) is a popular
-versions, for example it is used in <a href="https://mc-stan.org/"><em>STAN</em></a>.</p>
+version. For example, it is used in <a href="https://mc-stan.org/"><em>STAN</em></a>.</p>
 <p>The package <a href="https://github.com/TuringLang/AdvancedHMC.jl"><code>AdvancedHMC</code></a>
 provides building blocks that can be combined to construct various HMC
 samplers. The function is a wrapper that provides a NUTS sampler as
@@ -2019,10 +2017,10 @@ function stanHMC(lp::Function, ∇lp::Function,  θ_init,;
     return (samples=samples, stats=stats)
 
 end</code></pre>
-<p>HMC sampler need many density and gradient evaluations to produce a
-single proposal. However, the acceptance rate of a HMC sampler should be
-close to one. We can use the wrapper function <code>stanHMC</code> like
-this:</p>
+<p>HMC samplers need many density- and gradient-evaluations to produce a
+single proposal. However, the acceptance rate of an HMC sampler should
+be close to one. We can use the wrapper function <code>stanHMC</code>
+like this:</p>
 <pre class="julia"><code>par_init = [-1.0, -1.0, -1.0]   # in ℝⁿ
 res = stanHMC(logposterior_monod_Rn,
               ∇logposterior_monod_Rn,
@@ -2031,7 +2029,7 @@ res = stanHMC(logposterior_monod_Rn,
 
 res.samples                     # this are the samples in ℝⁿ !</code></pre>
 <p>The samples we get are in <span class="math inline">\(\mathbb{R}^n\)</span>. Before we have a look,
-let’s transform them in the “normal” parameter space:</p>
+let’s transform them to the “normal” parameter space:</p>
 <pre class="julia"><code># Transform the samples to the &quot;normal&quot; space and convert to `Chains`
 _chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i]))
         for i in 1:size(res.samples, 1)];
@@ -2043,10 +2041,10 @@ corner(chn)</code></pre>
 <div id="barkermcmc" class="section level2">
 <h2>BarkerMCMC</h2>
 <p><a href="https://doi.org/10.1111/rssb.12482">Livingstone and Zanella
-(2021)</a> proposed a comparable simple MCMC algorithm that uses the
+(2021)</a> proposed a comparably simple MCMC algorithm that uses the
 gradient to adapt the jump distribution. It is a promising alternative
-to HMC in cases the number of parameters is not very high, or if the
-gradient is expected to be noisy (which is often the case if a model
+to HMC in cases where the number of parameters is not very high, or if
+the gradient is expected to be noisy (which is often the case if a model
 uses adaptive ODE solvers).</p>
 <p><a href="https://github.com/scheidan/BarkerMCMC.jl"><code>BarkerMCMC.jl</code></a>
 implements it including an adaptation that aims at a given acceptance
@@ -2065,7 +2063,7 @@ res = barker_mcmc(logposterior_monod_Rn,
 res.samples                     # this are the samples in ℝⁿ !
 res.log_p</code></pre>
 <p>The samples we get are in <span class="math inline">\(\mathbb{R}^n\)</span>. Before we have a look,
-let’s transform them in the “normal” parameter space:</p>
+let’s transform them to the “normal” parameter space:</p>
 <pre class="julia"><code>using MCMCChains
 using StatsPlots
 

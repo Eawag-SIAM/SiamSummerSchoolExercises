@@ -370,7 +370,7 @@ $$ p(Y^* | x^*, y, x,)  = \int p(Y^* | x^*, \theta) \, p(\theta | y, x)
 ```{r, child = if(params$showsolutions){"exe_3_solution_4.Rmd"}}
 ```
 
-# 5. Gradient based samplers 🗲
+# 5. Gradient based samplers ♛
 
 If we are able to compute the gradient of the log density, $\nabla
 \log p$, we can use much more efficient sampling methods. For small

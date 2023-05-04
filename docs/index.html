@@ -458,15 +458,14 @@ document.addEventListener("DOMContentLoaded", function(){
 reason we tend to provide more exercises than you can solve in this
 week. Exercises that cover fundamental concepts are marked with ★. We
 recommend that everyone has a look at them. Exercises that are more
-advanced are marked with 🗲.</p>
+advanced are marked with ♛.</p>
 </div>
 <div id="software" class="section level1 tabset">
 <h1 class="tabset">Software</h1>
 <p>For most exercises we provide hints and solutions in
 <strong>R</strong> and <strong>Julia</strong>. You can attempt the
-exercises in any other language you are comfortable with, however, is
-some cases you may find it difficult to find corresponding packages (in
-particular for <a href="exercise_3.html">Exercises 3</a>).</p>
+exercises in any other language you are comfortable with, however, in
+some cases you may find it difficult to find corresponding packages.</p>
 <p><strong>R</strong> is a popular free software environment for
 statistical computing, with an wide range of packages for a extensive
 array of statistical procedures, plotting options, data handling, and
@@ -677,18 +676,42 @@ Here you find the exact package versions used to compile the solutions:
 ## LAPACK: /usr/lib/liblapack.so.3.11.0
 ## 
 ## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## [1] parallel  stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
 ## 
 ## other attached packages:
-## [1] JuliaCall_0.17.5 knitr_1.39       rmarkdown_2.19  
+##  [1] mcmcensemble_3.0.0 IDPmisc_1.1.20     FME_1.3.6.2        rootSolve_1.8.2.3 
+##  [5] adaptMCMC_1.4      Matrix_1.5-3       coda_0.19-4        sensitivity_1.28.1
+##  [9] deSolve_1.34       mvtnorm_1.1-3      JuliaCall_0.17.5   knitr_1.39        
+## [13] rmarkdown_2.19    
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_1.0.9      digest_0.6.29   R6_2.5.1        lifecycle_1.0.3
-##  [5] jsonlite_1.8.4  magrittr_2.0.3  evaluate_0.15   stringi_1.7.8  
-##  [9] cachem_1.0.6    rlang_1.0.6     cli_3.6.0       jquerylib_0.1.4
-## [13] bslib_0.4.2     vctrs_0.5.2     tools_4.2.3     stringr_1.5.0  
-## [17] glue_1.6.2      xfun_0.30       yaml_2.3.5      fastmap_1.1.0  
-## [21] compiler_4.2.3  htmltools_0.5.4 sass_0.4.4</code></pre>
+##  [1] sass_0.4.4          jsonlite_1.8.4      foreach_1.5.2      
+##  [4] bslib_0.4.2         RcppParallel_5.1.7  shiny_1.7.4        
+##  [7] highr_0.9           stats4_4.2.3        yaml_2.3.5         
+## [10] ggrepel_0.9.2       globals_0.16.2      pillar_1.8.1       
+## [13] lattice_0.20-45     glue_1.6.2          digest_0.6.29      
+## [16] promises_1.2.0.1    minqa_1.2.4         colorspace_2.0-3   
+## [19] htmltools_0.5.4     httpuv_1.6.9        plyr_1.8.7         
+## [22] pkgconfig_2.0.3     listenv_0.9.0       flexclust_1.4-1    
+## [25] xtable_1.8-4        scales_1.2.0        RSpectra_0.16-1    
+## [28] later_1.3.0         dtw_1.23-1          tibble_3.2.0       
+## [31] proxy_0.4-27        generics_0.1.2      ggplot2_3.4.0      
+## [34] ellipsis_0.3.2      cachem_1.0.6        shinyjs_2.1.0      
+## [37] cli_3.6.0           magrittr_2.0.3      mime_0.12          
+## [40] evaluate_0.15       ramcmc_0.1.2        parallelly_1.34.0  
+## [43] future_1.32.0       fansi_1.0.3         MASS_7.3-58.2      
+## [46] class_7.3-21        progressr_0.13.0    tools_4.2.3        
+## [49] minpack.lm_1.2-3    lifecycle_1.0.3     stringr_1.5.0      
+## [52] munsell_0.5.0       cluster_2.1.4       compiler_4.2.3     
+## [55] jquerylib_0.1.4     numbers_0.8-5       dtwclust_5.5.12    
+## [58] rlang_1.0.6         grid_4.2.3          iterators_1.0.14   
+## [61] boot_1.3-28.1       gtable_0.3.0        codetools_0.2-19   
+## [64] reshape2_1.4.4      R6_2.5.1            dplyr_1.1.0        
+## [67] future.apply_1.10.0 fastmap_1.1.0       utf8_1.2.2         
+## [70] clue_0.3-63         modeltools_0.2-23   stringi_1.7.8      
+## [73] Rcpp_1.0.9          vctrs_0.5.2         tidyselect_1.2.0   
+## [76] xfun_0.30</code></pre>
 </div>
 <div id="julia-2" class="section level2">
 <h2>Julia</h2>
@@ -729,7 +752,7 @@ Here you find the exact package versions used to compile the solutions:
 ##   [10745b16] Statistics
 ## Info Packages marked with ⌃ have new versions available</code></pre>
 </details>
-<p>Built at 28 April, 2023.</p>
+<p>Built at 04 May, 2023.</p>
 <hr />
 <p><a href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="data:image/png;base64,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" alt="license" /></a> This work is licensed under a <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
 Commons Attribution-NonCommercial-ShareAlike 4.0 International

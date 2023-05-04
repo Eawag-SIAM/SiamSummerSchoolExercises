@@ -22,7 +22,7 @@ All participants have different backgrounds and interests. For this
 reason we tend to provide more exercises than you can solve in this
 week. Exercises that cover fundamental concepts are marked with ★. We
 recommend that everyone has a look at them. Exercises that are more
-advanced are marked with 🗲.
+advanced are marked with ♛.
 
 
 
@@ -30,8 +30,8 @@ advanced are marked with 🗲.
 
 For most exercises we provide hints and solutions in **R** and
 **Julia**. You can attempt the exercises in any other language you are
-comfortable with, however, is some cases you may find it difficult to
-find corresponding packages (in particular for [Exercises 3](exercise_3.html)).
+comfortable with, however, in some cases you may find it difficult to
+find corresponding packages.
 
 **R** is a popular free software environment for statistical
 computing, with an wide range of packages for a extensive array

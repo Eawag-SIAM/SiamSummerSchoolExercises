@@ -53,7 +53,7 @@ probabilities to visualize the dependence structure.
 ```{r, child = if(params$showsolutions){"exe_0_solution_2.Rmd"}}
 ```
 
-# 3. Compound distribution 🗲
+# 3. Compound distribution ♛
 Assume that:
 $$
   \mu \sim f_{\mu}(m) =
