@@ -171,13 +171,13 @@ using GlobalSensitivity
 lower = par .* 0.7;
 upper = par .* 1.3;
 param_ranges = [(lower[i], upper[i]) for i in 1:2]
-# We can run multible outputs (i.e. different concetrations at once)
+# We can run multible outputs (i.e. different concentrations at once)
 res = gsa(θ -> model_monod(C_monod, ComponentVector(r_max = θ[1], K = θ[2])),
           eFAST(num_harmonics=6),
           param_ranges,
           samples = 200)
-res.S1                          # direct effect
-res.ST                          # total effect
+# res.S1                          # direct effects
+# res.ST                          # total effects
 p = plot(C_monod, res.ST[:,1], label="r_max, total effect",
          xlab="concentration", ylab="sensitivity index");
 plot!(p, C_monod, res.S1[:,1], label="r_max, main effect");

@@ -48,7 +48,7 @@ p(y_i|x_i,\boldsymbol{\theta}) = \frac{1}{\sqrt{2 \pi \sigma^2 }} \exp\left( {-\
 $$
 
 
-Under the assumption of independence\textbf{*}, the likelihood of all observations $\mathbf{y} = \{y_1,y_2,...,y_n\}$, given all inputs $\mathbf{x} = \{x_1,x_2,...,x_n\}$, is then given by
+Thanks to the assumption of independence, the likelihood of all observations $\mathbf{y} = \{y_1,y_2,...,y_n\}$, given all inputs $\mathbf{x} = \{x_1,x_2,...,x_n\}$, is then given by
 
 $$
 p(\mathbf{y}|\mathbf{x},\boldsymbol{\theta}) = p(y_1|x_1,\boldsymbol{\theta}) \, p(y_2|x_2,\boldsymbol{\theta}) \, p(y_3|x_3,\boldsymbol{\theta}) \, \dots \, p(y_n|x_n,\boldsymbol{\theta}) = \prod_{i=1}^n p(y_i|x_i,\boldsymbol{\theta})
@@ -59,27 +59,10 @@ $$
 which is then given in full by
 
 $$
-L(\boldsymbol{\theta}) = p(\mathbf{y}|\mathbf{x},\boldsymbol{\theta})
-= \prod_{i=1}^n \frac{1}{\sqrt{2 \pi \sigma^2} } \exp\left( {-\frac{(y_i - y_{i,det})^2}{2\sigma^2}}  \right) \\
-= \frac{1}{(2 \pi)^{n/2} \sigma^n } \exp\left( {-\frac{1}{2\sigma^2}} \sum_{i=1}^n (y_i - \beta x_i - \gamma)^2 \right)
-\;.
+p(\mathbf{y}|\mathbf{x},\boldsymbol{\theta}) = L(\boldsymbol{\theta})
+= \prod_{i=1}^n p(y_i|x_i,\boldsymbol{\theta})
+= \prod_{i=1}^n \frac{1}{\sqrt{2 \pi \sigma^2} } \exp\left( {-\frac{(y_i - y_{i,det})^2}{2\sigma^2}}  \right) \;.
 $$
-
-
-
-
-
-**Note**: If the observations were not independent, the likelihood would instead be given by
-
-$$
-p(\mathbf{y}|\mathbf{x},\boldsymbol{\theta}) = p(y_1|\mathbf{x},\boldsymbol{\theta}) \, p(y_2|y_1,\mathbf{x},\boldsymbol{\theta}) \, p(y_3|y_1,y_2,\mathbf{x},\boldsymbol{\theta}) \, \dots \, p(y_n|y_1,y_2,...,y_{n-1},\mathbf{x},\boldsymbol{\theta})
-\;.
-$$
-
-
-Only because the observations are independent, this reduces to the simple product given above.
-
-
 
 
 

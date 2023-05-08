@@ -1664,8 +1664,8 @@ p(\lambda|y)\propto p(\lambda,y) = p(y|\lambda)p(\lambda) \; .
 1.</p>
 <pre class="julia"><code>using Distributions
 
-function loglikelihood_survival(N::Int64, t, y::Vector, lambda)
-    S = exp.(-lambda .* t)
+function loglikelihood_survival(N::Int, t::Vector, y::Vector, λ)
+    S = exp.(-λ .* t)
     S = [1; S; 0]
     p = -diff(S)
     ## Add number of survivors at the end of the experiment:

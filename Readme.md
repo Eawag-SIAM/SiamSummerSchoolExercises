@@ -12,10 +12,11 @@ The `Rmarkdown` files  are compiles with
 the R packages `rmarkdown`. Additionally `pandoc` may need to be
 installed manually.
 
-Run the R script `src/build_html.R` to update the documents in
-`docs/`. Then commit all changes (*including the `html` files!*) and
-push it to GitHub. The new html will be deployed automatically in a
-few minutes.
+Run the R script `src/build_html.R` to generate the documents in
+`docs/` and all solutions. This means that R and Julia need to be
+installed.  Then commit all changes (*including the `html` files in
+`docs/`!*) and push it to GitHub. The new html will be deployed
+automatically in a few minutes.
 
 
 ## License
