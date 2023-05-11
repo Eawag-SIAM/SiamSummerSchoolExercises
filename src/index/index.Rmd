@@ -185,7 +185,7 @@ You can load it with `source("path_to/models.r")` in your scripts.
 #### Julia
 - [`models.jl`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/models/models.jl){target="_blank"}
 
-You can load it with `include("path_to/models.r")` in your scripts.
+You can load it with `include("path_to/models.jl")` in your scripts.
 
 
 # Exercises

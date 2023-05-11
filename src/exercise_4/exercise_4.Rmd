@@ -1,9 +1,8 @@
 ---
-title: 'Exercise 4: TODO! Bayesian Inference of Hierarchical Models'
-author: "Eawag Summer School in Environmental Systems Analysis"
+title: "Hierarchical Modeling with JAGS"
+author: "Helen Moor"
 output:
   html_document:
-    number_sections: no
     toc: TRUE
     toc_depth: 3
     toc_float: true
@@ -12,606 +11,700 @@ params:
   showsolutions: TRUE
 ---
 
-<!-- setup Julia environmental and JS Code -->
-```{r, child = "../header.Rmd"}
-```
 
-```{r}
-# Do not evaluate any code. This needs to be removed!
-knitr::opts_chunk$set(eval = FALSE)
-```
+**Objectives**
 
-Objectives:
+* Brief review of the concept of hierarchical statistical models.
+* Example how to use `JAGS` together with R to do Bayesian inference for parameters and states of potentially hierarchical models.
+* Build an ecological occupancy model and the dynamic occupancy model of Kéry & Royle (2007) in `JAGS`.
 
-* Review of the concept of hierarchical statistical models.
-* Become familiar with the software `JAGS`  to do Bayesian inference for parameters and states of potentially hierarchical models using Gibbs sampling.
-* Do inference for the simple, didactical, hierarchical probability network model presented in Charniak, E. Bayesian networks without tears. AI Magazine, 12(4):50-63. 1991.
-* Optional: Become familiar with the software `Stan`  for inference of hierarchical models with continuous parameters based on Hamiltonian Markov Chain Monte Carlo sampling
+**Prerequisites**
 
-Prerequisites:
-
-* `JAGS` must be installed independently of R before use with `rjags` from <http://mcmc-jags.sourceforge.net/>.
-* Required packages: `rjags`, `coda`; for optional exercise `rstan` (you may have to add the line `CXX14 = g++ -std=c++1y` to the file `My Documents\.R\Makevars.win` to get the command `stan` from `rstan` running).
+* `JAGS` installed from http://mcmc-jags.sourceforge.net/
+* `R` and `R` library
+  [`jagsUI](https://cran.r-project.org/web/packages/jagsUI/index.html)`
+  to interface Jags (for Julia there is [`Jags.jl`](https://github.com/JagsJulia/Jags.jl))
+* Dataset `BomVarData.csv`
 
 
 
-# Hierarchical Statistical Models
+Hierarchical statistical models are sets of coupled probability models
+that are conditionally related to each other. As such, hierarchical
+models provide a broad framework that encompasses different kinds of
+models, from generalized linear mixed models (often called multilevel
+models) to Bayesian belief networks to customized process-based models
+in ecology, physiology, hydrology, etc.
 
-The joint probability distribution of a probabilistic model graphically represented by a directed, acyclic graph can be formulated as the product of the marginal (prior) distributions of all nodes without parents and the conditional distributions of all child nodes given their parents.
+Hierarchical modeling provides a general and flexible framework for
+building complex statistical models from simple building
+blocks. `JAGS` is a software that makes it easy to program and fit
+complex hierarchical models, because users don't have to explicitly
+state the joint probability distribution of the entire model. Instead,
+the model is represented by submodels and their conditional
+dependencies. This allows for the creative development of complex
+models for which no standard packages are available.
 
-![Probability network of Charniak et al. 1991](charniak.png)
-
-For the simple probability network by Charniak et al. (1991), this leads to the following joint probability distribution of all nodes:
-
-$$P(fo,bp,lo,do,hb) = P(fo) \cdot P(bp) \cdot P(lo \mid fo) \cdot P(do \mid fo,bp) \cdot P(hb \mid do)$$
-
-The posterior distribution of unknown nodes given observed nodes is proportional to this joint distribution with the observations substituted for the observed nodes:
-
-$$P(fo,bp,do \mid lo,hb) \propto P(fo) \cdot P(bp) \cdot P(lo \mid fo) \cdot P(do \mid fo,bp) \cdot P(hb \mid do)$$
-
-Gibbs sampling, Metropolis sampling or Metropolis-Hastings sampling of posteriors of all unknown nodes conditioned on observed nodes can then easily be implemented.
-
-Probabilistic programming languages allow their users to formulate there models by defining the factors as shown in the example above.
-This makes them easy to use.
-
-In `JAGS`, this is done by 'sampling statements' of the form `variable ~ distribution(parameters)` for all nodes.
-As for the factors in the expression above, the order of these statements does not matter.
-Additional statements can be added to calculate distribution parameters.
-`JAGS` automatically detects from the data provided which variables are observed and which ones have to be inferred.
-`JAGS` then does Gibbs sampling from the conditional distributions.
-
-`Stan` uses a similar syntax but builds the log of the joint probability density by adding the log of the corresponding probability density for each sampling statement.
-The log of the joint density is then used for Hamiltonian Markov Chain Monte Carlo sampling of the posterior.
-The first initialization of a new model is much slower in `Stan` relative to `JAGS` as the posterior and its derivatives is translated into `C++` code, compiled and then executed.
-This makes `Stan` less convenient for small, didactical models.
-However, for larger models, the higher initialization effort in `Stan` is by far compensated by the much more efficient sampling process based on Hamiltonian Monte Carlo.
-Also, if the model is not changed, the previously compiled code is re-used which significantly accelerates initialization.
+`JAGS` uses Gibbs sampling to do Bayesian inference for parameters and
+states of (potentially) hierarchical models. Other softwares and
+packages can be used for probabilistic programming, such as `Stan`
+(interfaced to `R`with package `rstan`) or the python library `PyMC3`
+(Krapu & Borsuk 2019). An advantage of `JAGS` over Stan is that `JAGS`
+can accommodate discrete variables, such as Bernoulli-distributed
+presence-absences.
 
 
+# 1. Toad colonization 🐸
 
-# Inference with "rjags" for the Model "monod"
 
-Load the coda and rjags packages:
-```{r message=FALSE}
-library(rjags)
-library(coda)
-```
+To demonstrate model development with `JAGS` with use we use field
+observations of toads. The dataset used here is a subset of the
+long-term monitoring data set of observations of the [yellow-bellied
+toad](https://en.wikipedia.org/wiki/Yellow-bellied_toad) (*Bombina
+variegata*) in the canton of Aargau in Switzerland.
 
-Define global variables for file name, sample size, and plot line resolution:
-```{r}
+The core data is detection/non-detection of this species observed at
+$N=379$ sites (ponds) $i$ during up to 3 repeat visits $j$, over
+multiple years $t$ from 1999 to 2009 ($T=11$). Sites are nested in
+four different regions $R$.
 
-# Define global variables:
-file.jags.model.4.1 <- "exercise_4_1.jags"
-sampsize <- 10000
-nout     <- 101
+We first collapse these data across years and visits to observed
+presence-absence per site, and fit a very simple model to estimate the
+average expected probability of occurrence (occupancy). We conduct a
+naive analysis that ignores detection error.
 
-```
 
-Read and plot the data:
-```{r}
+```{r, echo=T, eval=F}
+# read data
+dat <- read.csv(file = "../../data/BomVarData.csv")
 
-# Read data for model "monod":
-data.monod <- read.table("model_monod.dat",header=T)
+# number of sites
+nsites <- length(unique(dat$SiteID))
 
-# Plot data:
-plot(data.monod)
-```
+# extract the site data only:
+sites <- unique(dat[, !(names(dat) %in% c("Visit", "Year", "Detection", "ObsID", "SiteVisited"))])
+sites <- sites[(order(sites$SiteID)),]
 
-Create JAGS model definition file by calculating parameters and writing 'sampling statements' for all prior and conditional distributions (this file could also be created using any text editor).
+# extract detection/nondetection data per site, pooling all visits and years:
+# was the toad ever seen in site i?
+seen_i <- aggregate(dat$Detection, by = list(SiteID=dat$SiteID), FUN=max, na.rm=TRUE)
 
-Note 1: The means and standard deviations, `mu` and `sd`, of the lognormal distributions have to be converted to the corresponding parameters, `mulog` and `sdlog`, of the normal distribution that generates the lognormal distribution by exponentiation).
+# number of regions
+nregions <- length(unique(sites$Region))
 
-Note 2: `JAGS` is using the precision (inverse variance), `1/sd^2`, rather than the standard deviation, `sd`, to parameterize normal and lognormal distributions.
-```{r}
-
-# Write model definition file for model "monod":
-cat("model {\n",
-    # parameter conversions for lognormal distributions:
-    "  sdlog_rmax <- sqrt(log(1+sd_r_max^2/mu_r_max^2))\n",
-    "  mulog_rmax <- log(mu_r_max)-0.5*sdlog_rmax^2\n",
-    "  sdlog_K    <- sqrt(log(1+sd_K^2/mu_K^2))\n",
-    "  mulog_K    <- log(mu_K)-0.5*sdlog_K^2\n",
-    "  sdlog_sd_r <- sqrt(log(1+sd_sd_r^2/mu_sd_r^2))\n",
-    "  mulog_sd_r <- log(mu_sd_r)-0.5*sdlog_sd_r^2\n",
-    # priors of model parameters:
-    "  r_max  ~ dlnorm(mulog_rmax,1/sdlog_rmax^2)\n",
-    "  K      ~ dlnorm(mulog_K,1/sdlog_K^2)\n",
-    "  sd_r   ~ dlnorm(mulog_sd_r,1/sdlog_sd_r^2)\n",
-    # model of observables given parameters (likelihood):
-    "  for ( i in 1:n ) {\n",
-    "    rhat[i] <- r_max*C[i]/(K+C[i])\n",
-    "    r[i] ~ dnorm(rhat[i],1/sd_r^2)\n",
-    "  }\n",
-    "}\n",
-    sep="",
-    file=file.jags.model.4.1)
-
-```
-
-Initialize the `JAGS` model and sample from the posterior of the model parameters given the data:
-```{r}
-# Initialize JAGS model:
-jags.obj <- jags.model(file.jags.model.4.1,
-                       data=list(mu_r_max = 5,
-                                 mu_K     = 3,
-                                 mu_sd_r  = 1,
-                                 sd_r_max = 2.5,
-                                 sd_K     = 1.5,
-                                 sd_sd_r  = 0.5,
-                                 n        = nrow(data.monod),
-                                 C        = data.monod$C,
-                                 r        = data.monod$data))
-
-# Sample from posterior of JAGS model:
-jags.res <- coda.samples(jags.obj,c("r_max","K","sd_r"),sampsize)
-
-```
-
-Plot traces of Markov chains and marginal densities of parameters:
-```{r monod_traces_densities_jags,fig.height=7,fig.width=7,cache=TRUE}
-
-# Plot marginal posteriors:
-plot(jags.res)
-
-```
-
-Plot model predictions and data (median prediction, 95% credibility interval of knowledge of 'TRUE' solution, 95% credibility interval of potential new observations [including observation error]):
-```{r monod_predictions_data_jags,fig.height=4,fig.width=5,cache=TRUE}
-
-# Plot model predictions
-# Plot data:
-plot(data.monod$C, data.monod$data, main="Data: monod",xlab="C", ylab="r", pch=19,
-     xaxs="i",yaxs="i",xlim=c(0,1.05*max(data.monod$C)),ylim=c(0,1.05*max(data.monod$data)))
-# Plot quantiles of model prediction without observation error:
-C <- 1.05*max(data.monod$C)*0:(nout-1)/(nout-1)
-r <- matrix(NA,ncol=nout,nrow=sampsize)
-for ( i in 1:nout ) r[,i] <- jags.res[[1]][,"r_max"]*C[i]/(jags.res[[1]][,"K"]+C[i])
-r.quant <- apply(r,2,quantile,probs=c(0.05,0.5,0.95))
-for ( j in 1:nrow(r.quant) ) lines(C,r.quant[j,],lty=c("dashed","solid","dashed")[j])
-# Plot quantiles of model prediction with observation error:
-for ( i in 1:nrow(r) ) r[i,] <- r[i,] + rnorm(nout,0,jags.res[[1]][i,"sd_r"])
-r.quant <- apply(r,2,quantile,probs=c(0.05,0.95))
-for ( j in 1:nrow(r.quant) ) lines(C,r.quant[j,],lty="dotted")
-
+# Region index: in JAGS we need to use integer indices to encode
+#  categorical data; indices must start at 1 and be consecutive
+Region <- as.integer(as.factor(sites$Region))
 ```
 
 
+# 2. Presence/absence model
 
-# 1. Inference with "rjags" for the Model "survival"
+We describe the presence/absence of the toads by an generalized linear
+mixed model (GLMM), a relatively simple hierarchical model. It allows
+to account for differences between regions in the expected occurrence
+probability $\theta$.
 
-Load the coda and rjags packages:
-```{r}
 
-# Load packages:
-if ( !require("coda") )  { install.packages("coda");  library(coda)  }
-if ( !require("rjags") ) { install.packages("rjags"); library(rjags) }
+\begin{align*}
+y_{i} & \sim \text{Bernoulli}(\theta_{i}) \\
+\theta_{i} & = \text{logit}^{-1}(\alpha_{R(i)}) \\
+\alpha_{R(i)} & \sim \text{Normal}(\mu, \tau) \\
 
+\mu & \sim \text{Normal}(0, 0.001)\\
+\tau & \sim \text{Gamma}(0.5, 0.5)
+\end{align*}
+
+where $\text{logit}^{-1}(x) =  \exp(x)/(1 + \exp(x))$.
+
+<!-- We here specify the intercept of occurrence probability as a
+random variable with its own model; in other words, we have added a
+random effect for region. -->
+Regional occurrence probabilities are
+generated by a common process with expectation $\mu$ and _precision_
+$\tau = 1 /\sigma^2$, called hyperparameters with their own prior
+distributions (hyperpriors).
+
+### Implementation in `JAGS`
+
+A `JAGS` model must be defined in a separate text file; we can writ
+this file from R or use any text editor. The `JAGS` model description goes inside curly
+brackets, preceded with the word model:`model { }`. Use hashtags to
+comment code. The model is specified as a series of relations between
+variables. Every variable must be either defined in the model or given
+as data. Relations can be deterministic (`<- `) or stochastic (`~
+`). `JAGS` automatically detects from the data provided which
+variables are observed and which ones have to be inferred. The order
+in which the model components are specified does not matter, it gets
+compiled into a DAG before running. `JAGS` then does Gibbs sampling
+from the conditional distributions.
+
+Steps:
+
+1. write the `JAGS` model to a file
+    + Note: in `JAGS`, levels of categorical variables are specified as integers, that must be consecutive and start at 1
+    + Note: `JAGS` specifies normal distributions by the mean and precision $\tau = 1/\sigma^2$
+2. run the model from `R`
+    + bundle input data in a list  `JAGS`
+    + define initial values (optional)
+    + list names of parameters to be monitored
+    + run the model using function `jags()` from package `jagsUI`
+
+
+We save the following JAGS code in a file called `glmm_v1.jags`. Note
+how closely the syntax follows the  mathematical equations.
+```{r, echo=TRUE, eval=FALSE}
+model{
+
+    ## Is site i occupied?
+    for(i in 1:nsites){
+        y[i] ~ dbern(theta[i])
+        logit(theta[i]) <- alpha_R[Region[i]]
+    }
+
+    ## Priors:
+    for(r in 1:nregions){
+        alpha_R[r] ~ dnorm(mu,tau)
+    }
+
+    ## Hyperpriors:
+    mu ~ dnorm(0, 0.001) # corresponds to a Normal distribution with variance = 1/0.001
+    tau ~ dgamma(0.5, 0.5) # gamma prior on precision (cf. Gelman 2006b)
+}
 ```
 
-Define global variables for file names and sample size:
-```{r}
+```{r, echo=TRUE, warning=FALSE, eval=F}
+library(jagsUI)
 
-# Define global variables:
-file.jags.model.4.2a  <- "exercise_4_2a.jags"
-file.jags.model.4.2b  <- "exercise_4_2a.jags"
-sampsize <- 10000
+### Run the JAGS model from R:---------------------------
+### Bundle data
+in.data <- list(y = seen_i$x,
+                nsites = nsites,
+                Region = Region,
+                nregions = nregions)
 
+### Initial values
+### -> can be omitted; if no inits are given, JAGS picks them automatically
+
+### Parameters to monitor
+params <- c("alpha_R", "mu", "tau") # "sd"
+
+### Run the model
+# MCMC settings
+ni <- 3000  # iterations
+nt <- 10    # thinning
+nb <- 1000  # burn-in
+nc <- 3     # chains
+
+
+out.v1 <- jags(data = in.data,
+                   parameters.to.save = params,
+                   parallel = T,
+                   model.file=paste0("./JAGS_models/glmm_v1.jags"),
+                   n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb,
+                   verbose=FALSE, store.data = F)
+
+out.v1
+
+# regional estimates:
+plogis(out.v1$mean$alpha_R)  # plogis(x) = exp(x)/(1 + exp(x))
+# grand mean:
+plogis(out.v1$mean$mu)
 ```
 
-Read and plot the data:
-```{r survival_data_again,fig.height=4,fig.width=5,cache=TRUE}
+### Tasks
 
-# Read data of model "survival"
-data.survival <- read.table("model_survival.dat",header=T)  # read as data frame
+Extend the `JAGS` model from above to include the effect of pond size on occupancy.
 
-# Plot data:
-y <- c(data.survival$data,30-sum(data.survival$data))
-t <- c(0,data.survival$t,1000000)
-names(y) <- c(data.survival$t,paste(">",max(data.survival$t)))
-barplot(y,main="Data: survival",xlab="t",ylab="deaths")
+Steps in extending a model:
 
+* `JAGS`:
+  + write an updated version of the process or observation model
+  + add priors for any new parameters
+* `R`:
+  + update input data
+  + update inits (optional)
+  + update names of parameters that are monitored
+
+
+
+```{r, child = if(params$showsolutions){"exe_4_solution_2.Rmd"}}
 ```
 
-Create JAGS model definition file for numbers of deaths in each time interval by calculating parameters and writing 'sampling statements' for all prior and conditional distributions (this file could also be created using any text editor).
+# 3. Static occupancy model
 
-Note 1: The means and standard deviations, `mu` and `sd`, of the lognormal distributions have to be converted to the corresponding parameters, `mulog` and `sdlog`, of the normal distribution that generates the lognormal distribution by exponentiation).
+Occupancy models account for the observation process as separate from
+the true, latent ecological process. They do this by introducing a new
+random variable $z$, which represents the true latent, but imperfectly
+observed occupancy state (MacKenzie et al. 2002).
+Detection/non-detection data from repeat visits to the same sites are
+exploited to estimate detection probability. At least some sites must
+have been visited repeatedly, during a period of closure (i.e., during
+a period within which the true state is assumed to remain constant).
 
-Note 2: `JAGS` is using the precision (inverse variance), `1/sd^2`, rather than the standard deviation, `sd`, to parameterize normal and lognormal distributions.
-```{r}
-
-# Write JAGS definition of model "survival" based on num. of deaths in time intervals
-cat("model {\n",
-    "  sdlog_lambda <- sqrt(log(1+sd_lambda^2/mu_lambda^2))\n",
-    "  mulog_lambda <- log(mu_lambda)-0.5*sdlog_lambda^2\n",
-    "  lambda ~ dlnorm(mulog_lambda,1/sdlog_lambda^2)\n",
-    "  for ( i in 1:n ) {\n",
-    "    p[i] <- exp(-lambda*t[i])-exp(-lambda*t[i+1])\n",
-    "  }\n",
-    "  y ~ dmulti(p,N)\n",
-    "}\n",
-    sep="",
-    file=file.jags.model.4.2a)
-
-```
-
-Initialize JAGS model and sample from the posterior of the model parameters given the data:
-```{r eval=FALSE}
-
-# Initialize JAGS model:
-jags.obj <- jags.model(file.jags.model.4.2a,
-                       data=list(mu_lambda = 0.2,
-                                 sd_lambda = 0.2,
-                                 n         = length(y),
-                                 N         = sum(y),
-                                 t         = t,
-                                 y         = y))
-
-# Sample from posterior of JAGS model:
-jags.res <- coda.samples(jags.obj,c("lambda"),sampsize)
-
-```
-
-Plot traces of Markov chains and marginal densities of parameters:
-```{r survival_traces_densities_jags,fig.height=4,fig.width=7,cache=TRUE}
-
-# Plot marginals of posterior:
-plot(jags.res)
-
-```
-
-Alternative model formulation for number of surviving organisms instead of number of deaths in each time interval.
-
-Define and plot modified variables and data:
-```{r survival_modified_data,fig.height=4,fig.width=5,cache=TRUE}
-
-# Define variables for model "survival" based on number of survivors at given times:
-y <- c(30,rep(NA,length(data.survival$data)))
-for ( i in 1:length(data.survival$data) ) y[i+1] <- y[i] - data.survival$data[i]
-t <- c(0,data.survival$t)
-names(y) <- t
-
-# Plot data:
-barplot(y,main="Data: survival",xlab="t",ylab="survivers")
-
-```
-
-Create JAGS model definition file for numbers of surviving individuals after each time interval by calculating parameters and writing 'sampling statements' for all prior and conditional distributions (this file could also be created using any text editor).
-
-Note 1: The means and standard deviations, `mu` and `sd`, of the lognormal distributions have to be converted to the corresponding parameters, `mulog` and `sdlog`, of the normal distribution that generates the lognormal distribution by exponentiation).
-
-Note 2: `JAGS` is using the precision (inverse variance), `1/sd^2`, rather than the standard deviation, `sd`, to parameterize normal and lognormal distributions.
-```{r}
-
-# Write JAGS definition for model "survival" for number of survivors at given times:
-cat("model {\n",
-    "  sdlog_lambda <- sqrt(log(1+sd_lambda^2/mu_lambda^2))\n",
-    "  mulog_lambda <- log(mu_lambda)-0.5*sdlog_lambda^2\n",
-    "  lambda ~ dlnorm(mulog_lambda,1/sdlog_lambda^2)\n",
-    "  for ( i in 2:n ) {\n",
-    "    y[i] ~ dbinom(exp(-lambda*(t[i]-t[i-1])),y[i-1])\n",
-    "  }\n",
-    "}\n",
-    sep="",
-    file=file.jags.model.4.2b)
-
-```
-
-Initialize JAGS model and sample from the posterior of the model parameters given the data:
-```{r}
-
-# Initialize JAGS model:
-jags.obj <- jags.model(file.jags.model.4.2b,
-                       data=list(mu_lambda = 0.2,
-                                 sd_lambda = 0.2,
-                                 n         = length(y),
-                                 t         = t,
-                                 y         = y))
-
-# Sample from posterior of JAGS model:
-jags.res <- coda.samples(jags.obj,c("lambda"),sampsize)
-
-```
-
-Plot traces of Markov chains and marginal densities of parameters:
-```{r survival_modified_traces_densities,fig.height=4,fig.width=7,cache=TRUE}
-
-# Plot results:
-plot(jags.res)
-
-```
+Detection/non-detection data $y_{ij}$ at site $i$ during repeat
+surveys $j$ are then described by a hierarchical model that contains
+one submodel for the only partially observed true state $z$ (occupied
+or not occupied), and another submodel for the actual observations
+$y$.  The actual observations result from both the particular
+realization of the ecological process and of the observation process.
 
 
-# 2. Inference with "rjags" for the Model "charniak"
+The observation process yields observations for each site $i$ during
+visit $j$, *conditional on* the true state $z_{i}$ and detection
+probability $p$
 
-Load the coda and rjags packages:
-```{r}
+$$
+y_{ij} \sim \text{Bernoulli}(z_{i} p)
+$$
+Detection probability $p$ is here assumed to be constant across sites
+and visits. We can easily formulate the model so as to let detection
+probability vary across sites and/ or visits (i.e., $p_{ij}$).
 
-# Load packages:
-if ( !require("coda") )  { install.packages("coda");  library(coda)  }
-if ( !require("rjags") ) { install.packages("rjags"); library(rjags) }
 
-```
+The ecological process yields the true, latent state $z_{i}$ of site
+$i$ (presence/ absence of a species)
+$$
+z_{i} \sim \text{Bernoulli}(\psi)
+$$
+with occupancy probability $\psi$ .
 
-Define global variables for file name and sample size:
-```{r}
+The model is completed with (flat) priors $\psi \sim \text{Uniform}(0,1)$ and $p \sim \text{Uniform}(0,1)$
 
-# Define globel variables:
-file.jags.model.4.3 <- "exercise_4_3.jags"
-sampsize <- 10000
+In `JAGS`, the components of this hierarchical model are encoded in
+the same way as the above algebraic statements, omitting the need to
+explicitly formulate the joint likelihood.
 
-```
 
-Create JAGS model definition file by writing 'sampling statements' for all prior and conditional distributions (this file could also be created using any text editor).
+## Data
 
-Note: The formulation of hierarchical models is straightforward: 'sampling nodes' can be uase as parameters in other 'sampling statements'.
-```{r}
+We will now use the detection/non-detection data of this species
+during up to 3 repeat visits $j$ in each site $i$, over multiple years
+$t$ from 1999 to 2009 ($T=11$), along with information on the sites
+and the observation process (the identity of the field worker/
+observer).
 
-# Write JAGS definition of model "charniak":
-cat("model {\n",
-    "  p_lo <- 0.60*fo + 0.05*(1-fo)\n",
-    "  p_do <- 0.99*fo*bp + 0.90*fo*(1-bp) + 0.97*(1-fo)*bp + 0.30*(1-fo)*(1-bp)\n",
-    "  p_hb <- 0.70*do + 0.01*(1-do)\n",
-    "  fo ~ dbern(0.15)\n",
-    "  bp ~ dbern(0.01)\n",
-    "  lo ~ dbern(p_lo)\n",
-    "  do ~ dbern(p_do)\n",
-    "  hb ~ dbern(p_hb)\n",
-    "}\n",
-    sep="",
-    file=file.jags.model.4.3)
+The observation data is arranged in an array:
 
-```
+*  `y_ijt`: Array of observations (detection/ non-detection) in sites $i$, repeat visit $j$, year $t$
 
-Initialize JAGS model and sample from the posterior of the model parameters given the data:
-```{r}
+Covariate data, ecological model:
 
-# Initialize JAGS model:
-jags.obj <- jags.model(file.jags.model.4.3,data=list(lo=1,hb=0))
+* `sites`: Dataframe containing potentially informative environmental variables describing the sites; we are especially interested in the water surface area (or size) of the ponds and the effect of water table fluctuations. These are features that can be controlled when constructing ponds.
 
-# Sample from JAGS model:
-jags.res <- coda.samples(jags.obj,c("fo","bp","lo","do","hb"),sampsize)
+Covariate data, observation model:
 
-```
+* `obs_ijt`: Array with identity of observer, dimensions [site $i$, visit $j$, year $t$]. Observer identity is encoded as an integer (1:134 over entire data set).
 
-Extract and print results:
-```{r}
+<!-- Helper data: -->
 
-# List results for model "charniak":
-print(summary(jags.res))
+<!-- * `visited_ijt`: Array specifying whether a site was visited during visit $j$ (1) or not (0), dimensions  [site $i$, visit $j$, year $t$]. -->
 
+**Important** when formatting data:
+
+* `JAGS` loops over all dimensions of vectors, matrices, etc. Good bookkeeping is essential! We must ensure that the data are all in the right order, e.g. that the order of sites is the same in x (`sites$Fluctuations`) and in y. It is a good idea to always label data, e.g. use dimnames for arrays.
+* Categorical variables are encoded in `JAGS` as integer indices; they must be consecutive and start at 1 (_not at zero_).
+* Where possible, standardize covariates (to mean zero and variance = 1), in order to improve convergence.
+
+```{r, echo=T, eval=F}
+nsites <- length(unique(dat$SiteID))
+nyears <- length(unique(dat$Year))
+nvisits <- length(unique(dat$Visit))
+
+# extract the site data only:
+sites <- unique(dat[, !(names(dat) %in% c("Visit", "Year", "Detection", "ObsID", "SiteVisited"))])
+sites <- sites[(order(sites$SiteID)),]
+
+# extract the detection/nondetection data and store in array
+# with dimensions [sites, visits, years]
+y_ijt <- array(data = dat$Detection,
+               dim = c(nsites, nvisits, nyears),
+               dimnames=list(sites$SiteID, c(1:3), 1999:2009))
+
+dim(y_ijt) # sites, visits, years
+dimnames(y_ijt)[[3]]
+
+
+# extract the observer identity and store in array with dimensions [sites, visits, years]
+obs_ijt <-  array(data = dat$ObsID,
+                  dim = c(nsites, nvisits, nyears),
+                  dimnames=list(sites$SiteID, c(1:3), 1999:2009))
+nobservers <- length(unique(dat$ObsID))
 ```
 
 
 
-# 3. Inference with "rstan" for the Model "monod"
+## Occupany model for a single year
 
-Load the coda and rstan packages and set options for using (in this case all) multiple cores in parallel for multiple chains:
-```{r message=FALSE}
+We build the occupancy model for the first year, which will be needed
+to provide initial conditions for the dynamic model. We subset our
+data to the first year, and formulate the model for a single year only
+(note the indices!). We start with above model that accounts for
+regional differences in occupancy $\psi_R$:
 
-# Load packages and initialize number of cores to be used:
-if ( !require("coda") )  { install.packages("coda");  library(coda)  }
-if ( !require("rstan") ) { install.packages("rstan"); library(rstan) }
-rstan_options(auto_write = TRUE)
-options(mc.cores = parallel::detectCores())
+$$
+z_{i,t=1} \sim \text{Bernoulli}(\psi_{R,t=1})
+$$
+$$
+y_{ij,t=1} \sim \text{Bernoulli}(z_{i,t=1} p)
+$$
 
+While the indexing may seem tedious, it makes explicit over which
+dimensions the random variables or parameters vary. To begin with,
+we here assume detection probability to be constant across sites and
+visits.
+
+We save the JAGS models as `occ_v0.jags`:
+```{r, echo=T, warning=FALSE, eval=FALSE}
+model{
+    ## Ecological process model
+
+    for(i in 1:nsites){
+          z[i] ~ dbern(psi1[i])
+          logit(psi1[i]) <- alpha.psi1[Region[i]]
+    }
+
+    ## Observation model:
+    for(i in 1:nsites){
+          for (j in 1:nvisits){
+            y[i,j] ~ dbern(muy[i,j])
+            muy[i,j] <- z[i] * p
+          }
+      }
+
+    ## Priors:
+
+    ## Ecological model
+    for(r in 1:nregions){
+        alpha.psi1[r] ~ dnorm(mu, tau)
+    }
+    ## Hyperpriors
+    mu ~ dnorm(0,0.001)
+    tau ~ dgamma(0.5, 0.5) # gamma prior on precision (cf. Gelman 2006b)
+
+    ## Observation model
+    p ~ dunif(0,1)    # (constant) detection probability
+}
 ```
 
-Define global variables for file name, sample size, and plot line resolution:
-```{r}
+We compile all needed data in R as list and then run the JAGS model
+```{r, echo=T, eval=F}
+### Bundle data (we here use data from the first year only)
+in.data <- list(y = y_ijt[,,1],
+                nsites = nsites,
+                nvisits = nvisits,
+                nregions= nregions,
+                Region = Region
+                )
 
-# Define global variables:
-file.stan.model.4.4.1 <- "exercise_4_4_1.stan"
-sampsize <- 10000
-nout     <- 101
+### Initial values
+### We use observed occurrences as inits for z
+temp <- y_ijt; temp[is.na(temp)] <- 0  # remove NAs to avoid conflicts
+z.inits <-apply(temp, c(1,3), max); rm(temp)
 
-```
+inits <- function() list(z = z.inits[,1],
+                         p = runif(n = 1, 0, 1))
 
-Read and plot the data:
-```{r monod_data_again,fig.height=4,fig.width=5,cache=TRUE}
+### Parameters to monitor
+params <- c("p",
+            "alpha.psi1")
 
-# Read data of model "monod":
-data.monod <- read.table("model_monod.dat",header=T)
-
-# Plot data of model "monod":
-plot(data.monod$C,data.monod$data,main="Data: monod",xlab="C",ylab="r",pch=19,
-     xaxs="i",yaxs="i",xlim=c(0,1.05*max(data.monod$C)),ylim=c(0,1.05*max(data.monod$data)))
-
-```
+### Run the model
+# MCMC settings
+ni <- 5000  # iterations
+nt <- 10    # thinning
+nb <- 1000  # burn-in
+nc <- 3     # chains
 
 
-Create Stan model definition file by calculating parameters and writing 'sampling statements' for all prior and conditional distributions (this file could also be created using any text editor):
-
-Note 1: `Stan` requires the explicit declaration of variables and parameters.
-
-Note 2: The means and standard deviations, `mu` and `sd`, of the lognormal distributions have to be converted to the corresponding parameters, `mulog` and `sdlog`, of the normal distribution that generates the lognormal distribution by exponentiation).
-
-Note 3: In contrast to `JAGS`, `Stan` used the standard deviation, `sd`, to parameterize the normal and lognormal distributions.
-```{r}
-
-# Write Stan definition of model "monod":
-cat("data {\n",
-    "  real mu_r_max;\n",
-    "  real sd_r_max;\n",
-    "  real mu_K;\n",
-    "  real sd_K;\n",
-    "  real mu_sd_r;\n",
-    "  real sd_sd_r;\n",
-    "  int n;\n",
-    "  real C[n];\n",
-    "  real r[n];\n",
-    "}\n",
-    "parameters {\n",
-    "  real<lower=0> r_max;\n",
-    "  real<lower=0> K;\n",
-    "  real<lower=0> sd_r;\n",
-    "}\n",
-    "model {\n",
-    "  real mulog_rmax;\n",
-    "  real sdlog_rmax;\n",
-    "  real mulog_K;\n",
-    "  real sdlog_K;\n",
-    "  real mulog_sd_r;\n",
-    "  real sdlog_sd_r;\n",
-    "  real rhat[n];\n",
-    "  sdlog_rmax = sqrt(log(1+sd_r_max^2/mu_r_max^2));\n",
-    "  mulog_rmax = log(mu_r_max)-0.5*sdlog_rmax^2;\n",
-    "  sdlog_K    = sqrt(log(1+sd_K^2/mu_K^2));\n",
-    "  mulog_K    = log(mu_K)-0.5*sdlog_K^2;\n",
-    "  sdlog_sd_r = sqrt(log(1+sd_sd_r^2/mu_sd_r^2));\n",
-    "  mulog_sd_r = log(mu_sd_r)-0.5*sdlog_sd_r^2;\n",
-    "  r_max ~ lognormal(mulog_rmax,sdlog_rmax);\n",
-    "  K     ~ lognormal(mulog_K,sdlog_K);\n",
-    "  sd_r  ~ lognormal(mulog_sd_r,sdlog_sd_r);\n",
-    "  for ( i in 1:n ) {\n",
-    "    rhat[i] = r_max*C[i]/(K+C[i]);\n",
-    "    r[i] ~ normal(rhat[i],sd_r);\n",
-    "  }\n",
-    "}\n",
-    sep="",
-    file=file.stan.model.4.4.1)
-
-```
-
-Run inference with the Stan model:
-```{r}
-
-# Sample from model "monod":
-stan.res1 <- stan(file.stan.model.4.4.1,
-                  data=list(mu_r_max = 5,
-                            mu_K     = 3,
-                            mu_sd_r  = 1,
-                            sd_r_max = 2.5,
-                            sd_K     = 1.5,
-                            sd_sd_r  = 0.5,
-                            n        = nrow(data.monod),
-                            C        = data.monod$C,
-                            r        = data.monod$data),
-                  iter=sampsize,
-                  chains=4)
-
-```
-
-Extract and plot results.
-
-Note: `Stan` by default adds a trace (the density can be ignored) for the log posterior (variable `lp__`). This is very convenient for convergence checks.
-
-```{r monod_stan,fig.height=9,fig.width=7,cache=TRUE}
-
-# Extract results of model "monod":
-stan.res.sample1 <- as.array(stan.res1)
-stan.res.mcmc1   <- As.mcmc.list(stan.res1)
-
-# Plot results:
-plot(stan.res.mcmc1)
+out.v0 <- jags(data = in.data,
+               inits = inits,
+               parameters.to.save = params,
+               parallel = TRUE,
+               model.file=paste0("./JAGS_models/occ_v0.jags"),
+               n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb,
+               verbose=FALSE, store.data = TRUE)
 
 ```
 
 
+## Tasks 1
 
-# 4. Inference with "rstan" for the Model "survival"
+Extend the ecological process model to test whether the occurrence of
+this toad depends on the size (surface area) of the pond. Check
+whether there is a unimodal (quadratic) instead of linear response of
+occupancy probability to pond area.
 
-Load the coda and rstan packages:
 
-```{r}
+$$
+z_{i,t=1} \sim \text{Bernoulli}(\psi_{i,t=1}),
+$$
+$$
+logit(\psi_{i,t=1}) = \alpha_{\psi1, R(i)} + \beta_{area} Area_{i},
+$$
 
-# Load packages and initialize number of cores to be used:
-if ( !require("coda") )  { install.packages("coda");  library(coda)  }
-if ( !require("rstan") ) { install.packages("rstan"); library(rstan) }
-rstan_options(auto_write = TRUE)
-options(mc.cores = parallel::detectCores())
+Additionally, try what happens when there are NAs in the explanatory variable!
 
+
+
+
+```{r, child = if(params$showsolutions){"exe_4_solution_3.1.Rmd"}}
 ```
 
-Define global variables for file name, sample size, and plot line resolution:
-```{r}
+## Task 2
 
-# Define global variables:
-file.stan.model.4.4.2  <- "exercise_4_4_2.stan"
-sampsize <- 10000
-nout     <- 101
+Second, we want to improve the observation model, by accounting for variation in detection probability between observers. Observers are trained volunteers with different levels of experience. The identity of the observer may vary between sites, visits, and years: detection probability becomes $p_{ijt}$ and we need to loop accordingly. We estimate detection probability with a random effect of observer identity, where observers vary around a common mean $\mu_{obs}$:
 
+$$
+logit(p_{ij,t=1}) = \alpha_{obs} + \beta_{obs(ij,t=1)},   \\   \beta_{obs} \sim \text{Normal}(0,\sigma_{obs}^2).
+$$
+*NOTE*: indices for categories or factor levels in `JAGS` are encoded as *consecutive* integers, starting from 1.
+
+
+```{r, child = if(params$showsolutions){"exe_4_solution_3.2.Rmd"}}
 ```
 
-Read and plot the data:
-```{r survival_data,fig.height=4,fig.width=5,cache=TRUE}
 
-# Read data of model "survival":
-data.survival <- read.table("model_survival.dat",header=T)  # read as data frame
+# 4. Dynamic occupancy model
 
-# Plot data of model "survival":
-y <- c(data.survival$data,30-sum(data.survival$data))
-t <- c(0,data.survival$t,1000000)
-names(y) <- c(data.survival$t,paste(">",max(data.survival$t)))
-barplot(y,main="Data: survival",xlab="t",ylab="deaths")
+The dynamic occupancy model extends the static, single-year model to
+the dynamic change in occupancy over time. It is based on
+metapopulation theory and describes how the true state (occupied or
+empty) of each site evolves over time as a function of two processes:
+colonization and persistence.
 
+We initiate the dynamic model with a simple occupancy model for the
+occupancy probability in the first year. This provides the starting
+conditions $z_{i, t=1}$ for the dynamic process.
+
+$$
+z_{i,t=1} \sim \text{Bernoulli}(\psi_{i,t=1})
+$$
+
+After the first year, the true state of each site depends only on its
+state in the previous year and the probabilities of colonization and
+persistence. Empty patches can get colonized in the next time step
+with probability $\gamma$ or remain empty with probability $1-
+\gamma$.  Occupied patches can either persist (i.e., remain occupied)
+with probability $\phi$ or go locally "extinct" with probability $1-
+\phi$. The realization of this process over years $t = 2, ...,T$ can
+be formulated for each site $i$ and year $t$ as conditional on the
+true state in the previous time step and the two process
+probabilities:
+
+
+$$
+z_{i, t} \sim \text{Bernoulli}( (1-z_{i, t-1}) \gamma_{it} + z_{i, t-1} \phi_{it} )
+$$
+
+This has the advantage that we can learn something about the dynamic
+process rates, not only the resulting occupancy probability. Finally,
+observations (detection/ non-detection data) are again related to the
+true, latent occupancy state via the observation model:
+
+
+$$
+y_{ijt} \sim \text{Bernoulli}(z_{it} p_{ijt})
+$$
+Detection probability $p_{ijt}$ is here allowed to vary between sites, visits, and years.
+
+
+The aim of the dynamic occupancy model is to estimate the
+probabilities of colonization and persistence, and their dependence on
+site characteristics, using detection/ non-detection data and
+accounting for observation uncertainty.
+
+
+Update the `JAGS` model to use all data and include the dynamic
+process. Start by assuming constant colonization and persistence
+probabilities.
+
+Covariate effects on colonization and persistence probabilities can
+easily be included using GLMs. Note that these explanatory models
+don't have to be linear models, but can take any functional form.
+
+We save the JAGS model in `dynocc_v1.jags`.
+```{r, echo=T, eval=F, warning=FALSE}
+model{
+    # Ecological process model:
+    for(i in 1:nsites){
+        # initial occupany in year 1
+        z[i,1] ~ dbern(psi1[i])
+        logit(psi1[i]) <- alpha.psi1[Region[i]]
+
+        # dynamic change year 2:T
+        for (k in 1:(nyear-1)){
+            z[i,(k+1)] ~ dbern(muZ[i,(k+1)])
+            muZ[i,(k+1)]<- ((1-z[i,k])*gamma[i,k]) + (z[i,k]*phi[i,k])
+
+            logit(gamma[i,k]) <- alpha.gamma
+	        logit(phi[i,k]) <- alpha.phi
+        }
+    }
+
+
+    # Observation model:
+    for(i in 1:nsites){
+          for (j in 1:nvisits){
+            for(k in 1:nyear){
+              y[i,j,k] ~ dbern(muy[i,j,k])
+              muy[i,j,k] <- z[i,k] * p[i,j,k]
+              logit(p[i,j,k]) <- alpha.obs + beta.obs[obs[i,j,k]]
+            }
+         }
+      }
+
+
+    # Priors:
+
+    ## Ecological process model:
+    # Occupancy year 1:
+    for(r in 1:nregions){
+       alpha.psi1[r] ~ dnorm(mu, tau)
+    }
+    # Hyperpriors:
+    mu ~ dnorm(0,0.001)
+    tau ~ dgamma(0.5, 0.5)
+
+    # Colonization gamma, persistence phi:
+    alpha.gamma ~ dnorm(0, 0.001)
+    alpha.phi ~ dnorm(0, 0.001)
+
+    ## Observation model:
+     alpha.obs ~ dnorm(0, 0.001)
+    # random observer effects:
+    for (obs in 1:nobservers){
+      beta.obs[obs] ~ dnorm(0, tau.obs)
+    }
+    tau.obs <- 1/ pow(sd.obs,2) # tau = 1/variance
+    sd.obs ~ dunif(0,10)
+}
 ```
 
-Create Stan model definition file by calculating parameters and writing 'sampling statements' for all prior and conditional distributions (this file could also be created using any text editor):
 
-Note 1: `Stan` requires the explicit declaration of variables and parameters.
 
-Note 2: The means and standard deviations, `mu` and `sd`, of the lognormal distributions have to be converted to the corresponding parameters, `mulog` and `sdlog`, of the normal distribution that generates the lognormal distribution by exponentiation).
+Again, we run this model from R:
+```{r, echo=F, eval=F, warning=FALSE}
+### 2. UPDATE INDATA, INITS, PARAMETERS
+### Data prep:
+# pass entire time series
 
-Note 3: In contrast to `JAGS`, `Stan` used the standard deviation, `sd`, to parameterize the normal and lognormal distributions.
+# how many observers are there across all years?
+nobservers <- length(unique(c(obs_ijt)))
 
-```{r}
+### Bundle data (first year only)
+in.data <- list(y = y_ijt,
+                nsites = nsites,
+                nvisits = nvisits,
+                nregions = nregions,
+                Region = Region,
+                obs = obs_ijt, # observer identities in all years
+                nobservers = nobservers, # number of unique observers (all years)
+                nyear = nyears # number of years
+                )
 
-# Write Stan definition of model "survival":
-cat("data {\n",
-    "  real mu_lambda;\n",
-    "  real sd_lambda;\n",
-    "  int n;\n",
-    "  real t[n+1];\n",
-    "  int  y[n];\n",
-    "}\n",
-    "parameters {\n",
-    "  real<lower=0> lambda;\n",
-    "}\n",
-    "model {\n",
-    "  real      mulog_lambda;\n",
-    "  real      sdlog_lambda;\n",
-    "  vector[n] p;\n",
-    "  sdlog_lambda = sqrt(log(1+sd_lambda^2/mu_lambda^2));\n",
-    "  mulog_lambda = log(mu_lambda)-0.5*sdlog_lambda^2;\n",
-    "  lambda ~ lognormal(mulog_lambda,sdlog_lambda);\n",
-    "  for ( i in 1:n ) {\n",
-    "    p[i] = exp(-lambda*t[i])-exp(-lambda*t[i+1]);\n",
-    "  }\n",
-    "  y ~ multinomial(p);\n",
-    "}\n",
-    sep="",
-    file=file.stan.model.4.4.2)
+### Initial values
+### use observed occurrences as inits for z
+temp <- y_ijt; temp[is.na(temp)] <- 0  # remove NAs to avoid conflicts
+z.inits <-apply(temp, c(1,3), max)
 
+inits <- function() list(z = z.inits,
+                          alpha.psi1 = runif(n=nregions, -3, 3),
+                         alpha.obs = runif(n=1, 0.1, 1),
+                         sd.obs = runif(n = 1, 0.5,3))
+
+### Parameters to monitor
+params <- c("alpha.psi1",  # parameters for occupancy probability in year 1
+            #"mu", "tau",  # hyperparameters for regional differences psi1
+            "alpha.gamma", "alpha.phi", # colonization and persistence intercepts
+            "alpha.obs", "sd.obs" ) #  observer effect
+            #"beta.obs") # p estimates for individual observers
+
+### Run the model
+# MCMC settings  (ca. 3 mins)
+ni <- 8000  # iterations
+nt <- 10    # thinning
+nb <- 3000   # burn-in
+nc <- 3     # chains
+
+out.dyn1 <- jags(data = in.data,
+            inits = inits,
+            parameters.to.save = params,
+            parallel = TRUE,
+            model.file=paste0("./JAGS_models/dynocc_v1.jags"),
+            n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb,
+            verbose=TRUE, store.data = TRUE)
 ```
 
-Run inference with the Stan model:
+Then we look at the results
+```{r, echo=F, eval=F, warning=FALSE}
+### inspect the outcome:
+out.dyn1
 
-```{r}
+plot(out.dyn1) # traceplots and densities
 
-# Sample from posterior of model "survival"
-stan.res2 <- stan(file.stan.model.4.4.2,
-                  data=list(mu_lambda = 0.2,
-                            sd_lambda = 0.2,
-                            n         = nrow(data.survival)+1,
-                            N         = sum(y),
-                            t         = t,
-                            y         = y),
-                  iter=sampsize,
-                  chains=4)
+## What have we learnt about colonization and extinction probabilities?
+## out.dyn1$sims.list contains the samples from posteriors
+str(out.dyn1$sims.list)
 
+par(mfrow=c(1,2))
+## plot colonization intercept, on probability scale:
+hist(plogis(out.dyn1$sims.list$alpha.gamma), main="Colonization probability")
+abline(v=plogis(out.dyn1$mean$alpha.gamma), col="red")
+#hist(plogis(out.dyn1$sims.list$alpha.gamma))
+
+## plot persistence intercept, on probability scale:
+hist(plogis(out.dyn1$sims.list$alpha.phi), main="Persistence probability")
+abline(v=plogis(out.dyn1$mean$alpha.phi), col="red")
 ```
 
-Extract and plot results.
 
-Note: `Stan` by default adds a trace (the density can be ignored) for the log posterior (variable `lp__`). This is very convenient for convergence checks.
+## Tasks
 
-```{r survival_stan,fig.height=6,fig.width=7,cache=TRUE}
+### Extend the dynamic occupancy model
 
-# Extract results of model "survival":
-stan.res.sample2 <- as.array(stan.res2)
-stan.res.mcmc2   <- As.mcmc.list(stan.res2)
+Test for effects of covariates on colonization and persistence probabilities:
 
-# Plot results:
-plot(stan.res.mcmc2)
+* Does colonization probability depend on
+  + the size, i.e. area, of the pond? Linearly or unimodally?
+  + whether the water table fluctuates?
+  + (whether the pond is a newly constructed pond?)
 
+* Does persistence probability depend on
+  + the size, i.e. area, of the pond? Linearly or unimodally?
+  + whether the water table fluctuates?
+  + ...
+
+We can additionally let `JAGS` calculate derived variables, such as a summary of the actual number of sites occupied. We will obtain full posteriors for such quantities as well.
+
+* Add a derived quantity: what is the estimated true number of occupied ponds in each year?
+
+
+```{r, child = if(params$showsolutions){"exe_4_solution_4.Rmd"}}
 ```
+
+
+# 5. Summary
+
+* `JAGS` allows you to do inference for complex hierarchical models.
+* Specify a `JAGS` model within `model{ }` as a series of stochastic (`~`) and deterministic (`<-`) relations.
+* Run `JAGS` from `R`:
+  + edit and bundle required data (be careful with dimensions and order; consecutive integer indices for levels of categorical variables)
+  + specify initial values to help convergence (else let `JAGS` choose automatically from the prior)
+  + specify parameters to be monitored
+  + set MCMC settings and run the model
+* Working with `JAGS` output:
+  + the `jagsUI` model object contains a lot of helpful information; storing the used data and model aids reproducibility
+  + working with the full joint posteriors (`out$sims.list`) is the most flexible
+
+
+# References
+
+Gelman, A. (2006). Multilevel (hierarchical) modeling: What it can and cannot do. Technometrics, 48(3), 432–435. https://doi.org/10.1198/004017005000000661
+
+Gelman, A. (2006b). Prior distributions for variance parameters in hierarchical models (Comment on Article by Browne and Draper). Bayesian Analysis, 1(3), 515–534. https://doi.org/10.1214/06-BA117A
+
+Krapu, C., & Borsuk, M. (2019). Probabilistic programming: A review for environmental modellers. Environmental Modelling and Software, 114(January), 40–48. https://doi.org/10.1016/j.envsoft.2019.01.014
+
+MacKenzie, D. I., Nichols, J. D., Lachman, G. B., Droege, S., Royle, A. A., & Langtimm, C. A. (2002). Estimating site occupancy rates when detection probabilities are less than one. Ecology, 83(8), 2248–2255. https://doi.org/10.1890/0012-9658(2002)083[2248:ESORWD]2.0.CO;2
+
+Royle, J. A., & Kéry, M. (2007). A Bayesian state-space formulation of dynamic occupancy models. Ecology, 88(7), 1813–1823. https://doi.org/10.1890/06-0669.1

@@ -1,0 +1,60 @@
+### Solution
+
+Jags model:
+```{r, echo=T, warning=FALSE, eval=FALSE}
+model{
+
+    ## Ecological process model:
+    for (i in 1:nsites){
+        y[i] ~ dbern(theta[i])
+        logit(theta[i]) <- alpha_R[Region[i]] + beta*Area[i]
+    }
+
+    ## Priors:
+    for (r in 1:nregions){
+        alpha_R[r] ~ dnorm(mu,tau)
+    }
+    beta  ~ dnorm(0,0.001)
+    ## Hyperpriors:
+    mu ~ dnorm(0,0.001)
+    tau ~ dgamma(0.5, 0.5) # gamma prior on precision (cf. Gelman 2006b)
+
+}
+```
+
+Run the JAGS model from R:
+```{r, echo=T, warning=FALSE, eval=F}
+
+### Bundle data (we here use data from the first year only)
+in.data <- list(y = seen_i$x,
+                Area = sites$log.Area.scaled,
+                nsites = nsites,
+                Region = Region,
+                nregions = nregions
+                )
+
+### Initial values
+### if no inits are given, JAGS picks them automatically
+
+### Parameters to monitor
+params <- c("alpha_R", "beta", "mu", "tau") # "sd"
+
+### Run the model
+# MCMC settings
+ni <- 3000  # iterations
+nt <- 10    # thinning
+nb <- 1000  # burn-in
+nc <- 3     # chains
+
+
+out.v2 <- jags(data = in.data,
+                   parameters.to.save = params,
+                   parallel = T,
+                   model.file=paste0("./JAGS_models/glmm_v2.jags"),
+                   n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb,
+                   verbose=FALSE, store.data = F)
+
+
+out.v2
+plot(out.v2) # --> no clear effect of pond size on occupancy
+```

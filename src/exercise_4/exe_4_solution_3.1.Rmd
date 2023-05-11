@@ -1,0 +1,99 @@
+## Solution
+
+```{r, echo=T, eval=FALSE, warning=FALSE}
+### 1. UPDATE JAGS MODEL
+### write JAGS model to text file from R
+sink("./JAGS_models/occ_v1_1.jags")
+cat("
+    model{
+    #------------------------------------------
+    # Ecological process model:
+    for (i in 1:nsites){
+        z[i] ~ dbern(psi1[i])
+
+        logit(psi1[i]) <- alpha.psi1[Region[i]] + beta.area.psi1 * Area[i]   #  + beta.area.psi1.2 * pow(Area[i],2)
+
+    }# end i
+
+    #------------------------------------------
+    # Observation model:
+    for (i in 1:nsites){
+        for (j in 1:nvisits){
+            y[i,j] ~ dbern(muy[i,j])
+            muy[i,j] <- z[i] * p
+        }# end j
+      }# end i
+
+    #------------------------------------------
+    # Priors:
+
+    # Ecological process model:
+    for(r in 1:nregions){
+    alpha.psi1[r] ~ dnorm(mu, tau)
+    }
+    beta.area.psi1 ~ dnorm(0, 0.001)  # normal distribution: defined in JAGS by mean and precision tau = 1/variance
+    # beta.area.psi1.2 ~ dnorm(0, 0.001)
+
+    # Hyperpriors:
+    mu ~ dnorm(0,0.001)
+    tau ~ dgamma(0.5, 0.5) # gamma prior on precision (cf. Gelman 2006b)
+
+    # Observation model:
+    p ~ dunif(0,1)               # (constant) detection probability, on probability scale
+
+    }
+
+    ", fill=TRUE)
+sink()
+
+
+### 2. UPDATE INDATA, INITS, MONTIORED PARAMS
+
+### Bundle data (first year only)
+in.data <- list(y = y_ijt[,,1],
+                nsites = nsites,
+                nvisits = nvisits,
+                # now also needed:
+                Area = sites$log.Area.scaled, # surface area of ponds (standardized)
+                Region = Region,
+                nregions = nregions
+                )
+
+### Initial values
+### use observed occurrences as inits for z
+temp <- y_ijt; temp[is.na(temp)] <- 0  # remove NAs to avoid conflicts
+z.inits <-apply(temp, c(1,3), max)
+
+inits <- function() list(z = z.inits[,1],
+                         alpha.psi1 = runif(n=nregions, -3, 3),
+                         beta.area.ps1 = rnorm(n=1, 0, 1))
+
+### Parameters to monitor
+params <- c("alpha.psi1", "beta.area.psi1", # parameters for occupancy probability in year 1
+           #"beta.area.psi1.2", # quadratic term
+            "p")
+
+### Run the model
+# MCMC settings
+ni <- 8000  # iterations
+nt <- 10    # thinning
+nb <- 3000   # burn-in
+nc <- 3     # chains
+
+starttime <- Sys.time()
+
+out.v11 <- jags(data = in.data,
+            inits = inits,
+            parameters.to.save = params,
+            parallel = TRUE,
+            model.file=paste0("./JAGS_models/occ_v1_1.jags"),
+            n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb,
+            verbose=FALSE, store.data = TRUE)
+
+print(Sys.time()-starttime)
+
+### inspect the outcome:
+out.v11
+
+plot(out.v11) # traceplots and densities
+```

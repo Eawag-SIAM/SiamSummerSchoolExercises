@@ -1,0 +1,198 @@
+## Solution
+
+```{r, echo=T, eval=F, warning=FALSE}
+### 1. EXTEND THE JAGS MODEL
+
+sink("./JAGS_models/dynocc_v2.jags")
+cat("
+    model{
+    #------------------------------------------
+    # Ecological process model:
+    for (i in 1:nsites){
+         # initial occupany in year 1
+        z[i,1] ~ dbern(psi1[i])
+        logit(psi1[i]) <- alpha.psi1[Region[i]]
+
+        # dynamic change year 2:T
+        for (k in 1:(nyear-1)){
+
+            z[i,(k+1)] ~ dbern(muZ[i,(k+1)])
+            muZ[i,(k+1)]<- ((1-z[i,k])*gamma[i,k]) + (z[i,k]*phi[i,k])
+
+            logit(gamma[i,k]) <- alpha.gamma + beta.area*Area[i] + beta.area.2* pow(Area[i],2) + beta.fluct*Fluct[i]
+	          logit(phi[i,k]) <- alpha.phi + delta.area*Area[i] + delta.area.2* pow(Area[i],2)  + delta.fluct*Fluct[i]
+
+        } #k
+    }# end i
+
+    #------------------------------------------
+    # Observation model:
+    for (i in 1:nsites){
+          for (j in 1:nvisits){
+            for(k in 1:nyear){
+
+              y[i,j,k] ~ dbern(muy[i,j,k])
+              muy[i,j,k] <- z[i,k] * p[i,j,k]
+
+              logit(p[i,j,k]) <- alpha.obs + beta.obs[obs[i,j,k]]
+            }#end k
+          }# end j
+      }# end i
+
+    #------------------------------------------
+    # Priors:
+
+    ## Ecological process model:
+    # Occupancy year 1:
+    for(r in 1:nregions){
+    alpha.psi1[r] ~ dnorm(mu, tau)
+    }
+    # Hyperpriors:
+    mu ~ dnorm(0,0.001)
+    tau ~ dgamma(0.5, 0.5)
+
+    # Colonization gamma, persistence phi:
+    alpha.gamma ~ dnorm(0, 0.01)
+    beta.area ~ dnorm(0, 0.01) # dunif(-10,10)
+    beta.area.2 ~ dnorm(0, 0.01) # dunif(-10,10)
+    beta.fluct ~ dnorm(0, 0.01)
+
+    alpha.phi ~ dnorm(0, 0.01)
+    delta.area ~ dnorm(0, 0.01) # dunif(-10,10)
+    delta.area.2 ~ dnorm(0, 0.01) # dunif(-10,10)
+    delta.fluct ~ dnorm(0, 0.01) # dunif(-10,10)
+
+    ## Observation model:
+    alpha.obs ~ dnorm(0, 0.01) # dunif(-10,10)
+    # random observer effects:
+    for (obs in 1:nobservers){
+      beta.obs[obs] ~ dnorm(0, tau.obs)
+    }
+    tau.obs <- 1/ pow(sd.obs,2) # tau = 1/variance
+    sd.obs ~ dunif(0,10)
+
+    #--------------------------------------------
+    # Derived parameters:
+    for (k in 1:nyear){
+      n.occ[k] <-  sum(z[1:nsites,k]) # equivalent: sum(z[ ,k])
+    }#k
+    }
+    ", fill=TRUE)
+sink()
+
+
+### 2. UDPATED INDATA, INITS, PARAMETERS
+### Data prep:
+# pass entire time series
+
+### Bundle data (first year only)
+in.data <- list(y = y_ijt,
+                nsites = dim(y_ijt)[1],
+                nvisits = dim(y_ijt)[2],
+                nregions = nregions,
+                Region = Region,
+                obs = obs_ijt, # observer identities in all years
+                nobservers = nobservers, # number of unique observers (all years)
+                nyear = dim(y_ijt)[3],
+                Area = sites$log.Area.scaled, # surface area of ponds (standardized)
+                Fluct= sites$Fluctuations
+               # New = sites$NewSite # new site? (0/1)
+                )
+
+
+### Initial values
+### use observed occurrences as inits for z
+temp <- y_ijt; temp[is.na(temp)] <- 0  # remove NAs to avoid conflicts
+z.inits <-apply(temp, c(1,3), max)
+
+inits <- function() list(z = z.inits,
+                         alpha.psi1 = runif(n=nregions, -3, 3),
+                         alpha.obs = runif(n=1, 0.1, 1),
+                         sd.obs = runif(n = 1, 0.5,3))
+
+### Parameters to monitor
+params <- c("alpha.psi1",  # parameters for occupancy probability in year 1
+            "alpha.gamma",
+            "beta.area",
+            "beta.area.2",
+            "beta.fluct",
+            "alpha.phi",
+            "delta.area",
+            "delta.area.2",
+            "delta.fluct",
+            "alpha.obs", "sd.obs",# hyperparameters for observer effect
+            "n.occ")
+            #"beta.obs") # p estimates for individual observers
+
+### Run the model
+# MCMC settings  (ca. 7 mins with 8000 time steps)
+ni <- 8000  # iterations
+nt <- 10    # thinning
+nb <- 3000   # burn-in
+nc <- 3     # chains
+
+starttime <- Sys.time()
+
+out.dyn2 <- jags(data = in.data,
+                 inits = inits,
+                 parameters.to.save = params,
+                 parallel = TRUE,
+                 model.file=paste0("./JAGS_models/dynocc_v2.jags"),
+                 n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb,
+                 verbose=F, store.data = TRUE)
+
+print(Sys.time()-starttime)
+
+# save(out.dyn2, file="./OUT/out_dyn2.RData")
+```
+
+```{r, echo=F, eval=F, warning=FALSE}
+load("./OUT/out_dyn2.RData") # load previously stored model output
+
+### inspect the outcome:
+out.dyn2
+
+#plot(out.dyn2) # traceplots and densities
+
+### correlation between parameter estimates? -> plot joint posteriors
+# plot(out.dyn2$sims.list$alpha.gamma,out.dyn2$sims.list$beta.area )
+# plot(out.dyn2$sims.list$delta.area,out.dyn2$sims.list$delta.area.2 )
+# pairs(out.dyn2$sims.list[1:6])
+
+# # compare sites with detections to estimated number of sites with occurrences:
+# points(1999:2009, out.dyn2$mean$n.occ, col="blue") # estimated number of sites occupied
+
+```
+
+
+Create partial dependence plots using joint posteriors.
+
+```{r, echo=F, eval=F}
+
+## partial dependence plot, colonization ~ distance to nearest neighbour:
+range(sites$Wasserflaeche.mean, na.rm=T)
+
+## prepare some new x data to predict for:
+x.new <- seq(2,10000, length.out = 100)
+x.new.scaled <- (x.new - mean(sites$Wasserflaeche.mean, na.rm=T))/sd(sites$Wasserflaeche.mean, na.rm=T)
+
+
+# use full posteriors for intercept and slope estimates to predict for new range of x:
+parms <- cbind(out.dyn2$sims.list$alpha.phi, out.dyn2$sims.list$delta.area, out.dyn2$sims.list$delta.area.2) # intercept and slope estimate
+predictions <- plogis(cbind(rep(1,length(x.new.scaled)),x.new.scaled, x.new.scaled^2) %*% t(parms))
+mysummary.predictions <- data.frame("mean"= rowMeans(predictions),
+                                    "lower" = apply(predictions, 1, quantile, probs = c(0.025),  na.rm = TRUE),
+                                    "upper" = apply(predictions, 1, quantile, probs = c(0.975),  na.rm = TRUE))
+
+### PLOT on LOG scale! or find better covariate to plot (and add fluct if sign)
+
+plot(x.new, mysummary.predictions$mean, type="l",
+     ylim=c(0.5,1),
+     xlab="Surface area (m2)", ylab="Persistence probability")
+polygon(x=c(x.new, rev(x.new)) ,
+        y=c(mysummary.predictions$upper, rev(mysummary.predictions$lower)),
+        border=NA, col=rgb(0.5,0.5,0.5,0.3))  # last value in col is transparency
+lines(x.new,mysummary.predictions$mean, lwd=2)
+
+
+```
