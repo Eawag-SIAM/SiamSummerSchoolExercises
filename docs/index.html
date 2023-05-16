@@ -579,12 +579,14 @@ downloads and links to many other resources.</p></li>
 documentation</a>, rather technical.</p></li>
 <li><p>A <a href="https://learnxinyminutes.com/docs/julia/">brief Julia
 introduction</a> for programmers.</p></li>
-<li><p><a href="https://discourse.julialang.org/">Julia forum</a>, where
-you find many questions answered.</p></li>
+<li><p><a href="https://discourse.julialang.org/">Julia forum</a>, here
+you find most questions answered.</p></li>
 <li><p><a href="https://docs.julialang.org/en/v1/manual/noteworthy-differences/">Noteworthy
 Differences from other Languages</a> such as Matlab, Python, R.</p></li>
 <li><p><a href="https://juliahub.com/ui/Home">Juliahub</a>, search for
 packages and documentation</p></li>
+<li><p><a href="https://m3g.github.io/JuliaNotes.jl/stable/">JuliaNotes</a>, tips
+on workflows and other topics</p></li>
 <li><p><a href="https://computationalthinking.mit.edu/">Introduction to
 computational thinking</a> A very cool MIT lecture using Julia and
 interactive notebooks.</p></li>
@@ -652,6 +654,8 @@ Computation (ABC)</p></li>
 <li><p><a href="exercise_1_solution.html">Monday</a></p></li>
 <li><p><a href="exercise_2_solution.html">Tuesday</a></p></li>
 <li><p><a href="exercise_3_solution.html">Wednesday</a></p></li>
+<li><p><a href="exercise_4_solution.html">Thursday A</a></p></li>
+<li><p><a href="exercise_5_solution.html">Thursday B</a></p></li>
 </ul>
 </div>
 <div id="ive-found-a-bug-or-typo" class="section level1">
@@ -679,27 +683,26 @@ Here you find the exact package versions used to compile the solutions:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] jagsUI_1.5.2     JuliaCall_0.17.5 knitr_1.39       rmarkdown_2.19  
+## [1] JuliaCall_0.17.5 knitr_1.39       rmarkdown_2.19  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] vctrs_0.5.2     cli_3.6.0       rlang_1.0.6     xfun_0.30      
-##  [5] stringi_1.7.8   jsonlite_1.8.4  glue_1.6.2      rjags_4-14     
-##  [9] htmltools_0.5.4 sass_0.4.4      grid_4.3.0      evaluate_0.15  
-## [13] jquerylib_0.1.4 fastmap_1.1.0   yaml_2.3.5      lifecycle_1.0.3
-## [17] stringr_1.5.0   compiler_4.3.0  coda_0.19-4     Rcpp_1.0.10    
-## [21] lattice_0.21-8  digest_0.6.29   R6_2.5.1        parallel_4.3.0 
-## [25] magrittr_2.0.3  bslib_0.4.2     tools_4.3.0     cachem_1.0.6</code></pre>
+##  [1] digest_0.6.29   R6_2.5.1        fastmap_1.1.0   xfun_0.30      
+##  [5] magrittr_2.0.3  glue_1.6.2      cachem_1.0.6    stringr_1.5.0  
+##  [9] htmltools_0.5.4 lifecycle_1.0.3 cli_3.6.0       vctrs_0.5.2    
+## [13] sass_0.4.4      jquerylib_0.1.4 compiler_4.3.0  tools_4.3.0    
+## [17] evaluate_0.15   bslib_0.4.2     Rcpp_1.0.10     yaml_2.3.5     
+## [21] jsonlite_1.8.4  rlang_1.0.6     stringi_1.7.8</code></pre>
 </div>
 <div id="julia-2" class="section level2">
 <h2>Julia</h2>
-<pre><code>## Julia Version 1.8.1
-## Commit afb6c60d69a (2022-09-06 15:09 UTC)
+<pre><code>## Julia Version 1.9.0
+## Commit 8e630552924 (2023-05-07 11:25 UTC)
 ## Platform Info:
 ##   OS: Linux (x86_64-linux-gnu)
 ##   CPU: 8 × Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
 ##   WORD_SIZE: 64
 ##   LIBM: libopenlibm
-##   LLVM: libLLVM-13.0.1 (ORCJIT, skylake)
+##   LLVM: libLLVM-14.0.6 (ORCJIT, skylake)
 ##   Threads: 1 on 8 virtual cores
 ## Environment:
 ##   LD_PRELOAD = /usr/lib64/libstdc++.so.6
@@ -709,27 +712,27 @@ Here you find the exact package versions used to compile the solutions:
 ##   [717c3277] AdaptiveMCMC v0.1.3
 ##   [0bf59076] AdvancedHMC v0.4.5
 ##   [be4af45d] BarkerMCMC v0.1.1
-##   [336ed68f] CSV v0.10.9
+##   [336ed68f] CSV v0.10.10
 ##   [b0b7db55] ComponentArrays v0.13.12
 ##   [a93c6f00] DataFrames v1.5.0
-##   [31c24e10] Distributions v0.25.89
+## ⌃ [31c24e10] Distributions v0.25.90
 ##   [f6369f11] ForwardDiff v0.10.35
 ##   [38e38edf] GLM v1.8.3
 ##   [af5da776] GlobalSensitivity v2.1.4
 ##   [79d62d8d] KissMCMC v0.2.1
 ##   [c7f686f2] MCMCChains v6.0.1
 ##   [429524aa] Optim v1.7.5
-## ⌃ [1dea7af3] OrdinaryDiffEq v6.51.0
-##   [91a5bcdd] Plots v1.38.11
+##   [1dea7af3] OrdinaryDiffEq v6.51.1
+## ⌃ [91a5bcdd] Plots v1.38.11
 ## ⌅ [2913bbd2] StatsBase v0.33.21
 ##   [f3b207a7] StatsPlots v0.15.5
 ##   [84d833dd] TransformVariables v0.8.6
 ##   [3a884ed6] UnPack v1.0.2
 ##   [37e2e46d] LinearAlgebra
-##   [10745b16] Statistics
-## Info Packages marked with ⌃ and ⌅ have new versions available, but those with ⌅ cannot be upgraded. To see why use `status --outdated`</code></pre>
+##   [10745b16] Statistics v1.9.0
+## Info Packages marked with ⌃ and ⌅ have new versions available, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated`</code></pre>
 </details>
-<p>Built at 11 May, 2023.</p>
+<p>Built at 16 May, 2023.</p>
 <hr />
 <p><a href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="data:image/png;base64,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" alt="license" /></a> This work is licensed under a <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
 Commons Attribution-NonCommercial-ShareAlike 4.0 International

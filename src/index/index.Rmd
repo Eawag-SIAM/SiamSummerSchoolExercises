@@ -150,8 +150,8 @@ using ...
 - A [brief Julia introduction](https://learnxinyminutes.com/docs/julia/) for
 programmers.
 
-- [Julia forum](https://discourse.julialang.org/), where you find
-    many questions answered.
+- [Julia forum](https://discourse.julialang.org/), here you find
+    most questions answered.
 
 - [Noteworthy Differences from other
   Languages](https://docs.julialang.org/en/v1/manual/noteworthy-differences/)
@@ -159,6 +159,8 @@ programmers.
 
 - [Juliahub](https://juliahub.com/ui/Home), search for packages and
   documentation
+
+- [JuliaNotes](https://m3g.github.io/JuliaNotes.jl/stable/), tips on workflows and other topics
 
 - [Introduction to computational
   thinking](https://computationalthinking.mit.edu/) A very cool MIT
@@ -220,6 +222,10 @@ This exercises may use additional software packages.
 - [Tuesday](exercise_2_solution.html)
 
 - [Wednesday](exercise_3_solution.html)
+
+- [Thursday A](exercise_4_solution.html)
+
+- [Thursday B](exercise_5_solution.html)
 
 
 # I've found a bug or typo! 🐜
