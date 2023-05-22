@@ -97,7 +97,7 @@ monod_data = CSV.read(joinpath("..", "..", "data", "model_monod_stoch.csv"),
              DataFrame)
 
 C = monod_data.C
-yobs = monod_data.C
+yobs = monod_data.r
 ```
 We can compute
 ```{julia}
@@ -110,11 +110,12 @@ loglikelihood_monod(yobs, C, par2)
 
 ```
 Plotting
-```{julia, out.width = '80%', results = 'hide'}
+```{julia, results = 'hide'}
 # use the better parameters to compute the deterministic predictions
 y_det = model_monod(C, par1)
+```
 
-# plots
+```{julia, out.width = '80%'}
 scatter(C, yobs,
         labels = false,
         xlabel = "C",

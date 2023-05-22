@@ -101,7 +101,7 @@ normal values with mean $0$ and standard deviation $\sigma$ and add
 them to the deterministic model output.
 
 #### R
-```{r }
+```{r}
 source("../../models/models.r") # load the model
 
 simulate.monod.stoch <- function(par, C){
