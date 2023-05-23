@@ -62,7 +62,7 @@ r <- dat$r
 
 ## compare the two parameter vectors
 par1 <- c(r_max = 5, K = 3, sigma=0.2)
-par2 <- c(r_max = 5, K = 4, sigma=0.2)
+par2 <- c(r_max = 10, K = 4, sigma=0.2)
 
 loglikelihood.monod(r, C, par1)
 loglikelihood.monod(r, C, par2)
