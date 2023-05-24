@@ -2,16 +2,6 @@
 
 ### R
 
-#### Reading and plotting the data
-
-```{r}
-data.survival <- read.table("../../data/model_survival.csv", header=TRUE)
-barplot(data.survival$deaths, names=data.survival$time,
-        xlab="Time interval", ylab="No. of deaths",
-        main="Survival data")
-```
-
-
 #### Defining the likelihood, prior, and posterior
 
 
@@ -127,24 +117,6 @@ plot(density(chain[1000:nrow(chain),1]), xlab=expression(lambda), main="")
 
 
 ### Julia
-
-
-#### Reading and plotting the data
-
-```{julia, out.width = '80%'}
-using DataFrames
-import CSV
-using Plots
-
-survival_data = CSV.read("../../data/model_survival.csv",
-                         DataFrame)
-
-bar(survival_data.deaths,
-    labels = false,
-    xlabel = "Times interval",
-    ylabel = "No. of deaths",
-    title = "Survival Model")
-```
 
 #### Defining the likelihood, prior, and posterior
 

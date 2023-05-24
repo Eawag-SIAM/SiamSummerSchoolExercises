@@ -31,4 +31,10 @@ import Pkg
 Pkg.activate(".")
 Pkg.instantiate()
 Pkg.status()
+
+# set up plot style
+using Plots
+theme(:wong2)
+default(fontfamily = "Computer Modern", dpi = 300)
+Plots.scalefontsizes(1.1)
 ```

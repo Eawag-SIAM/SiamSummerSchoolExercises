@@ -158,7 +158,6 @@ import CSV
 using Plots
 
 monod_data = CSV.read("../../data/model_monod_stoch.csv", DataFrame)
-
 scatter(monod_data.C, monod_data.r,
         label=false, xlab="C", ylab="r")
 ```
@@ -213,7 +212,6 @@ using StatsPlots
 # define a function that generates a proposal given θ:
 Σjump = diagm(ones(3))
 sample_proposal(θ) = θ .+ rand(MvNormal(zeros(length(θ)), Σjump))
-
 # run sampler
 samples, acceptance_ratio, lp = metropolis(logposterior_monod,
                                            sample_proposal,
@@ -224,9 +222,7 @@ samples, acceptance_ratio, lp = metropolis(logposterior_monod,
 
 # We convert the sampeles in a `MCMCChains.Chains` object to
 # get plotting and summary functions
-
 chn = Chains(samples, labels(par))
-
 plot(chn)
 corner(chn)
 ```
@@ -244,7 +240,6 @@ then used as new jump distribution.
 # take covariance for previous chain
 Σjump = cov(Array(chn)) * (1/2)^2
 sample_proposal(θ) = θ .+ rand(MvNormal(zeros(length(θ)), Σjump))
-
 samples2, acceptance_ratio2, lp2 = metropolis(logposterior_monod,
                                               sample_proposal,
                                               par;
@@ -252,7 +247,6 @@ samples2, acceptance_ratio2, lp2 = metropolis(logposterior_monod,
                                               nburnin = 0);
 
 chn2 = Chains(samples2, labels(par))
-
 plot(chn2)
 corner(chn2)
 ```

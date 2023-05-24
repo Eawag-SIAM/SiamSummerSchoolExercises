@@ -78,41 +78,33 @@ b. Histograms and densities
 ```{julia, out.width = '80%', results = 'hide'}
 hist = [
     histogram(y_1_sample[1, :], nbins = 15,
-              xlabel="Y_1_indep sample",
-              title="Y_1 of Y_indep"),
+              xlabel="y_1_sample[1,:]"),
     histogram(y_1_sample[2, :], nbins = 15,
-              xlabel="Y_2_indep sample",
-              title="Y_2 of Y_indep"),
+              xlabel="y_1_sample[2,:]"),
     histogram(y_2_sample[1, :], nbins = 15,
-              xlabel="Y_1_dep sample",
-              title="Y_1 of Y_dep"),
+              xlabel="y_2_sample[1,:]"),
     histogram(y_2_sample[2, :], nbins = 15,
-              xlabel="Y_2_dep sample",
-              title="Y_2 of Y_dep")
+              xlabel="y_2_sample[2,:]")
 ]
 ```
 ```{julia, out.width = '80%'}
-plot(hist..., legend = false, ylabel = "Frequency")
+plot(hist..., legend = false, ylabel = "frequency")
 ```
 ```{julia, out.width = '80%', results = 'hide'}
 using StatsPlots
 dens = [
     density(y_1_sample[1,:],
-            xlabel="N=1000",
-            title="Y_1 of Y_indep"),
+            xlabel="y_1_sample[1,:]"),
     density(y_1_sample[2,:],
-            xlabel="N=1000",
-            title="Y_2 of Y_indep"),
+            xlabel="y_1_sample[2,:]"),
     density(y_2_sample[1,:],
-            xlabel="N=1000",
-            title="Y_1 of Y_dep"),
+            xlabel="y_2_sample[1,:]"),
     density(y_2_sample[2,:],
-            xlabel="N=1000",
-            title="Y_2 of Y_dep")
+            xlabel="y_2_sample[2,:]")
 ]
 ```
 ```{julia, out.width = '80%'}
-plot(dens..., lengend = false, ylabel = "Density")
+plot(dens..., legend = false, ylabel = "density")
 ```
 
 Alternatively, we could also have written a loop for the four plots.

@@ -65,7 +65,7 @@ barplot(data.survival$deaths, names=data.survival$time,
 ```
 
 ##### Julia
-```{julia}
+```{julia, out.width = '80%'}
 using DataFrames
 import CSV
 using Plots
@@ -76,7 +76,7 @@ bar(survival_data.deaths,
     labels = false,
     xlabel = "Times interval",
     ylabel = "No. of deaths",
-    title = "Survival data
+    title = "Survival data")
 ```
 
 ### Defining the likelihood, prior, and posterior
