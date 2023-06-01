@@ -502,7 +502,7 @@ Studio</a>, the most widely used IDE for R.</p></li>
 <p>Run this code once to install all required packages for this course.
 Check careful for any error messages!</p>
 <pre class="r"><code>## all packages that we need to install
-pkgs &lt;- c(&quot;mcmcensemble&quot;, &quot;IDPmisc&quot;, &quot;FME&quot;, &quot;rootSolve&quot;,
+pkgs &lt;- c(&quot;mcmcensemble&quot;, &quot;IDPmisc&quot;, &quot;FME&quot;, &quot;rootSolve&quot;, &quot;EasyABC&quot;,
           &quot;adaptMCMC&quot;, &quot;mvtnorm&quot;, &quot;sensitivity&quot;, &quot;deSolve&quot;)
 
 ## install packages if needed
@@ -684,38 +684,42 @@ Here you find the exact package versions used to compile the solutions:
 ## [8] base     
 ## 
 ## other attached packages:
-##  [1] mcmcensemble_3.0.0 IDPmisc_1.1.20     FME_1.3.6.2        rootSolve_1.8.2.3 
-##  [5] adaptMCMC_1.4      Matrix_1.5-4       coda_0.19-4        sensitivity_1.28.1
-##  [9] deSolve_1.34       mvtnorm_1.1-3      JuliaCall_0.17.5   knitr_1.39        
-## [13] rmarkdown_2.19    
+##  [1] mcmcensemble_3.0.0 IDPmisc_1.1.20     adaptMCMC_1.4      Matrix_1.5-4      
+##  [5] sensitivity_1.28.1 mvtnorm_1.1-3      FME_1.3.6.2        coda_0.19-4       
+##  [9] rootSolve_1.8.2.3  deSolve_1.34       EasyABC_1.5.2      abc_2.2.1         
+## [13] locfit_1.5-9.7     MASS_7.3-58.4      quantreg_5.95      SparseM_1.81      
+## [17] nnet_7.3-18        abc.data_1.0       JuliaCall_0.17.5   knitr_1.39        
+## [21] rmarkdown_2.19    
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] gtable_0.3.0        xfun_0.30           bslib_0.4.2        
-##  [4] ggplot2_3.4.1       shinyjs_2.1.0       ggrepel_0.9.3      
-##  [7] lattice_0.21-8      vctrs_0.5.2         tools_4.3.0        
-## [10] generics_0.1.2      stats4_4.3.0        tibble_3.2.0       
-## [13] proxy_0.4-27        fansi_1.0.3         highr_0.9          
-## [16] cluster_2.1.4       pkgconfig_2.0.3     RcppParallel_5.1.7 
-## [19] lifecycle_1.0.3     compiler_4.3.0      stringr_1.5.0      
-## [22] munsell_0.5.0       minpack.lm_1.2-3    codetools_0.2-19   
-## [25] clue_0.3-64         httpuv_1.6.9        htmltools_0.5.4    
-## [28] numbers_0.8-5       class_7.3-21        sass_0.4.4         
-## [31] yaml_2.3.5          pillar_1.8.1        later_1.3.0        
-## [34] jquerylib_0.1.4     MASS_7.3-58.4       ellipsis_0.3.2     
-## [37] cachem_1.0.6        iterators_1.0.14    boot_1.3-28.1      
-## [40] foreach_1.5.2       parallelly_1.34.0   mime_0.12          
-## [43] RSpectra_0.16-1     tidyselect_1.2.0    digest_0.6.29      
-## [46] future_1.32.0       stringi_1.7.8       listenv_0.9.0      
-## [49] dplyr_1.1.0         reshape2_1.4.4      flexclust_1.4-1    
-## [52] fastmap_1.1.0       grid_4.3.0          colorspace_2.0-3   
-## [55] cli_3.6.0           magrittr_2.0.3      utf8_1.2.2         
-## [58] future.apply_1.10.0 scales_1.2.0        promises_1.2.0.1   
-## [61] globals_0.16.2      dtwclust_5.5.12     progressr_0.13.0   
-## [64] modeltools_0.2-23   shiny_1.7.4         evaluate_0.15      
-## [67] dtw_1.23-1          ramcmc_0.1.2        rlang_1.0.6        
-## [70] Rcpp_1.0.10         xtable_1.8-4        glue_1.6.2         
-## [73] minqa_1.2.4         jsonlite_1.8.4      R6_2.5.1           
-## [76] plyr_1.8.7</code></pre>
+##  [1] mnormt_2.1.1        rlang_1.0.6         magrittr_2.0.3     
+##  [4] clue_0.3-64         flexclust_1.4-1     compiler_4.3.0     
+##  [7] vctrs_0.5.2         reshape2_1.4.4      lhs_1.1.6          
+## [10] stringr_1.5.0       pkgconfig_2.0.3     fastmap_1.1.0      
+## [13] ellipsis_0.3.2      utf8_1.2.2          promises_1.2.0.1   
+## [16] numbers_0.8-5       MatrixModels_0.5-0  xfun_0.30          
+## [19] modeltools_0.2-23   ramcmc_0.1.2        cachem_1.0.6       
+## [22] jsonlite_1.8.4      highr_0.9           later_1.3.0        
+## [25] dtwclust_5.5.12     cluster_2.1.4       R6_2.5.1           
+## [28] bslib_0.4.2         stringi_1.7.8       parallelly_1.34.0  
+## [31] boot_1.3-28.1       jquerylib_0.1.4     Rcpp_1.0.10        
+## [34] iterators_1.0.14    future.apply_1.10.0 httpuv_1.6.9       
+## [37] splines_4.3.0       tidyselect_1.2.0    yaml_2.3.5         
+## [40] codetools_0.2-19    dtw_1.23-1          minpack.lm_1.2-3   
+## [43] listenv_0.9.0       lattice_0.21-8      tibble_3.2.0       
+## [46] plyr_1.8.7          shiny_1.7.4         evaluate_0.15      
+## [49] future_1.32.0       survival_3.5-5      proxy_0.4-27       
+## [52] RcppParallel_5.1.7  pillar_1.8.1        tensorA_0.36.2     
+## [55] foreach_1.5.2       stats4_4.3.0        shinyjs_2.1.0      
+## [58] generics_0.1.2      ggplot2_3.4.1       munsell_0.5.0      
+## [61] scales_1.2.0        minqa_1.2.4         globals_0.16.2     
+## [64] xtable_1.8-4        class_7.3-21        glue_1.6.2         
+## [67] tools_4.3.0         RSpectra_0.16-1     grid_4.3.0         
+## [70] colorspace_2.0-3    cli_3.6.0           fansi_1.0.3        
+## [73] dplyr_1.1.0         gtable_0.3.0        pls_2.8-2          
+## [76] sass_0.4.4          digest_0.6.29       progressr_0.13.0   
+## [79] ggrepel_0.9.3       htmltools_0.5.4     lifecycle_1.0.3    
+## [82] mime_0.12</code></pre>
 </div>
 <div id="julia-2" class="section level2">
 <h2>Julia</h2>
@@ -731,7 +735,8 @@ Here you find the exact package versions used to compile the solutions:
 ## Environment:
 ##   LD_PRELOAD = /usr/lib64/libstdc++.so.6
 ##   LD_LIBRARY_PATH = /usr/lib64/R/lib
-##   JULIA_STACKTRACE_MINIMAL = true</code></pre>
+##   JULIA_STACKTRACE_MINIMAL = true
+##   JULIA_IMAGE_THREADS = 1</code></pre>
 <pre><code>## Status `~/Dropbox/Projects/Summer School/SummerSchoolExercises/src/Project.toml`
 ##   [717c3277] AdaptiveMCMC v0.1.3
 ## ⌃ [0bf59076] AdvancedHMC v0.4.5
@@ -756,7 +761,7 @@ Here you find the exact package versions used to compile the solutions:
 ##   [10745b16] Statistics v1.9.0
 ## Info Packages marked with ⌃ and ⌅ have new versions available, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated`</code></pre>
 </details>
-<p>Built at 24 May, 2023.</p>
+<p>Built at 01 June, 2023.</p>
 <hr />
 <p><a href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="data:image/png;base64,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" alt="license" /></a> This work is licensed under a <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
 Commons Attribution-NonCommercial-ShareAlike 4.0 International

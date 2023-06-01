@@ -72,7 +72,7 @@ Run this code once to install all required packages for this
 course. Check careful for any error messages!
 ```r
 ## all packages that we need to install
-pkgs <- c("mcmcensemble", "IDPmisc", "FME", "rootSolve",
+pkgs <- c("mcmcensemble", "IDPmisc", "FME", "rootSolve", "EasyABC",
           "adaptMCMC", "mvtnorm", "sensitivity", "deSolve")
 
 ## install packages if needed

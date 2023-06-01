@@ -35,6 +35,6 @@ Pkg.status()
 # set up plot style
 using Plots
 theme(:wong2)
-default(fontfamily = "Computer Modern", dpi = 300)
+default(fontfamily = "Computer Modern", minorticks=5, dpi = 300)
 Plots.scalefontsizes(1.1)
 ```
