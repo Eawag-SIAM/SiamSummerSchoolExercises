@@ -90,6 +90,8 @@ $$
 This means that we need the likelihood function $p(y|\lambda)$
 and the prior $p(\lambda)$.
 
+Remember to set `N=30`.
+
 #### Likelihood {.tabset}
 
 ##### R
@@ -229,7 +231,7 @@ colnames(chain) <- c("lambda","logposterior")
 par.start <- ???
 
 # compute logosterior value of of your start parameter
-survival[1,] <- ???
+chain[1,] <- ???
 
 # Run the MCMC:
 for (i in 2:sampsize){
