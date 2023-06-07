@@ -1711,31 +1711,32 @@ bins with the argument <code>nbins</code>, e.g
 </div>
 <div id="generate" class="section level1">
 <h1>5. Generating data ★</h1>
-<p>Generate two samples of fictional observations (each of class
-<code>matrix</code>) denoted as <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,indep}\)</span> and
-<span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,dep}\)</span>.
-The former should contain 1000 realisations of two <em>independent</em>
-random variables (as two columns of the matrix) and the latter of two
-<em>dependent</em> ones. Use means of <span class="math inline">\(\boldsymbol{\mu}=(3,8)\)</span> for both samples.
-Use the standard deviations <span class="math inline">\(\boldsymbol{\sigma}_\mathrm{obs,indep}=(2,5)\)</span>
-for the independent variables constituting <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,indep}\)</span>, and
-the covariance matrix. <span class="math display">\[
+<p>Generate 1000 samples of two different 2-dimensional normal
+distributions. The mean of both distribution is <span class="math inline">\(\boldsymbol{\mu}=(3,8)\)</span>.</p>
+<ul>
+<li><p>For the first distribution, <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,indep}\)</span>, both
+dimensions are <em>independent</em> and have a standard deviations of
+<span class="math inline">\(\boldsymbol{\sigma}_\mathrm{obs,indep}=(2,5)\)</span>.</p></li>
+<li><p>The second distribution, <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,dep}\)</span>, the two
+dimensions are correlated. This is defined with the covariance matrix
+<span class="math display">\[
 \boldsymbol{\Sigma}_\mathrm{obs,dep}=
 \begin{pmatrix}
-  4 &amp; 8\\
-  8 &amp; 25
+4 &amp; 8\\
+8 &amp; 25
 \end{pmatrix}
-\]</span></p>
-<p>for the dependent variables constituting <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,dep}\)</span>.</p>
+\]</span>.</p></li>
+</ul>
+<p>The aim is obtain two matrices(with two columns and 1000 rows)
+containing the random samples.</p>
 <div id="hints-1" class="section level3 tabset">
 <h3 class="tabset">Hints</h3>
 <div id="r-1" class="section level4">
 <h4>R</h4>
-<p>In R, objects of a certain class can often be constructed by a
-function that matches the class name, such as <code>matrix()</code>. You
-can use <code>rnorm()</code> and <code>cbind()</code> to construct <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,indep}\)</span> and
-<code>rmvnorm()</code> from the package <code>mvtnorm</code> to
-construct <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,dep}\)</span>.</p>
+<p>You can use <code>rnorm()</code> to sample form a one-dimensional
+normal distribution. With <code>cbind()</code> you can combine vectors
+to a matrix. For the depended normal distribution use
+<code>rmvnorm()</code> from the package <code>mvtnorm</code>.</p>
 </div>
 <div id="julia-1" class="section level4">
 <h4>Julia</h4>
@@ -1743,7 +1744,8 @@ construct <span class="math inline">\(\boldsymbol{Y}_\mathrm{obs,dep}\)</span>.<
 correlation matrix <span class="math inline">\(\Sigma\)</span>, you can
 construct a multivariate normal distribution with
 <code>MvNormal(μ, Σ)</code> from the package
-<code>Distribution.jl</code>.</p>
+<code>Distribution.jl</code>. How does the covariance matrix for
+independent variables look like?</p>
 </div>
 </div>
 </div>
