@@ -6,7 +6,7 @@ school.
 You should find the exercises here:
 https://www.eawag.ch/summerschool/exercises
 (redirecting to):
-https://scheidan.github.io/SiamSummerSchoolExercises/
+https://eawag-siam.github.io/SiamSummerSchoolExercises/
 
 ## Build html's
 
