@@ -116,9 +116,9 @@ Julia has a build-in package manager that also handles environments
 (for Python users, think `pip` and `virtualenv` combined), see the documentation [here](https://pkgdocs.julialang.org/v1/). The required packages used in the exercises
 are defined in the files:
 
-- [`Project.toml`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/src/Project.toml){target="_blank"}
+- [`Project.toml`](https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/src/Project.toml){target="_blank"}
   (defines the needed packages)
-- [`Manifest.toml`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/src/Manifest.toml){target="_blank"} (defines all indirect dependencies and exact versions)
+- [`Manifest.toml`](https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/src/Manifest.toml){target="_blank"} (defines all indirect dependencies and exact versions)
 
 Save them at a convenient location and run
 the following code to install and precompile all packages. Note, the
