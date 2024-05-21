@@ -37,3 +37,16 @@ theme(:wong2)
 default(fontfamily = "Computer Modern", minorticks=5, dpi = 300)
 Plots.scalefontsizes(1.1)
 ```
+
+<!-- activate conda environment for python -->
+```{r, echo = FALSE, results = FALSE}
+library(reticulate)
+## install miniconda with: install_miniconda()
+## create conda environment if needed
+if(!condaenv_exists("SummerSchoolExercises")) {
+    conda_create(envname = "SummerSchoolExercises", environment = "environment.yml")
+}
+use_condaenv("SummerSchoolExercises") # activate environment
+## conda_python(envname = "SummerSchoolExercises") # show the active python binary
+```
+

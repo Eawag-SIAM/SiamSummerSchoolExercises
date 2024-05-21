@@ -28,8 +28,9 @@ advanced are marked with ♛.
 
 # Software {.tabset}
 
-For most exercises we provide hints and solutions in **R** and
-**Julia**. You can attempt the exercises in any other language you are
+For most exercises we provide hints and solutions for **R**,
+**Julia**, and (still a bit less polished) for **Python**.
+You can attempt the exercises in any other language you are
 comfortable with, however, in some cases you may find it difficult to
 find corresponding packages.
 
@@ -56,6 +57,8 @@ makes this a worthwhile trade-off for larger problems. Another
 distinct advantage of Julia is the availability of [Automatic
 Differentiation](https://juliadiff.org/) that can help a lot with
 optimization and posterior sampling.
+
+**Python** is a versatile and widely-used programming language known for its readability and simplicity. It has a rich ecosystem of libraries and frameworks for various applications. Libraries for data handling are comparable ot R (e.g., Pandas, NumPy) and deep learning learning frameworks such as Pytorch, Jax, Tensorflow are usually  best integrated with python. As an interpreted language, Python, like R, belongs to the slower languages (Cython and Numba that can optimize performance-critical parts of the code).
 
 
 ## R
@@ -168,6 +171,30 @@ programmers.
   thinking](https://computationalthinking.mit.edu/) A very cool MIT
   lecture using Julia and interactive notebooks.
 
+## Python
+
+### Installation
+
+Python can be installed in many ways. For this exercises we used a `miniconda` installation.
+
+1. Install `miniconda` following the instructions given [here](https://docs.anaconda.com/free/miniconda/index.html).
+
+2. If you do not have a favorite text editor, install [Visual Studio Code](https://code.visualstudio.com/) and the [Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+
+### Install the packages used for the course
+
+The packages required are defined in `environment.yml`. The file defines the conda environment `SummerSchoolExercises`. 
+Download the it **XXXXhereXXX** the file and create the `SummerSchoolExercises` environment with
+```
+conda env create -f environment.yml
+```
+
+Then, before you run your code make sure you activate the environment:
+```
+conda activate SummerSchoolExercises
+```
+
+
 # Example models and data
 
 ### Data
@@ -195,7 +222,7 @@ You can load it with `include("path_to/models.jl")` in your scripts.
 # Exercises
 
 - [Sunday](exercise_0.html): Review of probability
-  calculus, basics of R and Julia
+  calculus, basics of R, Julia, and Python
 
 - [Monday](exercise_1.html): Deriving and implementing likelihood
   functions, sensitivity analysis
@@ -259,6 +286,12 @@ versioninfo()
 import Pkg
 Pkg.activate("../.")
 Pkg.status()
+```
+
+## Python
+
+```{r, echo=FALSE}
+py_list_packages("SummerSchoolExercises", type="conda")
 ```
 </details>
 

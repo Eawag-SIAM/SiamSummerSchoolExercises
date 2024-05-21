@@ -145,6 +145,27 @@ rand(π, n)      # sample n random numbers
 
 Histograms are generated with the function `histogram` from the package `Plots.jl`. You can adjust the number of bins with the argument `nbins`, e.g `histogram(rand(Uniform(0,5), 10000), nbins = 100)`.
 
+#### Python
+This the Python solution:
+```{python}
+import numpy as np
+x = np.random.normal(10)
+np.mean(x)
+```
+
+Another code snippet
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+
+xpoints = np.array([1, 2, 6, 8])
+ypoints = np.array([3, 8, 1, 10])
+
+plt.plot(xpoints, ypoints)
+plt.show()
+```
+
+
 ```{r, child = if(params$showsolutions){"exe_0_solution_4.Rmd"}}
 ```
 

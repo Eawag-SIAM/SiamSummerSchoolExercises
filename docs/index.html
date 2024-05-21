@@ -413,6 +413,7 @@ information</a></li>
 <ul>
 <li><a href="#r" id="toc-r">R</a></li>
 <li><a href="#julia" id="toc-julia">Julia</a></li>
+<li><a href="#python" id="toc-python">Python</a></li>
 </ul></li>
 <li><a href="#example-models-and-data" id="toc-example-models-and-data">Example models and data</a></li>
 <li><a href="#exercises" id="toc-exercises">Exercises</a></li>
@@ -422,6 +423,7 @@ information</a></li>
 <ul>
 <li><a href="#r-2" id="toc-r-2">R</a></li>
 <li><a href="#julia-2" id="toc-julia-2">Julia</a></li>
+<li><a href="#python-1" id="toc-python-1">Python</a></li>
 </ul></li>
 </ul>
 </div>
@@ -453,6 +455,7 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 </script>
 <!-- activate julia environment -->
+<!-- activate conda environment for python -->
 <div id="general-information" class="section level1">
 <h1>General information</h1>
 <p>All participants have different backgrounds and interests. For this
@@ -463,10 +466,11 @@ advanced are marked with ♛.</p>
 </div>
 <div id="software" class="section level1 tabset">
 <h1 class="tabset">Software</h1>
-<p>For most exercises we provide hints and solutions in
-<strong>R</strong> and <strong>Julia</strong>. You can attempt the
-exercises in any other language you are comfortable with, however, in
-some cases you may find it difficult to find corresponding packages.</p>
+<p>For most exercises we provide hints and solutions for
+<strong>R</strong>, <strong>Julia</strong>, and (still a bit less
+polished) for <strong>Python</strong>. You can attempt the exercises in
+any other language you are comfortable with, however, in some cases you
+may find it difficult to find corresponding packages.</p>
 <p><strong>R</strong> is a popular free software environment for
 statistical computing, with an wide range of packages for a extensive
 array of statistical procedures, plotting options, data handling, and
@@ -487,6 +491,14 @@ compilation step. However, the faster execution speed of Julia makes
 this a worthwhile trade-off for larger problems. Another distinct
 advantage of Julia is the availability of <a href="https://juliadiff.org/">Automatic Differentiation</a> that can
 help a lot with optimization and posterior sampling.</p>
+<p><strong>Python</strong> is a versatile and widely-used programming
+language known for its readability and simplicity. It has a rich
+ecosystem of libraries and frameworks for various applications.
+Libraries for data handling are comparable ot R (e.g., Pandas, NumPy)
+and deep learning learning frameworks such as Pytorch, Jax, Tensorflow
+are usually best integrated with python. As an interpreted language,
+Python, like R, belongs to the slower languages (Cython and Numba that
+can optimize performance-critical parts of the code).</p>
 <div id="r" class="section level2">
 <h2>R</h2>
 <div id="installation" class="section level3">
@@ -597,6 +609,32 @@ interactive notebooks.</p></li>
 </ul>
 </div>
 </div>
+<div id="python" class="section level2">
+<h2>Python</h2>
+<div id="installation-2" class="section level3">
+<h3>Installation</h3>
+<p>Python can be installed in many ways. For this exercises we used a
+<code>miniconda</code> installation.</p>
+<ol style="list-style-type: decimal">
+<li><p>Install <code>miniconda</code> following the instructions given
+<a href="https://docs.anaconda.com/free/miniconda/index.html">here</a>.</p></li>
+<li><p>If you do not have a favorite text editor, install <a href="https://code.visualstudio.com/">Visual Studio Code</a> and the <a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python
+extension</a></p></li>
+</ol>
+</div>
+<div id="install-the-packages-used-for-the-course-1" class="section level3">
+<h3>Install the packages used for the course</h3>
+<p>The packages required are defined in <code>environment.yml</code>.
+The file defines the conda environment
+<code>SummerSchoolExercises</code>. Download the it
+<strong>XXXXhereXXX</strong> the file and create the
+<code>SummerSchoolExercises</code> environment with</p>
+<pre><code>conda env create -f environment.yml</code></pre>
+<p>Then, before you run your code make sure you activate the
+environment:</p>
+<pre><code>conda activate SummerSchoolExercises</code></pre>
+</div>
+</div>
 </div>
 <div id="example-models-and-data" class="section level1">
 <h1>Example models and data</h1>
@@ -632,7 +670,7 @@ your scripts.</p>
 <h1>Exercises</h1>
 <ul>
 <li><p><a href="exercise_0.html">Sunday</a>: Review of probability
-calculus, basics of R and Julia</p></li>
+calculus, basics of R, Julia, and Python</p></li>
 <li><p><a href="exercise_1.html">Monday</a>: Deriving and implementing
 likelihood functions, sensitivity analysis</p></li>
 <li><p><a href="exercise_2.html">Tuesday</a>: Bayesian computations,
@@ -686,25 +724,21 @@ Here you find the exact package versions used to compile the solutions:
 ## [1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] sensitivity_1.30.0 mcmcensemble_3.1.0 adaptMCMC_1.5      Matrix_1.6-5       IDPmisc_1.1.21     FME_1.3.6.3       
-##  [7] coda_0.19-4.1      rootSolve_1.8.2.4  deSolve_1.40       JuliaCall_0.17.5   knitr_1.46         rmarkdown_2.26    
+##  [1] EasyABC_1.5.2      abc_2.2.1          locfit_1.5-9.9     MASS_7.3-60.0.1    quantreg_5.97      SparseM_1.81       nnet_7.3-19        abc.data_1.1       mcmcensemble_3.1.0
+## [10] IDPmisc_1.1.21     FME_1.3.6.3        rootSolve_1.8.2.4  adaptMCMC_1.5      Matrix_1.6-5       coda_0.19-4.1      sensitivity_1.30.0 deSolve_1.40       mvtnorm_1.2-4     
+## [19] reticulate_1.36.1  JuliaCall_0.17.5   knitr_1.46         rmarkdown_2.26    
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] tidyselect_1.2.1    dplyr_1.1.4         fastmap_1.1.1       promises_1.3.0      numbers_0.8-5      
-##  [6] shinyjs_2.1.0       digest_0.6.35       mime_0.12           lifecycle_1.0.4     cluster_2.1.6      
-## [11] magrittr_2.0.3      compiler_4.3.3      rlang_1.1.3         sass_0.4.9          tools_4.3.3        
-## [16] utf8_1.2.4          yaml_2.3.8          plyr_1.8.9          grid_4.3.3          stats4_4.3.3       
-## [21] fansi_1.0.6         xtable_1.8-4        colorspace_2.1-0    future_1.33.2       progressr_0.14.0   
-## [26] ggplot2_3.5.0       globals_0.16.3      scales_1.3.0        iterators_1.0.14    MASS_7.3-60.0.1    
-## [31] cli_3.6.2           generics_0.1.3      RcppParallel_5.1.7  future.apply_1.11.2 RSpectra_0.16-1    
-## [36] reshape2_1.4.4      minqa_1.2.6         cachem_1.0.8        proxy_0.4-27        stringr_1.5.1      
-## [41] modeltools_0.2-23   ramcmc_0.1.2        vctrs_0.6.5         boot_1.3-30         jsonlite_1.8.8     
-## [46] minpack.lm_1.2-4    ggrepel_0.9.5       clue_0.3-65         listenv_0.9.1       foreach_1.5.2      
-## [51] jquerylib_0.1.4     glue_1.7.0          parallelly_1.37.1   dtw_1.23-1          codetools_0.2-20   
-## [56] flexclust_1.4-1     stringi_1.8.3       gtable_0.3.4        later_1.3.2         munsell_0.5.1      
-## [61] tibble_3.2.1        pillar_1.9.0        htmltools_0.5.8.1   R6_2.5.1            evaluate_0.23      
-## [66] shiny_1.8.1.1       lattice_0.22-6      highr_0.10          dtwclust_5.5.12     httpuv_1.6.15      
-## [71] bslib_0.7.0         class_7.3-22        Rcpp_1.0.12         xfun_0.43           pkgconfig_2.0.3</code></pre>
+##  [1] mnormt_2.1.1        rlang_1.1.3         magrittr_2.0.3      clue_0.3-65         flexclust_1.4-1     compiler_4.3.3      png_0.1-8           vctrs_0.6.5         reshape2_1.4.4     
+## [10] lhs_1.1.6           stringr_1.5.1       pkgconfig_2.0.3     fastmap_1.1.1       utf8_1.2.4          promises_1.3.0      numbers_0.8-5       MatrixModels_0.5-3  xfun_0.43          
+## [19] modeltools_0.2-23   ramcmc_0.1.2        cachem_1.0.8        jsonlite_1.8.8      highr_0.10          later_1.3.2         dtwclust_5.5.12     cluster_2.1.6       R6_2.5.1           
+## [28] bslib_0.7.0         stringi_1.8.3       parallelly_1.37.1   boot_1.3-30         jquerylib_0.1.4     Rcpp_1.0.12         iterators_1.0.14    future.apply_1.11.2 httpuv_1.6.15      
+## [37] splines_4.3.3       tidyselect_1.2.1    yaml_2.3.8          codetools_0.2-20    dtw_1.23-1          minpack.lm_1.2-4    listenv_0.9.1       lattice_0.22-6      tibble_3.2.1       
+## [46] plyr_1.8.9          shiny_1.8.1.1       withr_3.0.0         evaluate_0.23       future_1.33.2       survival_3.5-8      proxy_0.4-27        RcppParallel_5.1.7  pillar_1.9.0       
+## [55] tensorA_0.36.2.1    foreach_1.5.2       stats4_4.3.3        shinyjs_2.1.0       generics_0.1.3      ggplot2_3.5.0       munsell_0.5.1       scales_1.3.0        minqa_1.2.6        
+## [64] globals_0.16.3      xtable_1.8-4        class_7.3-22        glue_1.7.0          tools_4.3.3         RSpectra_0.16-1     grid_4.3.3          colorspace_2.1-0    cli_3.6.2          
+## [73] rappdirs_0.3.3      fansi_1.0.6         dplyr_1.1.4         gtable_0.3.4        pls_2.8-3           sass_0.4.9          digest_0.6.35       progressr_0.14.0    ggrepel_0.9.5      
+## [82] htmltools_0.5.8.1   lifecycle_1.0.4     mime_0.12</code></pre>
 </div>
 <div id="julia-2" class="section level2">
 <h2>Julia</h2>
@@ -743,8 +777,75 @@ Here you find the exact package versions used to compile the solutions:
 ##   [3a884ed6] UnPack v1.0.2
 ##   [37e2e46d] LinearAlgebra
 ##   [10745b16] Statistics v1.10.0</code></pre>
+</div>
+<div id="python-1" class="section level2">
+<h2>Python</h2>
+<pre><code>##                package     version                requirement   channel
+## 1                 blas         1.0                   blas=1.0 pkgs/main
+## 2               brotli       1.0.9               brotli=1.0.9 pkgs/main
+## 3           brotli-bin       1.0.9           brotli-bin=1.0.9 pkgs/main
+## 4      ca-certificates   2024.3.11  ca-certificates=2024.3.11 pkgs/main
+## 5            contourpy       1.2.0            contourpy=1.2.0 pkgs/main
+## 6               cycler      0.11.0              cycler=0.11.0 pkgs/main
+## 7            fonttools      4.51.0           fonttools=4.51.0 pkgs/main
+## 8             freetype      2.12.1            freetype=2.12.1 pkgs/main
+## 9                  icu        73.1                   icu=73.1 pkgs/main
+## 10 importlib_resources       6.1.1  importlib_resources=6.1.1 pkgs/main
+## 11        intel-openmp    2023.1.0      intel-openmp=2023.1.0 pkgs/main
+## 12                jpeg          9e                    jpeg=9e pkgs/main
+## 13          kiwisolver       1.4.4           kiwisolver=1.4.4 pkgs/main
+## 14                krb5      1.20.1                krb5=1.20.1 pkgs/main
+## 15               lcms2        2.12                 lcms2=2.12 pkgs/main
+## 16                lerc         3.0                   lerc=3.0 pkgs/main
+## 17     libbrotlicommon       1.0.9      libbrotlicommon=1.0.9 pkgs/main
+## 18        libbrotlidec       1.0.9         libbrotlidec=1.0.9 pkgs/main
+## 19        libbrotlienc       1.0.9         libbrotlienc=1.0.9 pkgs/main
+## 20            libclang      14.0.6            libclang=14.0.6 pkgs/main
+## 21          libclang13      14.0.6          libclang13=14.0.6 pkgs/main
+## 22          libdeflate        1.17            libdeflate=1.17 pkgs/main
+## 23              libpng      1.6.39              libpng=1.6.39 pkgs/main
+## 24               libpq       12.17                libpq=12.17 pkgs/main
+## 25             libtiff       4.5.1              libtiff=4.5.1 pkgs/main
+## 26        libwebp-base       1.3.2         libwebp-base=1.3.2 pkgs/main
+## 27               lz4-c       1.9.4                lz4-c=1.9.4 pkgs/main
+## 28          matplotlib       3.8.4           matplotlib=3.8.4 pkgs/main
+## 29     matplotlib-base       3.8.4      matplotlib-base=3.8.4 pkgs/main
+## 30                 mkl    2023.1.0               mkl=2023.1.0 pkgs/main
+## 31         mkl-service       2.4.0          mkl-service=2.4.0 pkgs/main
+## 32             mkl_fft       1.3.8              mkl_fft=1.3.8 pkgs/main
+## 33          mkl_random       1.2.4           mkl_random=1.2.4 pkgs/main
+## 34               numpy      1.26.4               numpy=1.26.4 pkgs/main
+## 35          numpy-base      1.26.4          numpy-base=1.26.4 pkgs/main
+## 36            openjpeg       2.4.0             openjpeg=2.4.0 pkgs/main
+## 37             openssl      3.0.13             openssl=3.0.13 pkgs/main
+## 38           packaging        23.2             packaging=23.2 pkgs/main
+## 39              pillow      10.3.0              pillow=10.3.0 pkgs/main
+## 40                 pip        24.0                   pip=24.0 pkgs/main
+## 41                 ply        3.11                   ply=3.11 pkgs/main
+## 42           pyparsing       3.0.9            pyparsing=3.0.9 pkgs/main
+## 43                pyqt     5.15.10               pyqt=5.15.10 pkgs/main
+## 44           pyqt5-sip     12.13.0          pyqt5-sip=12.13.0 pkgs/main
+## 45              python      3.9.19              python=3.9.19 pkgs/main
+## 46     python-dateutil  2.9.0post0 python-dateutil=2.9.0post0 pkgs/main
+## 47             qt-main      5.15.2             qt-main=5.15.2 pkgs/main
+## 48          setuptools      69.5.1          setuptools=69.5.1 pkgs/main
+## 49                 sip      6.7.12                 sip=6.7.12 pkgs/main
+## 50                 six      1.16.0                 six=1.16.0 pkgs/main
+## 51              sqlite      3.45.3              sqlite=3.45.3 pkgs/main
+## 52                 tbb    2021.8.0               tbb=2021.8.0 pkgs/main
+## 53               tomli       2.0.1                tomli=2.0.1 pkgs/main
+## 54             tornado       6.3.3              tornado=6.3.3 pkgs/main
+## 55              tzdata       2024a               tzdata=2024a pkgs/main
+## 56        unicodedata2      15.1.0        unicodedata2=15.1.0 pkgs/main
+## 57                  vc        14.2                    vc=14.2 pkgs/main
+## 58      vs2015_runtime 14.29.30133 vs2015_runtime=14.29.30133 pkgs/main
+## 59               wheel      0.43.0               wheel=0.43.0 pkgs/main
+## 60                  xz       5.4.6                   xz=5.4.6 pkgs/main
+## 61                zipp      3.17.0                zipp=3.17.0 pkgs/main
+## 62                zlib      1.2.13                zlib=1.2.13 pkgs/main
+## 63                zstd       1.5.5                 zstd=1.5.5 pkgs/main</code></pre>
 </details>
-<p>Built at 19 May, 2024.</p>
+<p>Built at 21 May, 2024.</p>
 <hr />
 <p><a href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="data:image/png;base64,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" alt="license" /></a> This work is licensed under a <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
 Commons Attribution-NonCommercial-ShareAlike 4.0 International
