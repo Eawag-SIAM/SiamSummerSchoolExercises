@@ -1,6 +1,6 @@
 ## -------------------------------------------------------
 ##
-## Build html for all excerises from *rmd files
+## Build html for all exercises from *rmd files
 ##
 ## January 17, 2023 -- Andreas Scheidegger
 ## andreas.scheidegger@eawag.ch
@@ -14,12 +14,12 @@ library(knitr)
 library(JuliaCall)  # needed for Julia
 
 ## --- settings
-out.dir <- "docs"
-src.dir <- "src"
+out.dir <- "../docs"
+src.dir <- "."
 
 ## --- compile all exercises
 exercises <- c("exercise_0", "exercise_1", "exercise_2",
-               "exercise_3", "exercise_4", "exercise_5")[1]
+               "exercise_3", "exercise_4", "exercise_5")[2]
 
 exercises <- c(exercises, "index")
 for(exer in exercises){

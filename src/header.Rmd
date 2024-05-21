@@ -29,8 +29,7 @@ document.addEventListener("DOMContentLoaded", function(){
 ```{julia, echo = FALSE, results = FALSE}
 import Pkg
 Pkg.activate(".")
-Pkg.instantiate()
-Pkg.status()
+# Pkg.update()
 
 # set up plot style
 using Plots

@@ -2,84 +2,63 @@
 
 ### Julia
 
-First we make sure, that we can sample in an unlimited space by using
+First we make sure, that we can sample in an unlimited space by using a
 appropriate transformations:
 ```{julia}
 using TransformVariables
+using TransformedLogDensities: TransformedLogDensity
+using LogDensityProblemsAD: ADgradient
 
 # defines the 'legal' parameter space, all parameter cannot be negative
 # due to the lognormal prior
 trans = as((r_max = asℝ₊, K = asℝ₊, sigma = asℝ₊))
 
-# define a function that takes a parameter vector in ℝ^n
-function logposterior_monod_Rn(par_Rn)
-    # transforms from ℝ^n to parameter space,
-    # and compute log of the determinante of the jacobian
-    par, logjac = TransformVariables.transform_and_logjac(trans, par_Rn)
+# define an object that is compatible with the LogDensityProblems.jl interface.
+# This enables compability with idfferent samplers.
+lp = TransformedLogDensity(trans, θ -> logposterior_monod(ComponentVector(θ)))
 
-    # do not forget to add the log determinante!
-    logposterior_monod(ComponentVector(par)) + logjac
-end
 ```
 
-We get the gradient of the logposterior with AD:
-```{julia}
-import ForwardDiff
+We compute the gradient of the logposterior with automatic
+differentiation (AD). In Julia we can choose AD different back-ends. `ForwardDiff.jl` is
+a good option if we do not have many parameters.
 
-# derive a function that computes the gradient
-∇logposterior_monod_Rn(par_Rn) = ForwardDiff.gradient(logposterior_monod_Rn, par_Rn)
+```{julia}
+lp = ADgradient(:ForwardDiff, lp)
 ```
 
 #### HMC
 
-```{julia, result=FALSE}
-using AdvancedHMC
-function stanHMC(lp::Function, ∇lp::Function,  θ_init,;
-                 n_samples::Int=1000, n_adapts::Int=n_samples÷2)
-
-    # Define a Hamiltonian system
-    D = length(θ_init)   # number of parameters
-    metric = DiagEuclideanMetric(D)
-    hamiltonian = Hamiltonian(metric, lp, θr -> (lp(θr), ∇lp(θr)))
-
-    # Define a leapfrog solver, with initial step size chosen heuristically
-    initial_ϵ = find_good_stepsize(hamiltonian, θ_init)
-    integrator = Leapfrog(initial_ϵ)
-
-    # Define an HMC sampler, with the following components
-    #   - multinomial sampling scheme,
-    #   - generalised No-U-Turn criteria, and
-    #   - windowed adaption for step-size and diagonal mass matrix
-    proposal = NUTS{MultinomialTS, GeneralisedNoUTurn}(integrator)
-    adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(0.8, integrator))
-
-    # -- run sampler
-    samples, stats = sample(hamiltonian, proposal, θ_init, n_samples,
-                            adaptor, n_adapts; progress=true)
-
-    return (samples=samples, stats=stats)
-
-end
-```
-
-We use our wrapper function `stanHMC`. Note, that for HMC we typically
+We use a "No-U-turn sampler" HMC sampler, similar to the one
+implemented in STAN. Note, that for HMC we typically
 need a much lower number of samples.
 ```{julia}
-par_init = [-1.0, -1.0, -1.0]   # in ℝⁿ
-res = stanHMC(logposterior_monod_Rn,
-              ∇logposterior_monod_Rn,
-              par_init;
-              n_samples = 100);
+import Random
+using DynamicHMC: mcmc_with_warmup, ProgressMeterReport, Diagnostics.summarize_tree_statistics
 
-res.samples                     # this are the samples in ℝⁿ !
+# run for 100 samples
+par_init = [-1.0, -1.0, -1.0];   # in ℝⁿ
+
+results = mcmc_with_warmup(Random.GLOBAL_RNG, lp, 100;
+                           initialization = (q = par_init, ),
+                           reporter = ProgressMeterReport());
+
+# some convergence statistics
+summarize_tree_statistics(results.tree_statistics)
+
+results.posterior_matrix                     # this are the samples in ℝⁿ !
 ```
 
-We need to back-transform the samples to the "normal" space. For
- plotting we convert to `Chains`:
+We need to back-transform the samples to the "normal" parameter space. For
+ plotting we convert to `MCMCChains.Chains`:
 ```{julia, out.width = '80%'}
-_chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i]))
-        for i in 1:size(res.samples, 1)];
-chn = Chains(_chn,  [:r_max, :K, :sigma])
+# back-transform samples
+_samples = [TransformVariables.transform(trans, s)
+            for s in eachcol(results.posterior_matrix)];
+
+samples = vcat((hcat(i...) for i in _samples)...);
+chn = MCMCChains.Chains(samples,  [:r_max, :K, :sigma])
+
 plot(chn)
 corner(chn[25:end,:,:])
 ```
@@ -90,18 +69,18 @@ The same steps are taken for the `BarkerMCMC`:
 ```{julia, out.width = '80%'}
 using BarkerMCMC: barker_mcmc
 
-par_init = [-1.0, -1.0, -1.0];   # in ℝⁿ
+par_init = [-1.0, -1.0, -1.0];   # note, this is in ℝⁿ
 
 # see `?barker_mcmc` for all options
-res = barker_mcmc(logposterior_monod_Rn,
-                  ∇logposterior_monod_Rn,
+res = barker_mcmc(lp,
                   par_init;
                   n_iter = 1000,
                   target_acceptance_rate=0.4);
 # Transform the samples to the "normal" space and convert to `Chains`
-_chn = [ComponentVector(TransformVariables.transform(trans, res.samples[i,:]))
-        for i in 1:size(res.samples, 1)];
-chn = Chains(_chn,  [:r_max, :K, :sigma])
+_samples = [TransformVariables.transform(trans, s)
+            for s in eachrow(res.samples)];
+samples = vcat((hcat(i...) for i in _samples)...);
+chn = Chains(samples,  [:r_max, :K, :sigma])
 
 plot(chn)
 corner(chn[250:end,:,:])

@@ -1,6 +1,6 @@
 ---
-title: "Environmental Systems Analysis"
-subtitle: "Summer School organized by Siam, Eawag"
+title: "Bayesian Methods for Environmental Modelling"
+subtitle: "Summer School by Siam, Eawag"
 number_sections: TRUE
 output:
   html_document:
@@ -51,7 +51,7 @@ resources. The core language, however, is stable and very well
 documented. Note, for the exercises in this course you will not
 benefit a lot from the faster speed as all our example models are
 tiny. Julia may even appear slower than R in interactive use due to
-the compilation step, however, the faster execution speed of Julia
+the compilation step. However, the faster execution speed of Julia
 makes this a worthwhile trade-off for larger problems. Another
 distinct advantage of Julia is the availability of [Automatic
 Differentiation](https://juliadiff.org/) that can help a lot with
@@ -162,6 +162,8 @@ programmers.
 
 - [JuliaNotes](https://m3g.github.io/JuliaNotes.jl/stable/), tips on workflows and other topics
 
+- [Modern Julia Workflows](https://modernjuliaworkflows.github.io/), a collection of best practices for Julia development
+
 - [Introduction to computational
   thinking](https://computationalthinking.mit.edu/) A very cool MIT
   lecture using Julia and interactive notebooks.
@@ -180,12 +182,12 @@ The example models are defined in this file. Save it in a convenient
 location.
 
 #### R
-- [`models.r`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/models/models.r){target="_blank"}
+- [`models.r`](https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/models/models.r){target="_blank"}
 
 You can load it with `source("path_to/models.r")` in your scripts.
 
 #### Julia
-- [`models.jl`](https://raw.githubusercontent.com/scheidan/SiamSummerSchoolExercises/main/models/models.jl){target="_blank"}
+- [`models.jl`]("https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/models/models.r"}
 
 You can load it with `include("path_to/models.jl")` in your scripts.
 
@@ -233,7 +235,7 @@ This exercises may use additional software packages.
 If you find any typos, errors, confusing instructions, bad solutions,
 or you have general suggestions how to
 improve the exercises, please open an
-[issue here](https://github.com/scheidan/SiamSummerSchoolExercises/issues)
+[issue here](https://github.com/Eawag-SIAM/SiamSummerSchoolExercises/issues)
 (PRs are welcome too). Thanks a lot!
 
 # Version info {.tabset}

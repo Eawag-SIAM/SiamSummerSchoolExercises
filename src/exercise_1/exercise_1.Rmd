@@ -266,7 +266,7 @@ Construct the likelihood for the model "Survival".
 The mortality rate $\lambda$, upon multiplication with an infinitesimal time interval $\Delta t$, denotes the probability to die within this time interval, given that one is still alive at the beginning of it.
 If $S(t)$ denotes the probability of an individual to be still alive at time point $t$, this reads as
 $$
-\frac{S(t+\Delta t)-S(t)}{S(t)}=-\lambda \Delta t\,.
+\text{Prob}\left(\text{die in }[t, t+\Delta \right) \mid \text{survived until } t) = \frac{S(t+\Delta t)-S(t)}{S(t)}=-\lambda \Delta t\,.
 $$
 If we let $\Delta t\rightarrow 0$ this equation turns into the differential equation
 $$
