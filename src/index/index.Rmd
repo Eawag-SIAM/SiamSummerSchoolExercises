@@ -58,7 +58,7 @@ distinct advantage of Julia is the availability of [Automatic
 Differentiation](https://juliadiff.org/) that can help a lot with
 optimization and posterior sampling.
 
-**Python** is a versatile and widely-used programming language known for its readability and simplicity. It has a rich ecosystem of libraries and frameworks for various applications. Libraries for data handling are comparable ot R (e.g., Pandas, NumPy) and deep learning learning frameworks such as Pytorch, Jax, Tensorflow are usually  best integrated with python. As an interpreted language, Python, like R, belongs to the slower languages (Cython and Numba that can optimize performance-critical parts of the code).
+**Python** is a versatile and widely-used programming language known for its readability and simplicity. It has a rich ecosystem of libraries and frameworks for various applications. Libraries for data handling are comparable ot R (e.g., Pandas, NumPy) and deep learning learning frameworks such as Pytorch, Jax, Tensorflow are usually  best integrated with python. As an interpreted language, Python, like R, belongs to the slower languages (although Cython and Numba can often optimize performance-critical parts of the code).
 
 
 ## R
@@ -179,12 +179,12 @@ Python can be installed in many ways. For this exercises we used a `miniconda` i
 
 1. Install `miniconda` following the instructions given [here](https://docs.anaconda.com/free/miniconda/index.html).
 
-2. If you do not have a favorite text editor, install [Visual Studio Code](https://code.visualstudio.com/) and the [Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+2. If you do not have a favorite text editor, install [Visual Studio Code](https://code.visualstudio.com/) and the [Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python).
 
 ### Install the packages used for the course
 
-The packages required are defined in `environment.yml`. The file defines the conda environment `SummerSchoolExercises`. 
-Download the it **XXXXhereXXX** the file and create the `SummerSchoolExercises` environment with
+The packages required are defined in [`environment.yml`](https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/src/environment.yml). The file defines the [conda environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) `SummerSchoolExercises`. 
+Download it to your working directory and create the `SummerSchoolExercises` environment with:
 ```
 conda env create -f environment.yml
 ```
@@ -214,7 +214,7 @@ location.
 You can load it with `source("path_to/models.r")` in your scripts.
 
 #### Julia
-- [`models.jl`]("https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/models/models.r"}
+- [`models.jl`]("https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/models/models.jl"){target="_blank"}
 
 You can load it with `include("path_to/models.jl")` in your scripts.
 
