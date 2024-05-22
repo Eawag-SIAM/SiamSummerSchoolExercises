@@ -78,8 +78,12 @@ bar(survival_data.deaths,
     ylabel = "No. of deaths",
     title = "Survival data")
 ```
+
 ##### Python
 ```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+
 # Loading data
 # Specify the path to the CSV file
 file_path = r"../../data/model_survival.csv"
@@ -151,10 +155,30 @@ function loglikelihood_survival(N::Int, t::Vector, y::Vector, λ)
     logpdf(Multinomial(N, p), y)
 end
 ```
-
 Note, that we return `-Inf` if a negative parameter is given.
 However, we still need a prior distribution for the model parameter $\lambda$ that
 encodes that it must be positive.
+
+##### Python
+The likelihood can be implemented like this, copied from Exercise 1.
+```{python, eval = FALSE}
+def loglikelihood_survival(y, N, t, par):
+    # Calculate survival probabilities at measurement points
+    # and add zero "at time-point infinity":
+    S = np.exp(-par * np.concatenate(([0], t)))
+    S = np.concatenate((S, [0]))
+
+    # Calculate probabilities to die within observation windows:
+    p = -np.diff(S)
+
+    # Add number of survivors at the end of the experiment:
+    y = np.concatenate((y, [N - np.sum(y)]))
+
+    # Calculate log-likelihood of multinomial distribution at point y:
+    LL = multinomial.logpmf(y, n=N, p=p)
+
+    return LL
+```
 
 
 ### Prior {.tabset}
@@ -204,6 +228,25 @@ end
 
 ```
 
+#### Python
+You can use a `lognormal` prior distribution by understanding and filling-in the block below.
+```{python, eval = FALSE}
+def logprior_survival(par):
+    # Define mean and standard deviation that approximate the prior information given
+    mu = 0.6    # Since the distribution is skewed, choose it higher than 0.3 (the mode)
+    sigma = 0.7 # A value similar to mu will do
+
+    # Calculate the mean and standard deviation in the log-space
+    meanlog = np.log(mu) - 0.5 * np.log(1 + (sigma / mu)**2)
+    sdlog = np.sqrt(np.log(1 + (sigma / mu)**2))
+
+    # Calculate the log prior using log-normal distribution
+    log_prior = lognorm.logpdf(par, s=sdlog, scale=np.exp(meanlog))
+
+    return log_prior
+
+```
+
 ### Posterior {.tabset}
 
 Finally,  define a function that evaluates the density of
@@ -227,6 +270,14 @@ log.posterior <- function(par, data) {
 function logposterior_survival(λ, data)
     return ...
 end
+```
+
+#### Python
+```{python, eval = FALSE}
+def logposterior_survival(par, data):
+  
+
+    return log_posterior
 ```
 
 ## Code your own Markov Chain Metropolis sampler {.tabset #mcmc}
@@ -313,6 +364,47 @@ for i in 2:sampsize
 end
 ```
 
+### Python
+
+```{python, eval=FALSE}
+
+# Set sample size (make it feasible)
+sampsize = 5000
+
+# Create an empty array to hold the chain
+chain = np.zeros((sampsize, 2))
+# Define column names
+column_names = ['lambda', 'logposterior']
+
+# Set start value for your parameter
+par_start = {'lambda': 0.5}
+
+# Compute posterior value of the first chain using the start value
+# of the parameter and the logprior and loglikelihood functions already defined
+chain[0, 0] = par_start['lambda']
+chain[0, 1] = logposterior_survival(par_start['lambda'], data_survival)
+
+# Run the MCMC
+for i in range(1, sampsize):
+    # Propose a new parameter value based on the previous one (think of proposal distribution)
+    par_prop = ??
+
+    # Calculate log-posterior of the proposed parameter value (use likelihood and prior)
+    logpost_prop = ??
+
+    # Calculate acceptance probability
+    acc_prob = ??
+
+    # Store in chain[i, :] the new parameter value if accepted, or re-use the old one if rejected
+    if np.random.rand() < acc_prob:
+        chain[i, :] = [par_prop, logpost_prop]
+    else:  # if not accepted, stay at the current parameter value
+        chain[i, :] = chain[i - 1, :]
+
+# If you want to convert the array to a DataFrame for further analysis
+df_chain = pd.DataFrame(chain, columns=column_names)
+
+```
 
 Experiment with you sampler:
 - Plot the resulting chain. Does it look reasonable?
