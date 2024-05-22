@@ -28,7 +28,6 @@ y_2_sample = rand(Y_2, 1000)
 
 #### Python
 ```{python}
-import numpy as np
 from numpy.random import normal, multivariate_normal
 
 # Generate 1000 samples from the independent 2-dimensional normal distribution

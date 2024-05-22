@@ -12,14 +12,14 @@ library(rmarkdown)
 library(knitr)
 
 library(JuliaCall)  # needed for Julia
-
+julia_setup("C:/Users/nascimth/AppData/Local/Programs/Julia-1.10.3/bin")
 ## --- settings
 out.dir <- "../docs"
 src.dir <- "."
 
 ## --- compile all exercises
 exercises <- c("exercise_0", "exercise_1", "exercise_2",
-               "exercise_3", "exercise_4", "exercise_5")[1]
+               "exercise_3", "exercise_4", "exercise_5")[2]
 
 exercises <- c(exercises, "index")
 for(exer in exercises){

@@ -88,7 +88,8 @@ The following libraries are required:
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import uniform, norm
-import math 
+import math
+import numpy as np
 ```
 1. evaluate pdf
 ```{python}

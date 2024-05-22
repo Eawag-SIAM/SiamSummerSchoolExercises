@@ -285,3 +285,380 @@ using StatsBase
 acf = StatsBase.autocor(residuals);
 bar(0:(length(acf)-1), acf, label=false, xlab="lag", ylab="correlation")
 ```
+
+### Python
+
+#### Read data
+
+```{python}
+# If models.py are not stored in the same directory as the scripts, one should 
+# perform the following trick:
+###############################################################################
+import sys
+
+# Add the directory containing your modules to the Python path
+sys.path.append('../../models/')
+
+# Now you can import the modules
+from models import model_monod, model_growth
+
+# Now, remove the directory from the Python path to avoid conflicts
+sys.path.remove('../../models/')
+###############################################################################
+
+import emcee
+from emcee.moves import GaussianMove
+import seaborn as sns
+```
+
+```{python}
+# Loading data
+# Specify the path to the CSV file
+file_path = r"../../data/model_monod_stoch.csv"
+
+# Load the CSV file into a pandas DataFrame
+data_monod = pd.read_csv(file_path, sep=" ")
+
+# Assuming `data_monod` is a pandas DataFrame that contains columns 'C' and 'r'
+# Plot 'C' against 'r'
+plt.figure(figsize=(10, 6))
+plt.scatter(data_monod['C'], data_monod['r'])
+
+# Set x-axis label
+plt.xlabel("C")
+
+# Set y-axis label
+plt.ylabel("r")
+
+# Set title
+plt.title('"model_monod_stoch.csv"')
+
+# Display the plot
+plt.show()
+```
+
+#### Define likelihood, prior, and posterior
+```{python}
+# Define the prior mean and standard deviation
+prior_monod_mean = 0.5 * np.array([5, 3, 0.5])  # r_max, K, sigma
+prior_monod_sd = 0.5 * prior_monod_mean
+
+# Log prior for Monod model
+def logprior_monod(par, mean, sd):
+    # Calculate sdlog and meanlog for log-normal distribution
+    var = (sd**2) / (mean**2)
+    sdlog = np.sqrt(np.log(1 + var))
+    meanlog = np.log(mean) - 0.5 * sdlog**2
+
+    # Calculate the sum of log probabilities from the log-normal distribution
+    log_prior = np.sum(lognorm.logpdf(par, s=sdlog, scale=np.exp(meanlog)))
+
+    return log_prior
+
+def loglikelihood_monod(y, C, par):
+    """
+    Log-likelihood function for the Monod model.
+
+    Parameters:
+    - y: observed growth rates
+    - C: substrate concentrations
+    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
+
+    Returns:
+    - log_likelihood: the sum of log-likelihood values
+    """
+    # Calculate growth rate using Monod model
+    y_det = model_monod(par, C)
+    
+    # Calculate log-likelihood assuming a normal distribution
+    log_likelihood = np.sum(norm.logpdf(y, loc=y_det, scale=par[2]))
+    
+    return log_likelihood
+
+
+def logposterior_monod(par):
+    """
+    Log-posterior function for the Monod model.
+
+    Parameters:
+    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
+
+    Returns:
+    - log_posterior: the log posterior probability
+    """
+    # Calculate the log prior
+    lp = logprior_monod(par, prior_monod_mean, prior_monod_sd)
+    
+    # If log prior is finite, calculate log likelihood and sum
+    if np.isfinite(lp):
+        log_posterior = lp + loglikelihood_monod(data_monod['r'], data_monod['C'], par)
+        return log_posterior
+    else:
+        # Return negative infinity if log prior is not finite
+        return -np.inf
+
+# Make sure you have `data_monod` as a pandas DataFrame with columns 'r' and 'C'.
+```
+
+#### Create initial chain
+
+```{python, results = 'hide'}
+# Number of dimensions (parameters)
+ndim = 3  # For your example, 3 dimensions for r_max, K, sigma
+
+# Create a diagonal covariance matrix with each diagonal entry equal to 1
+jump_cov = np.diag([1.0] * ndim)
+
+# Create an instance of GaussianMove using the jump covariance matrix
+move = GaussianMove(jump_cov)
+
+# Define the initial parameter values (mean of the prior)
+par_init = np.array([2.5, 1.5, 0.25])  # r_max, K, sigma
+
+# Define the number of samples
+n_samples = 5000
+
+# Define the number of dimensions (parameters)
+ndim = len(par_init)
+
+# Define the number of walkers for the MCMC chain
+nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensions
+
+# Initialize the walkers around the initial parameter values with a small random perturbation
+init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
+
+# Define the log posterior function
+def logposterior(par):
+    return logposterior_monod(par)
+
+# Initialize the `emcee` sampler
+sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior, moves=move)
+
+# Run the MCMC chain
+sampler.run_mcmc(init_pos, n_samples, progress=True)
+
+# Get the chain samples
+chain_samples = sampler.get_chain()
+
+```
+
+```{python}
+# Display a summary of the chain
+print("Chain shape: ", chain_samples.shape)
+
+# Reshape the chain_samples to 2D by combining chain and iteration dimensions
+# Combine the second and first dimensions (walker and iteration) into a single dimension
+reshaped_chain = chain_samples[:, 0, :]
+
+# Convert reshaped chain samples to pandas DataFrame
+chain_df = pd.DataFrame(reshaped_chain, columns=['r_max', 'K', 'sigma'])
+
+# Calculate and display summary statistics (mean, SD, quantiles, etc.)
+summary = chain_df.describe(percentiles=[0.025, 0.25, 0.5, 0.75, 0.975])
+
+print("Summary statistics:")
+print(summary)
+```
+
+The acceptance rate is very low:
+```{python}
+print(np.mean(sampler.acceptance_fraction))
+```
+
+Them poor mixing is also visible from the chain plots:
+```{python}
+# Assuming `reshaped_chain` is the reshaped 2D array from the MCMC chain
+# Each column represents a parameter and each row represents an iteration
+
+# List of parameter names
+param_names = ['r_max', 'K', 'sigma']
+
+# Number of parameters (for each variable)
+n_params = len(param_names)
+
+# Create a 3x2 grid of subplots
+fig, axs = plt.subplots(n_params, 2, figsize=(12, 8))
+
+# Iterate through each parameter
+for i in range(n_params):
+    # Plot trace on the left subplot (left column)
+    axs[i, 0].plot(reshaped_chain[:, i])
+    axs[i, 0].set_ylabel(param_names[i])
+    axs[i, 0].set_xlabel('Iteration')
+    axs[i, 0].set_title(f'Trace of {param_names[i]}')
+    axs[i, 0].grid(True)
+    
+    # Plot KDE (kernel density estimation) on the right subplot (right column)
+    sns.kdeplot(reshaped_chain[:, i], ax=axs[i, 1], color='blue')
+    axs[i, 1].set_title(f'Density of {param_names[i]}')
+    axs[i, 1].grid(True)
+    axs[i, 1].set_xlabel(param_names[i])
+
+# Adjust layout and display the plots
+plt.tight_layout()
+plt.show()
+```
+
+Here we see a strong correlation between $K$ and $r_{max}$:
+```{python}
+# Define the parameter names (use appropriate names for your parameters)
+param_names = ['r_max', 'K', 'sigma']
+
+# Convert the reshaped_chain array to a pandas DataFrame with appropriate column names
+df = pd.DataFrame(reshaped_chain, columns=param_names)
+
+# Create pairwise scatter plots between the variables using seaborn's pairplot
+sns.pairplot(df)
+```
+
+#### Improve jump distribution
+
+In emcee, the default move type used in the EnsembleSampler is the stretch move 
+(StretchMove). This move is well-suited for a wide range of models and performs 
+efficiently in high-dimensional parameter spaces. The stretch move works by 
+randomly choosing a pair of walkers and proposing a new position for one walker
+based on a stretch factor relative to the other walker’s position.
+
+```{python, results = 'hide'}
+# Define the initial parameter values (mean of the prior)
+par_init = np.array([2.5, 1.5, 0.25])  # r_max, K, sigma
+
+# Define the number of samples
+n_samples = 5000
+
+# Define the number of dimensions (parameters)
+ndim = len(par_init)
+
+# Define the number of walkers for the MCMC chain
+nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensions
+
+# Initialize the walkers around the initial parameter values with a small random perturbation
+init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
+
+# Initialize the `emcee` sampler
+sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior)
+
+# Run the MCMC chain
+sampler.run_mcmc(init_pos, n_samples, progress=True)
+
+# Get the chain samples
+chain_samples = sampler.get_chain()
+```
+
+Everything looks much better now!
+```{python}
+np.mean(sampler.acceptance_fraction)
+```
+
+```{python}
+# Reshape the chain_samples to 2D by combining chain and iteration dimensions
+# Combine the second and first dimensions (walker and iteration) into a single dimension
+reshaped_chain = chain_samples[:, 0, :]
+
+# Convert reshaped chain samples to pandas DataFrame
+chain_df = pd.DataFrame(reshaped_chain, columns=['r_max', 'K', 'sigma'])
+
+# Calculate and display summary statistics (mean, SD, quantiles, etc.)
+summary = chain_df.describe(percentiles=[0.025, 0.25, 0.5, 0.75, 0.975])
+
+print("Summary statistics:")
+print(summary)
+```
+
+```{python}
+# Define the parameter names (use appropriate names for your parameters)
+param_names = ['r_max', 'K', 'sigma']
+
+# Convert the reshaped_chain array to a pandas DataFrame with appropriate column names
+df = pd.DataFrame(reshaped_chain, columns=param_names)
+
+# Create pairwise scatter plots between the variables using seaborn's pairplot
+sns.pairplot(df)
+```
+
+#### Residual Diagnostics
+
+
+First we compute the residuals with the 'best' parameters
+```{python}
+
+from scipy import stats
+
+#Get the log-posterior values for each sample in the chain
+log_posterior_values = sampler.get_log_prob(flat=False)
+
+# Select one walker
+log_posterior_values=log_posterior_values[:, 0]
+
+# Get the index of the maximum log-posterior probability
+max_log_p_index = np.argmax(log_posterior_values)
+
+# Get the parameter set that maximizes the log-posterior
+par_max = reshaped_chain[max_log_p_index, :]
+
+# Calculate residuals: observed data minus modeled data using par_max
+modeled_data = model_monod(par_max, data_monod['C'])
+
+residuals = data_monod['r'] - modeled_data
+```
+
+Plotting the residuals. We hope not to find any structure, but this
+model is clearly not perfect:
+```{python}
+# Plot observed data (data_monod_r) versus residuals
+plt.figure(figsize=(8, 4))
+plt.scatter(data_monod['r'], residuals, alpha=0.7)
+plt.xlabel("r")  # x-axis label
+plt.ylabel("Residuals")  # y-axis label
+plt.title("Observed Data vs. Residuals")
+
+# Add a horizontal line at y = 0
+plt.axhline(y=0, color='red', linestyle='--')
+
+# Show the plot
+plt.show()
+```
+
+Quantile-quantile plots are great to see if the residuals are
+normal distributed (which was out assumption for the likelihood
+functions). Here we see that we have too heavy tails.
+```{python}
+# Create a figure and axis for the plot
+plt.figure(figsize=(8, 4))
+
+# Generate a Q-Q plot using scipy's probplot function
+# probplot returns a tuple with the results and a dictionary with the plot data
+stats.probplot(residuals, dist="norm", plot=plt)
+
+# Add labels and title
+plt.xlabel("Theoretical Quantiles")
+plt.ylabel("Sample Quantiles")
+plt.title("Q-Q Plot of Residuals")
+
+# Show the plot
+plt.show()
+```
+
+We also assumed independence of the observations, i.e. we should not
+see any auto-correlation. This looks good here:
+```{python}
+from statsmodels.tsa.stattools import acf
+
+# Calculate the autocorrelation function (ACF) of the residuals
+acf_values = acf(residuals, nlags=40, fft=True)
+
+# Create a figure and axis for the plot
+plt.figure(figsize=(8, 6))
+
+# Plot the ACF values using a bar plot
+plt.stem(range(len(acf_values)), acf_values)
+plt.xlabel("Lag")
+plt.ylabel("Autocorrelation")
+plt.title("Autocorrelation Function (ACF) of Residuals")
+
+# Add a horizontal line at y = 0 for reference
+plt.axhline(y=0, color='gray', linestyle='--')
+
+# Show the plot
+plt.show()
+```

@@ -133,10 +133,76 @@ loglikelihood_linear(3,2,1, x, y)
 #parameters  β = 2, γ = 1, σ = 1 are more likely to have produced to data
 ```
 
+#### Python
+
+The following libraries and modules are required:
+```{python}
+# If models.py are not stored in the same directory as the scripts, one should 
+# perform the following trick:
+###############################################################################
+import sys
+
+# Add the directory containing your modules to the Python path
+sys.path.append('../../models/')
+
+# Now you can import the modules
+from models import model_monod, model_growth
+
+# Now, remove the directory from the Python path to avoid conflicts
+sys.path.remove('../../models/')
+###############################################################################
+import pandas as pd
+import numpy as np
+from scipy.stats import norm, multinomial
+import matplotlib.pyplot as plt
+import seaborn as sns
+```
+The likelihood can be implemented like this:
+
+```{python}
+def loglikelihood_linear(x, y, par):
+    """
+    Calculate the log-likelihood for a linear model.
+
+    Parameters:
+    x (array-like): Independent variable.
+    y (array-like): Dependent variable.
+    par (list or array-like): Parameters of the model [slope, intercept, standard deviation].
+
+    Returns:
+    float: The log-likelihood value.
+    """
+    # Deterministic part
+    y_det = par[0] * x + par[1]
+    
+    # Calculate log-likelihood
+    log_likelihood = np.sum(norm.logpdf(y, loc=y_det, scale=par[2]))
+    
+    return log_likelihood
+```
 
 
+You can then compute the likelihood of some parameters, given the data, for instance like this:
 
+```{python}
+# Loading data
+# Specify the path to the CSV file
+file_path = r"../../data/model_linear.csv"
 
+# Load the CSV file into a pandas DataFrame
+dat = pd.read_csv(file_path, sep=" ")
+
+# Extract x and y columns
+x = dat['x']
+y = dat['y']
+
+# Parameters for testing
+par_linear_test = [2, 1, 1]
+
+# Compute likelihood for these parameters
+result = loglikelihood_linear(x, y, par_linear_test)
+print(f"Log-likelihood: {result}")
+```
 
 ### Likelihood optimisation {.tabset}
 
@@ -207,6 +273,53 @@ plot!(x -> param[1]*x + param[2],
       labels = false)
 ```
 
+#### Python
+
+Calling the `optim` function then looks like this:
+
+```{python}
+from scipy.optimize import minimize
+
+# Define the negative log-likelihood function
+def neg_loglikelihood_linear(par, x, y):
+    return -loglikelihood_linear(x, y, par)
+
+# Define starting parameters for optimization
+par_init = [2, 1, 1]  # [beta, gamma, sigma]
+
+# Perform maximum likelihood estimation
+result = minimize(neg_loglikelihood_linear, par_init, args=(x, y))
+
+# Inspect the result
+MLEparameters = result.x
+print(f"MLE Parameters: {MLEparameters}")
+```
+
+
+We can check that the result looks reasonable by plotting the resulting linear model together with the data:
+
+
+```{python}
+# Model output from x-input and estimated parameters
+y_estimate = MLEparameters[0] * x + MLEparameters[1]
+
+# Plot the original data
+plt.figure(figsize=(14, 6))
+
+plt.scatter(x, y, label='Observed Data')
+
+# Plot the estimated values
+plt.plot(x, y_estimate, color='red', label='Estimated Model')
+
+# Add labels and legend
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend()
+
+# Show the plot
+plt.show()
+```
+
 ### Linear regression {.tabset}
 
 The linear regression functions  works differently (it uses a
@@ -226,5 +339,21 @@ Note, `(intercept)` corresponds to $\gamma$ and `x` to $\beta$.
 ```{julia}
 using GLM
 linear_mod = GLM.lm(@formula(y ~ x), linear_data)
+```
+Note, `(intercept)` corresponds to $\gamma$ and `x` to $\beta$.
+
+#### Python
+
+```{python}
+import statsmodels.api as sm
+
+# Add a constant term (intercept) to the independent variable
+x_with_const = sm.add_constant(x)
+
+# Fit the linear model
+model = sm.OLS(y, x_with_const).fit()
+
+# Print the summary of the model
+print(model.summary())
 ```
 Note, `(intercept)` corresponds to $\gamma$ and `x` to $\beta$.

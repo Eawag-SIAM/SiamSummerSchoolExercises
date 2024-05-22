@@ -78,6 +78,25 @@ bar(survival_data.deaths,
     ylabel = "No. of deaths",
     title = "Survival data")
 ```
+##### Python
+```{python}
+# Loading data
+# Specify the path to the CSV file
+file_path = r"../../data/model_survival.csv"
+
+# Load the CSV file into a pandas DataFrame
+data_survival = pd.read_csv(file_path, sep=" ")
+
+plt.bar(data_survival['time'], data_survival['deaths'])
+
+# Set the x and y labels and title
+plt.xlabel("Time interval")
+plt.ylabel("No. of deaths")
+plt.title("Survival data")
+
+# Display the plot
+plt.show()
+```
 
 ### Defining the likelihood, prior, and posterior
 

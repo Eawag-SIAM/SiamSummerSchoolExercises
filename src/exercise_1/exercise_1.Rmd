@@ -112,6 +112,43 @@ function loglikelihood_linear(theta, x, y)
 end
 ```
 
+#### Python {-}
+You can read the external data using the following piece of code:
+
+```{python eval=FALSE}
+
+# Specify the path to the CSV file
+file_path = r"../../data/model_linear.csv"
+
+# Load the CSV file into a pandas DataFrame
+dat = pd.read_csv(file_path, sep=" ")
+
+```
+
+Here is a template for the log-likelihood implementation -- you still need to fill in the important bits!
+
+```{python eval=FALSE}
+
+def loglikelihood_linear(x, y, par):
+    """
+    Calculate the log-likelihood for a linear model.
+
+    Parameters:
+    x (array-like): Independent variable.
+    y (array-like): Dependent variable.
+    par (list or array-like): Parameters of the model [slope, intercept, standard deviation].
+
+    Returns:
+    float: The log-likelihood value.
+    """
+    # Deterministic part
+    y_det = # put your expression for y_det here
+    
+    # Calculate log-likelihood
+    log_likelihood = # put your expression for log-likelihood here
+    
+    return log_likelihood
+```
 
 ## Likelihood optimization
 
@@ -146,6 +183,23 @@ param = Optim.minimizer(optimize(???, ???));
 best_param = ???
 ```
 
+#### Python {-}
+
+You can use, for instance, the `minimize()` function:
+
+```{python  eval=FALSE}
+
+# Define starting parameters for optimisation (e.g. beta_init, gamma_init, and sigma_init),
+# then find maximising parameters using optim:
+result = minimize(function_to_minimize, par_init, args=(x, y))
+
+# You can look at the result like this:
+result
+```
+
+Note that `minimize` does minimization! You will have to
+create a negative-loglikelihood function to minimize.
+
 ## Linear regression
 
 Use the standard linear regression function to estimate the parameters, and compare them to the ones you found through likelihood maximisation in Exercise 1.3.
@@ -169,6 +223,19 @@ summary(linearModel)
 #### Julia {-}
 Use the function `lm` from the package `GLM.jl`(Generalized Linear Model) and the macro `@formula`.
 
+#### Python {-}
+
+The function `statsmodels.api.sm` implements linear regression.
+
+```{python eval=FALSE}
+
+## Build a linear regression model
+# Add a constant term (intercept) to the independent variable
+x_with_const = sm.add_constant(x)
+
+# Fit the linear model
+model = sm.OLS(y, x_with_const).fit()
+```
 
 ```{r, child = if(params$showsolutions){"exe_1_solution_1.Rmd"}}
 ```
@@ -225,6 +292,11 @@ Both deterministic models are already implemented as `model.monod` and
 Both deterministic models are already implemented as `model_monod` and
 `model_growth` in the file `models.jl` .
 
+#### Python {-}
+
+Both deterministic models are already implemented as `model_monod` and
+`model_growth` in the file `models.py` .
+
 
 ## Probabilistic model simulation
 
@@ -251,6 +323,10 @@ For the computation of quantiles you can use the R function `quantile`.
 
 #### Julia {-}
 For the computation of quantiles, you can use the function `quantile`.
+
+
+#### Python {-}
+For the computation of quantiles, you can use the function `np.quantile`.
 
 
 
@@ -384,6 +460,44 @@ res = gsa(θ -> model_monod(C_monod, ComponentVector(r_max = θ[1], K = θ[2])),
           samples = 200)
 res.S1                          # direct effect
 res.ST                          # total effect
+```
+
+#### Python {-}
+
+Use the `SALib` package. Try to visualize the sensitivity with a plot. here there
+is one example of how to set up a function for the sensititvity analysis.
+
+```python
+def local_sa(model, par_vector, par, delta_rel=0.1, *args, **kwargs):
+    """
+    Perform local sensitivity analysis on the model function.
+    
+    Parameters:
+    - model: Function representing the model.
+    - par_vector: Dictionary of model parameters.
+    - par: Name of the parameter to perform sensitivity analysis on.
+    - delta_rel: Relative change in the parameter value.
+    - *args, **kwargs: Additional arguments for the model function.
+    
+    Returns:
+    Dictionary containing absolute and relative sensitivity indices.
+    """
+    # Copy the parameter dictionary to adjust the parameter of interest
+    par_vector2 = par_vector.copy()
+    
+    # Adjust the specified parameter by the relative delta
+    par_vector2[par] *= (1 + delta_rel)
+    
+    # Run the model with the original and adjusted parameter dictionary
+    Y = model(par_vector, *args, **kwargs)
+    Y2 = model(par_vector2, *args, **kwargs)
+
+    # Compute sensitivity indices
+    S_abs = (Y2 - Y) / (par_vector2[par] - par_vector[par])
+    S_rel = (par_vector[par] / Y) * S_abs
+
+    # Return sensitivity indices as a dictionary
+    return {'S_abs': S_abs, 'S_rel': S_rel}
 ```
 
 

@@ -136,6 +136,60 @@ boxplot(pred_survival,
 
 ```
 
+#### Python
+Create a function survival, whose arguments are:
+
+* `N,` the number of individuals,
+
+* `t`, a vector of the form 1:k
+
+* `λ`, the mortality rate.
+
+Returns a random vector `y` of number of deaths per bin.
+
+```{python}
+# Parameters for the survival model
+N = 30  # Number of individuals
+t = np.array([1, 2, 3, 4, 5])  # Times at which the numbers of deaths are counted
+par_survival = [0.2]  # Parameter vector of the model "Survival": 'lambda'
+
+# Function for the survival model
+def model_survival(N, t, par):
+    lambda_ = par[0]
+    
+    # Calculate survival probabilities at measurement points and add zero "at time-point infinity"
+    S = np.exp(-lambda_ * np.concatenate(([0], t)))
+    S = np.append(S, 0)  # Add zero "at time-point infinity"
+    
+    # Calculate probabilities to die within observation windows
+    p = -np.diff(S)
+    
+    # Simulate from multinomial distribution
+    y = multinomial.rvs(N, p)[:-1]
+    
+    return y
+
+# Generate simulations from the probabilistic model
+n_sample = 1000
+pred_survival = np.zeros((n_sample, len(t)))
+
+for i in range(n_sample):
+    pred_survival[i, :] = model_survival(N, t, par_survival)
+    
+# Convert the NumPy array to a pandas DataFrame (as input to seaborn)
+pred_survival_df = pd.DataFrame(pred_survival, columns=t)
+
+# Plotting a boxplot
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=pred_survival_df)
+plt.xlabel("Time")
+plt.ylabel("# Deaths")
+plt.title("Boxplot of # Deaths at Different Times")
+
+# Show the plot
+plt.show()
+```
+
 ### Likelihood evaluation {.tabset}
 
 #### R
@@ -189,3 +243,68 @@ y = survival(N, t, λ)
 
 loglikelihood_survival(N, t, y, λ)
 ```
+
+```{python}
+def loglikelihood_survival(y, N, t, par):
+    """
+    Calculate the log-likelihood of the observed data y given the parameters par
+    and the times t using the multinomial distribution.
+
+    Arguments:
+    - y: observed data (number of deaths at each time point).
+    - N: total number of individuals in the experiment.
+    - t: time points at which the number of deaths are counted.
+    - par: dictionary containing the lambda parameter for the model.
+
+    Returns:
+    - LL: log-likelihood value.
+    """
+    lambda_ = par[0]
+    
+    # Calculate survival probabilities at measurement points and add zero "at time-point infinity"
+    S = np.exp(-lambda_ * np.concatenate(([0], t)))
+    S = np.append(S, 0)
+    
+    # Calculate probabilities to die within observation windows
+    p = -np.diff(S)
+    
+    # Add number of survivors at the end of the experiment
+    y = np.append(y, N - np.sum(y))
+    
+    # Calculate log-likelihood of multinomial distribution at point y
+    LL = multinomial.logpmf(y, N, p)
+    
+    return LL
+
+# Simulate data using the model_survival function
+def model_survival(N, t, par):
+    lambda_ = par[0]
+    
+    # Calculate survival probabilities at measurement points and add zero "at time-point infinity"
+    S = np.exp(-lambda_ * np.concatenate(([0], t)))
+    S = np.append(S, 0)
+    
+    # Calculate probabilities to die within observation windows
+    p = -np.diff(S)
+    
+    # Simulate from multinomial distribution
+    y = multinomial.rvs(N, p)[:-1]
+    
+    return y
+
+# Parameters for the survival model
+N = 30  # Number of individuals
+t = np.array([1, 2, 3, 4, 5])  # Times at which the numbers of deaths are counted
+par_survival = [0.2]  # Parameter vector of the model "Survival"
+
+# Set seed for reproducibility
+np.random.seed(1)
+
+# Simulate data
+y_sim = model_survival(N, t, par_survival)
+
+# Evaluate log-likelihood
+LL = loglikelihood_survival(y_sim, N, t, par_survival)
+print(f"Log-likelihood: {LL}")
+```
+

@@ -91,6 +91,49 @@ plot!(res.time, res.C_S, label="C_S")
 
 ```
 
+#### Python
+##### Monod Model
+```{python}
+# Parameters
+C_monod = np.arange(0, 10.1, 0.1)  # concentrations at which model output should be calculated
+par_monod = [5, 3]   # define parameter vector for the model "Monod"
+
+# Run model
+r_det = model_monod(par_monod, C_monod)
+
+# Plot result
+plt.figure(figsize=(14, 6))
+sns.lineplot(x=C_monod, y=r_det, color='red')
+plt.ylabel('r')
+plt.xlabel('C')
+plt.title('Model Monod output')
+plt.show()
+```
+
+##### Growth Model
+```{python}
+# Parameters
+# 'mu', 'K', 'b','Y','C_M_ini','C_S_ini'
+
+par_growth = [4, 10, 1, 0.6, 10, 50]
+
+times = np.linspace(0, 2, 101)  # time resolution of solution
+
+# Run model
+out = model_growth(par_growth, times)
+
+# Plot results
+plt.figure(figsize=(14, 6))
+sns.lineplot(x=out['time'], y=out['C_M'], color='green', label='microorganisms')
+sns.lineplot(x=out['time'], y=out['C_S'], color='blue', label='substrate')
+plt.ylim(0, 51)
+plt.xlabel('time')
+plt.ylabel('concentration')
+plt.legend(loc='upper right')
+plt.title('Growth of microorganisms and substrate over time')
+plt.show()
+```
+
 
 ### Stochastic model simulation  {.tabset}
 
@@ -166,4 +209,74 @@ plot(C_monod, upper_quantile,
     ylabel = "r");
 plot!(C_monod, med_quantile,
     labels = false)
+```
+
+#### Python
+```{python}
+def simulate_monod_stoch(par, C):
+    """
+    Simulate the Monod model with stochastic noise.
+    
+    Arguments:
+    ----------
+    - par: Array containing the following parameters:
+        - r_max: maximum growth rate
+        - K: half-saturation concentration
+        - sigma: standard deviation of noise
+    - C: numpy array containing substrate concentrations
+    
+    Value:
+    ------
+    A numpy array representing the growth rate with stochastic noise added.
+    """
+    # Run deterministic model
+    r_det = model_monod(par, C)
+
+    # Generate noise using a normal distribution with mean 0 and standard deviation `sigma`
+    sigma = par[-1]
+    z = np.random.normal(0, sigma, size=len(C))
+    
+    # Add noise to the deterministic model results
+    return r_det + z
+
+# Parameters
+C_monod = np.arange(0, 10.1, 0.1)  # concentrations at which model output should be calculated
+par_monod = [5,  3,  0.2]  # define parameter dictionary for the model "Monod"
+n_rep = 1000  # number of simulations
+
+# Run `n_rep` simulations
+r_sims = np.array([simulate_monod_stoch(par_monod, C_monod) for _ in range(n_rep)])
+
+# The dimensions of `r_sims` array will be (n_rep, len(C_monod))
+print(r_sims.shape)  # Should print (1000, 101)
+
+# Compute quantiles
+# r_sims is a numpy array where each row is a simulation and each column represents a concentration
+quant = np.quantile(r_sims, q=[0.1, 0.9], axis=0)
+
+# The resulting `quant` is a 2D array where the first row contains the 10th percentile,
+# and the second row contains the 90th percentile for each concentration.
+print(quant.shape)  # Prints the shape of the resulting quantile array
+
+# Define variables for plotting
+C_monod = np.linspace(0, 10, 101)  # Concentrations at which model output is calculated
+
+# Plot result
+plt.figure(figsize=(14, 6))
+
+# Plot deterministic model output using seaborn
+sns.lineplot(x=C_monod, y=r_det, color='red', label='Deterministic model', linewidth=2)
+
+# Create a shaded region between the quantiles (0.1 and 0.9)
+plt.fill_between(C_monod, quant[0, :], quant[1, :], color='gray', alpha=0.5, label='10th-90th percentile')
+
+# Set labels for the x and y axes
+plt.xlabel('C')
+plt.ylabel('r')
+
+# Add a legend
+plt.legend()
+
+# Show the plot
+plt.show()
 ```

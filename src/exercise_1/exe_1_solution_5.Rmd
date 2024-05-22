@@ -185,3 +185,214 @@ plot!(p, C_monod, res.ST[:,2], label="K, total effect");
 plot!(p, C_monod, res.S1[:,2], label="K, main effect");
 p
 ```
+
+### Python
+#### Local sensitivity analysis
+
+Because we have to do the same calculations for every parameters, it is
+a good idea to write a little function that computes the
+absolute an relative local sensitivity indices. 
+```{python}
+from SALib.sample import fast_sampler
+from SALib.analyze import fast
+
+def local_sa(model, par_vector, par, delta_rel=0.1, *args, **kwargs):
+    """
+    Perform local sensitivity analysis on the model function.
+    
+    Parameters:
+    - model: Function representing the model.
+    - par_vector: Dictionary of model parameters.
+    - par: Name of the parameter to perform sensitivity analysis on.
+    - delta_rel: Relative change in the parameter value.
+    - *args, **kwargs: Additional arguments for the model function.
+    
+    Returns:
+    Dictionary containing absolute and relative sensitivity indices.
+    """
+    # Copy the parameter dictionary to adjust the parameter of interest
+    par_vector2 = par_vector.copy()
+    
+    # Adjust the specified parameter by the relative delta
+    par_vector2[par] *= (1 + delta_rel)
+    
+    # Run the model with the original and adjusted parameter dictionary
+    Y = model(par_vector, *args, **kwargs)
+    Y2 = model(par_vector2, *args, **kwargs)
+
+    # Compute sensitivity indices
+    S_abs = (Y2 - Y) / (par_vector2[par] - par_vector[par])
+    S_rel = (par_vector[par] / Y) * S_abs
+
+    # Return sensitivity indices as a dictionary
+    return {'S_abs': S_abs, 'S_rel': S_rel}
+```
+
+We apply our function `local_SA` for both parameters with different `delta.rel`:
+```{python}
+# Define inputs: concentrations at which model output should be calculated
+C_monod = np.arange(0, 10.1, 0.1)
+
+# Define parameters, the reference point
+par_monod = [5, 3]
+
+# Compute sensitivity indices using local sensitivity analysis
+S_rmax_10 = local_sa(model_monod, par_monod, 0, delta_rel=0.1, C=C_monod)
+S_rmax_50 = local_sa(model_monod, par_monod, 0, delta_rel=0.5, C=C_monod)
+S_K_10 = local_sa(model_monod, par_monod, 1, delta_rel=0.1, C=C_monod)
+S_K_50 = local_sa(model_monod, par_monod, 1, delta_rel=0.5, C=C_monod)
+```
+
+Plotting the absolute indices:
+```{python}
+# Create a Seaborn style figure
+sns.set(style="whitegrid")
+
+# Create a figure
+plt.figure(figsize=(10, 6))
+
+# Plot S.K.10 absolute sensitivity
+sns.lineplot(x=C_monod, y=S_K_10['S_abs'], color='red', linestyle='-', label='S_K 10%')
+
+# Plot S.K.50 absolute sensitivity
+sns.lineplot(x=C_monod, y=S_K_50['S_abs'], color='red', linestyle='--', label='S_K 50%')
+
+# Plot S.rmax.10 absolute sensitivity
+sns.lineplot(x=C_monod, y=S_rmax_10['S_abs'], color='blue', linestyle='-', label='S_r.max 10%')
+
+# Plot S.rmax.50 absolute sensitivity
+sns.lineplot(x=C_monod, y=S_rmax_50['S_abs'], color='blue', linestyle='--', label='S_r.max 50%')
+
+# Set labels and title
+plt.ylabel('Absolute Sensitivity')
+plt.title('Absolute Sensitivities')
+
+# Add a legend
+plt.legend(loc='upper left')
+
+# Display the plot
+plt.show()
+```
+
+Plotting the and relative indices:
+```{python}
+# Create a Seaborn style figure
+sns.set(style="whitegrid")
+
+# Create a figure
+plt.figure(figsize=(10, 6))
+
+# Plot S.K.10 relative sensitivity
+sns.lineplot(x=C_monod, y=S_K_10['S_rel'], color='red', linestyle='-', label='S_K 10%')
+
+# Plot S.K.50 relative sensitivity
+sns.lineplot(x=C_monod, y=S_K_50['S_rel'], color='red', linestyle='--', label='S_K 50%')
+
+# Plot S.rmax.10 relative sensitivity
+sns.lineplot(x=C_monod, y=S_rmax_10['S_rel'], color='blue', linestyle='-', label='S_r.max 10%')
+
+# Plot S.rmax.50 relative sensitivity
+sns.lineplot(x=C_monod, y=S_rmax_50['S_rel'], color='blue', linestyle='--', label='S_r.max 50%')
+
+# Set limits, labels, and title
+plt.ylim([-1, 1])
+plt.ylabel('Relative Sensitivity')
+plt.title('Relative Sensitivities')
+
+# Add a legend
+plt.legend(loc='lower right')
+
+# Display the plot
+plt.show()
+```
+
+#### Variance-based sensitivity
+
+We use the function `fast99` to compute `2*n` parameter combinations
+for which we will evaluate the model:
+```{python}
+# Define par.monod dictionary
+par_monod = [5, 3]  # Example values, adjust as needed
+
+# Calculate lower and upper bounds
+lower = np.array(list(par_monod)) * 0.7
+upper = np.array(list(par_monod)) * 1.3
+
+# Define the problem dictionary
+problem = {
+    'num_vars': len(par_monod),
+    'names': list(["r_max", "K"]),
+    'bounds': list(zip(lower, upper))
+}
+
+# Perform sensitivity sampling using FAST99
+res_fast = fast_sampler.sample(problem, N=100)
+
+# Display the first 5 rows of the parameter combinations
+print(res_fast[:5])
+```
+
+We then run the model with all combinations in a loop. For slow
+models, this could be done in parallel.
+```{python}
+# Assume model_monod function is already defined
+# Assume res_fast and C_monod are also defined as per the earlier code
+
+# Initialize an array to hold the results
+res_SA_monod = np.empty((res_fast.shape[0], len(C_monod)))
+
+# Loop through each sample
+for i in range(res_fast.shape[0]):
+    # Get the parameters for the current sample
+    parameters = [
+        res_fast[i, 0],
+        res_fast[i, 1]
+    ]
+    
+    # Calculate the model_monod results for the given parameters and concentrations
+    res_SA_monod[i, :] = model_monod(parameters, C_monod)
+```
+
+After picking a concentration, we can then compute the sensitivity
+indices
+```{python}
+# Choose a concentration
+j = 4
+selected_concentration = C_monod[j]
+print(selected_concentration)
+```
+
+```{python}
+# Assume problem, res_fast, and res_SA_monod are defined as per earlier code
+# Assume j is an integer index representing the concentration to analyze
+
+# Perform sensitivity analysis for the specified concentration
+# We expect `res_SA_monod[:, j]` to be a one-dimensional array of outputs
+# Ensure that `j` is within the range of columns in `res_SA_monod`
+S = fast.analyze(problem, Y=res_SA_monod[:, j], print_to_console=True)
+```
+
+```{python}
+# Assume S is the sensitivity analysis result obtained from fast.analyze()
+
+# Create a pandas DataFrame to hold the sensitivity indices and their names
+data = {
+    'Factor': S['names'],
+    'First-Order': S['S1'],
+    'Total-Order': S['ST']
+}
+df = pd.DataFrame(data)
+
+# Melt the DataFrame to long format for easier plotting with Seaborn
+df_long = df.melt(id_vars='Factor', var_name='Sensitivity Type', value_name='Index')
+
+# Create a barplot with Seaborn
+sns.barplot(data=df_long, x='Factor', y='Index', hue='Sensitivity Type')
+
+# Add labels and title
+plt.ylabel('Sensitivity Index')
+plt.title('Sensitivity Analysis Results')
+
+# Show the plot
+plt.show()
+```

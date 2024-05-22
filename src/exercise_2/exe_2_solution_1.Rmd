@@ -215,3 +215,179 @@ iterations as burn-in:
 ```{julia, out.width = '80%'}
 histogram(chain[1000:end], xlab="λ", label=false)
 ```
+
+### Python
+
+#### Defining the likelihood, prior, and posterior
+The following libraries are required:
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import multinomial, gaussian_kde, lognorm, norm
+```
+
+```{python}
+# Loading data
+# Specify the path to the CSV file
+file_path = r"../../data/model_survival.csv"
+
+# Load the CSV file into a pandas DataFrame
+data_survival = pd.read_csv(file_path, sep=" ")
+
+print(data_survival)
+```
+
+```{python}
+def loglikelihood_survival(y, N, t, par):
+    # Calculate survival probabilities at measurement points
+    # and add zero "at time-point infinity":
+    S = np.exp(-par * np.concatenate(([0], t)))
+    S = np.concatenate((S, [0]))
+
+    # Calculate probabilities to die within observation windows:
+    p = -np.diff(S)
+
+    # Add number of survivors at the end of the experiment:
+    y = np.concatenate((y, [N - np.sum(y)]))
+
+    # Calculate log-likelihood of multinomial distribution at point y:
+    LL = multinomial.logpmf(y, n=N, p=p)
+
+    return LL
+```
+
+Using a log normal distribution as prior
+```{python}
+def logprior_survival(par):
+    # Define mean and standard deviation that approximate the prior information given
+    mu = 0.6    # Since the distribution is skewed, choose it higher than 0.3 (the mode)
+    sigma = 0.7 # A value similar to mu will do
+
+    # Calculate the mean and standard deviation in the log-space
+    meanlog = np.log(mu) - 0.5 * np.log(1 + (sigma / mu)**2)
+    sdlog = np.sqrt(np.log(1 + (sigma / mu)**2))
+
+    # Calculate the log prior using log-normal distribution
+    log_prior = lognorm.logpdf(par, s=sdlog, scale=np.exp(meanlog))
+
+    return log_prior
+```
+
+We also define a function for the log posterior
+```{python}
+def logposterior_survival(par, data):
+    # Calculate log-likelihood
+    log_likelihood = loglikelihood_survival(data['deaths'], N=30, t=data['time'], par=par)
+    
+    # Calculate log-prior
+    log_prior = logprior_survival(par)
+    
+    # Calculate log-posterior
+    log_posterior = log_likelihood + log_prior
+    
+    return log_posterior
+```
+
+#### Code your own Markov Chain Metropolis sampler
+
+```{python}
+# Set sample size (make it feasible)
+sampsize = 5000
+
+# Create an empty array to hold the chain
+chain = np.zeros((sampsize, 2))
+# Define column names
+column_names = ['lambda', 'logposterior']
+
+# Set start value for your parameter
+par_start = {'lambda': 0.5}
+
+# Compute posterior value of the first chain using the start value
+# of the parameter and the logprior and loglikelihood functions already defined
+chain[0, 0] = par_start['lambda']
+chain[0, 1] = logposterior_survival(par_start['lambda'], data_survival)
+
+# Run the MCMC
+for i in range(1, sampsize):
+    # Propose a new parameter value based on the previous one (think of proposal distribution)
+    par_prop = chain[i - 1, 0] + np.random.normal(0, 0.01)
+
+    # Calculate log-posterior of the proposed parameter value (use likelihood and prior)
+    logpost_prop = logposterior_survival(par_prop, data_survival)
+
+    # Calculate acceptance probability
+    acc_prob = min(1, np.exp(logpost_prop - chain[i - 1, 1]))
+
+    # Store in chain[i, :] the new parameter value if accepted, or re-use the old one if rejected
+    if np.random.rand() < acc_prob:
+        chain[i, :] = [par_prop, logpost_prop]
+    else:  # if not accepted, stay at the current parameter value
+        chain[i, :] = chain[i - 1, :]
+
+# If you want to convert the array to a DataFrame for further analysis
+df_chain = pd.DataFrame(chain, columns=column_names)
+
+# Now `df_chain` contains the MCMC chain data in a pandas DataFrame
+```
+
+Plot the resulting chain. Does it look reasonable? Have you selected an appropriate jump distribution?
+
+```{python}
+# Extract lambda values from the chain
+lambda_values = chain[:, 0]  # Assuming lambda values are in the first column
+
+# Create the scatter plot
+plt.figure(figsize=(10, 6))
+plt.plot(lambda_values, 'o', markersize=2, color='black')
+
+# Set y-axis label with Greek letter lambda (λ)
+plt.ylabel(r'$\lambda$')
+
+# Set x-axis label and title (optional)
+plt.xlabel('Sample Index')
+
+# Display the plot
+plt.show()
+```
+
+Find the value of $\lambda$ within your sample, for which the posterior is maximal.
+
+```{python}
+# Find the index of the maximum log posterior density
+max_index = np.argmax(chain[:, 1])
+
+# Retrieve the parameter value corresponding to the maximum posterior density
+max_posterior_value = chain[max_index, :]
+
+# Print the result
+print(f"Lambda: {max_posterior_value[0]}, Log posterior: {max_posterior_value[1]}")
+```
+
+Create a density plot of the posterior sample using `plot(density())`,
+but remove the burn-in first. Inspect the chain in the figure above: how
+many samples would you discard as burn-in?
+
+```{python}
+# Define the portion of the chain to use (without burn-in)
+chain_without_burn_in = chain[1000:, 0]  # Considering only the first column of the chain
+
+# Create a kernel density estimation of the posterior sample
+kde = gaussian_kde(chain_without_burn_in)
+
+# Generate a range of x values over which to evaluate the density estimate
+x = np.linspace(min(chain_without_burn_in), max(chain_without_burn_in), 1000)
+
+# Plot the density estimate
+plt.figure(figsize=(10, 6))
+plt.plot(x, kde(x), label='Density')
+
+# Set x-axis label with Greek letter lambda (λ)
+plt.xlabel(r'$\lambda$')
+
+# Title is set as an empty string to match the provided R code
+plt.title("")
+
+# Show the plot
+plt.show()
+```

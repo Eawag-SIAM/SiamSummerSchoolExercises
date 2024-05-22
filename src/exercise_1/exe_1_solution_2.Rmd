@@ -123,3 +123,99 @@ scatter(C, yobs,
 plot!(C, y_det,
       labels = false)
 ```
+
+#### Python
+The implementation then looks like this:
+
+
+```{python}
+
+def loglikelihood_monod(yobs, C, par):
+    """
+    Calculate log-likelihood of observations yobs given parameters par and substrate concentration C.
+    
+    Arguments:
+    ----------
+    - yobs: array-like
+        Observed data.
+    - C: array-like
+        Substrate concentration.
+    - par: dictionary
+        Parameters including:
+        - 'r_max': maximum growth rate
+        - 'K': half-saturation concentration
+        - 'sigma': standard deviation of the normal distribution for the likelihood
+        
+    Returns:
+    -------
+    log_likelihood: float
+        The calculated log-likelihood of the observed data.
+    """
+    
+    # Deterministic part: calculate y.det using model_monod function
+    y_det = model_monod(par, C)
+    sigma = par[-1]
+    # Calculate log-likelihood: sum of log probabilities of yobs given y_det and sigma
+    log_likelihood = np.sum(norm.logpdf(yobs, loc=y_det, scale=sigma))
+    
+    return log_likelihood
+```
+
+The parameters with higher likelihood are more likely to have generated the data. In our case, this should be the parameter set $\{r_{\mathrm{max}} = 5,\,K = 3,\,\sigma=0.2\}$.
+
+Plotting the data together with the model output given those parameters looks ok too:
+```{python}
+# Loading data
+# Specify the path to the CSV file
+file_path = r"../../data/model_monod_stoch.csv"
+
+# Load the CSV file into a pandas DataFrame
+dat = pd.read_csv(file_path, sep=" ")
+
+C = dat['C']
+r = dat['r']
+
+# Define the two parameter vectors
+# 'r_max': 5, 'K': 3, 'sigma': 0.2
+# 'r_max': 10, 'K': 4, 'sigma': 0.2
+
+par1 = [5, 3, 0.2]
+par2 = [10, 4, 0.2]
+
+# Define the two parameter vectors
+#par1 = {'r_max': 5, 'K': 3, 'sigma': 0.2}
+#par2 = {'r_max': 10, 'K': 4, 'sigma': 0.2}
+
+# Calculate the log-likelihood using the loglikelihood_monod function
+loglikelihood_par1 = loglikelihood_monod(r, C, par1)
+loglikelihood_par2 = loglikelihood_monod(r, C, par2)
+
+# Output the log-likelihood results
+print("Log-likelihood for par1:", loglikelihood_par1)
+print("Log-likelihood for par2:", loglikelihood_par2)
+```
+
+```{python}
+# Assume C and r are already imported and available
+# par is a vector with parameters 'r_max', 'K' and 'sigma'
+par = [5, 3, 0.2]
+
+# Predict the deterministic growth rate using model_monod function
+r_det = model_monod(par, C)
+
+# Plot the observed data
+plt.figure(figsize=(14, 6))
+sns.scatterplot(x=C, y=r, label='Observed data')
+
+# Plot the deterministic growth rate as a line
+sns.lineplot(x=C, y=r_det, color='red', label='Deterministic model')
+
+# Add labels and a legend
+plt.xlabel('Substrate concentration (C)')
+plt.ylabel('Growth rate (r)')
+plt.legend()
+
+# Show the plot
+plt.show()
+```
+
