@@ -71,3 +71,77 @@ histogram(f.(x), nbins=20,
           ylabel = "Frequency",
           title = "Histogram of f(X)")
 ```
+
+#### Python
+a. Define the function
+```{python}
+# Define the function in Python
+def fun(x):
+    return np.sin(np.sqrt(x))
+```
+
+b. Generate the samples and compute the values
+```{python}
+# Generate 1000 samples from a log-normal distribution with meanlog=0 and sdlog=1
+X = np.random.lognormal(mean=0, sigma=1, size=1000)
+
+# Calculate the mean of X
+mean_X = np.mean(X)
+
+# Calculate the mean of f(X)
+mean_fX = np.mean(fun(X))
+
+# Calculate the function value of the mean of X
+f_mean_X = fun(mean_X)
+
+# Calculate the variance of X
+variance_X = np.var(X)
+
+# Calculate the variance of f(X)
+variance_fX = np.var(fun(X))
+```
+
+c. Print the results
+```{python}
+# Print the results
+print("Mean of X:", mean_X)
+print("Mean of f(X):", mean_fX)
+print("f(mean of X):", f_mean_X)
+print("Variance of X:", variance_X)
+print("Variance of f(X):", variance_fX)
+```
+
+d.Plot the results 
+```{python}
+# Plot X against fun(X) using seaborn
+plt.figure(figsize=(14, 6))
+sns.scatterplot(x=X, y=fun(X), alpha=0.5, color='blue')
+plt.title('Scatter Plot of X vs. fun(X)')
+plt.xlabel('X')
+plt.ylabel('fun(X)')
+plt.grid(True)
+plt.show()
+```
+
+```{python}
+# Create a figure with two subplots
+plt.figure(figsize=(14, 6))
+
+# Plot the histogram of X
+plt.subplot(1, 2, 1)
+sns.histplot(X, bins=30, color='blue', alpha=0.6)
+plt.title('Histogram of X')
+plt.xlabel('X')
+plt.ylabel('Frequency')
+
+# Plot the histogram of fun(X)
+plt.subplot(1, 2, 2)
+sns.histplot(fun(X), bins=30, color='red', alpha=0.6)
+plt.title('Histogram of fun(X)')
+plt.xlabel('fun(X)')
+plt.ylabel('Frequency')
+
+# Display the plots
+plt.tight_layout()
+plt.show()
+```

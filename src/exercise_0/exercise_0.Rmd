@@ -146,25 +146,13 @@ rand(π, n)      # sample n random numbers
 Histograms are generated with the function `histogram` from the package `Plots.jl`. You can adjust the number of bins with the argument `nbins`, e.g `histogram(rand(Uniform(0,5), 10000), nbins = 100)`.
 
 #### Python
-This the Python solution:
-```{python}
-import numpy as np
-x = np.random.normal(10)
-np.mean(x)
+This package `scipy` provides access to many probability distributions. The packages `matplotlib` and `seaborn` offer good ways to plot the graphs.
+
+Here are some examples of how to call some functions:
+```{python, eval = FALSE}
+uniform.pdf(x, loc, scale)  # Evaluate uniform pdf at x
+norm.pdf(x, loc, scale)     # Evaluate normal pdf at x
 ```
-
-Another code snippet
-```{python}
-import matplotlib.pyplot as plt
-import numpy as np
-
-xpoints = np.array([1, 2, 6, 8])
-ypoints = np.array([3, 8, 1, 10])
-
-plt.plot(xpoints, ypoints)
-plt.show()
-```
-
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_4.Rmd"}}
 ```
@@ -207,6 +195,11 @@ construct a multivariate normal distribution with  `MvNormal(μ, Σ)`
 from the package `Distribution.jl`. How does the covariance matrix for
 independent variables look like?
 
+#### Python
+ You can use `numpy.random.normal()` and `numpy.random.multivariate_normal()` to 
+ sample the required distributions. Additionally, you can use `np.column_stack` 
+ to can combine vectors to a matrix.
+
 ```{r, child = if(params$showsolutions){"exe_0_solution_5.Rmd"}}
 ```
 
@@ -239,7 +232,13 @@ The package [`Plots.jl`](https://docs.juliaplots.org/stable/)
 provides basic plotting function such as `scatter` and `histogram`. For
 density plots and other more specialized plots look at [`StatsPlots.jl`](https://docs.juliaplots.org/latest/generated/statsplots/).
 
-
+#### Python
+You can to arrange multiple plots in the same window by setting
+`fig, axs = plt.subplots(nrows, ncols)` and then calling 
+`plt.subplot(nrows, ncols, i)`. Use `np.percentile()` to calculate the
+percentiles; use `seaborn` and `matplotlib` to visualize
+the data; use `np.cov()`,`np.corrcoef()` for the covariance and the correlation,
+respectively.
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_6.Rmd"}}
 ```
@@ -284,6 +283,11 @@ data = DataFrame(CSV.File(path; delim=";"))
 data.x
 ```
 
+#### Python
+Use the `pandas` library to work with data frames. Read the data using 
+`pd.read_csv(file_path, sep=" ")`. To select a specific column, user can simply
+type: `dataframe['columnname']`
+
 ```{r, child = if(params$showsolutions){"exe_0_solution_7.Rmd"}}
 ```
 
@@ -325,6 +329,20 @@ end
 Very short functions can be defined as
 ```{julia, eval = FALSE}
 foo(a, b) = a + b
+```
+
+#### Python
+In python, one can define a function as follows:
+```{python, eval = FALSE}
+def square(number):
+    """
+    This function returns the square of the given number.
+    """
+    return number * number
+
+# Example usage
+num = 4
+result = square(num)
 ```
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_8.Rmd"}}

@@ -133,3 +133,141 @@ Statistics.cov(y_2_sample, dims=2)
 Statistics.cor(y_1_sample, dims=2)
 Statistics.cor(y_2_sample, dims=2)
 ```
+#### Python
+
+a. Quantiles
+```{python}
+
+# Calculate the interquartile ranges and 90%-interquantile ranges of the samples
+quartiles_indep = np.percentile(y_obs_indep, [25, 75], axis=0)
+quartiles_dep = np.percentile(y_obs_dep, [25, 75], axis=0)
+
+quant5_95_indep = np.percentile(y_obs_indep, [5, 95], axis=0)
+quant5_95_dep = np.percentile(y_obs_dep, [5, 95], axis=0)
+
+print(f"Interquartile range\nIndep: {np.diff(quartiles_indep, axis=0)[0]}")
+print(f"Dep: {np.diff(quartiles_dep, axis=0)[0]}")
+```
+
+b. Histograms and densities
+
+```{python}
+# Plot and compare the histograms of all marginals
+fig, axs = plt.subplots(2, 2, figsize=(14, 6))
+
+# Subplot 1
+plt.subplot(2, 2, 1)
+sns.histplot(y_obs_indep[:, 0], kde=False, bins=30, color='blue', alpha=0.6)
+plt.title('y1 of y.indep')
+plt.xlabel('y_obs_indep[:, 0]')
+plt.ylabel('Frequency')
+
+# Subplot 2
+plt.subplot(2, 2, 2)
+sns.histplot(y_obs_indep[:, 1], kde=False, bins=30, color='blue', alpha=0.6)
+plt.title('y2 of y.indep')
+plt.xlabel('y_obs_indep[:, 1]')
+plt.ylabel('Frequency')
+
+# Subplot 3
+plt.subplot(2, 2, 3)
+sns.histplot(y_obs_dep[:, 0], kde=False, bins=30, color='blue', alpha=0.6)
+plt.title('y1 of y.dep')
+plt.xlabel('y_obs_dep[:, 0]')
+plt.ylabel('Frequency')
+
+# Subplot 4
+plt.subplot(2, 2, 4)
+sns.histplot(y_obs_dep[:, 1], kde=False, bins=30, color='blue', alpha=0.6)
+plt.title('y2 of y.dep')
+plt.xlabel('y_obs_dep[:, 1]')
+plt.ylabel('Frequency')
+
+# Display the histograms
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+# Plot and compare the densities of all marginals
+fig, axs = plt.subplots(2, 2, figsize=(14, 6))
+
+# Density plot for y1 of y.indep
+plt.subplot(2, 2, 1)
+sns.kdeplot(y_obs_indep[:, 0], color='blue', alpha=0.6)
+plt.title('Density of y1 of y.indep')
+plt.xlabel('y_obs_indep[:, 0]')
+plt.ylabel('Density')
+
+# Density plot for y2 of y.indep
+plt.subplot(2, 2, 2)
+sns.kdeplot(y_obs_indep[:, 1], color='blue', alpha=0.6)
+plt.title('Density of y2 of y.indep')
+plt.xlabel('y_obs_indep[:, 1]')
+plt.ylabel('Density')
+
+# Density plot for y1 of y.dep
+plt.subplot(2, 2, 3)
+sns.kdeplot(y_obs_dep[:, 0], color='blue', alpha=0.6)
+plt.title('Density of y1 of y.dep')
+plt.xlabel('y_obs_dep[:, 0]')
+plt.ylabel('Density')
+
+# Density plot for y2 of y.dep
+plt.subplot(2, 2, 4)
+sns.kdeplot(y_obs_dep[:, 1], color='blue', alpha=0.6)
+plt.title('Density of y2 of y.dep')
+plt.xlabel('y_obs_dep[:, 1]')
+plt.ylabel('Density')
+
+# Adjust layout and display the plots
+plt.tight_layout()
+plt.show()
+```
+
+c. Scatterplots
+
+```{python}
+
+# Compare the scatterplots of y_obs_indep and y_obs_dep
+fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+
+# Scatterplot for y_obs_indep
+sns.scatterplot(x=y_obs_indep[:, 0], y=y_obs_indep[:, 1], alpha=0.7, ax=axs[0])
+axs[0].set_title("y.obs.indep")
+axs[0].set_xlabel('y_obs_indep[:, 0]')
+axs[0].set_ylabel('y_obs_indep[:, 1]')
+
+# Scatterplot for y_obs_dep
+sns.scatterplot(x=y_obs_dep[:, 0], y=y_obs_dep[:, 1], alpha=0.7, ax=axs[1])
+axs[1].set_title("y.obs.dep")
+axs[1].set_xlabel('y_obs_dep[:, 0]')
+axs[1].set_ylabel('y_obs_dep[:, 1]')
+
+# Display the scatterplots
+plt.tight_layout()
+plt.show()
+
+```
+
+d. Covariance and correlation
+```{python}
+# Compute the covariance and correlation matrices of y.obs.indep and y.obs.dep
+covariance_indep = np.cov(y_obs_indep, rowvar=False)
+covariance_dep = np.cov(y_obs_dep, rowvar=False)
+
+correlation_indep = np.corrcoef(y_obs_indep, rowvar=False)
+correlation_dep = np.corrcoef(y_obs_dep, rowvar=False)
+
+print("Covariance matrix of y.obs.indep:")
+print(covariance_indep)
+
+print("\nCovariance matrix of y.obs.dep:")
+print(covariance_dep)
+
+print("\nCorrelation matrix of y.obs.indep:")
+print(correlation_indep)
+
+print("\nCorrelation matrix of y.obs.dep:")
+print(correlation_dep)
+```

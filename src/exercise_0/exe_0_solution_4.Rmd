@@ -23,7 +23,7 @@ hist(ys)
 3. sample from $Z$
 ```{r}
 xs <- runif(10000, 0, 1)                # sample from X
-zs <- sin(2*pi*xs) * sqrt(xs)           # transfrom samples
+zs <- sin(2*pi*xs) * sqrt(xs)           # transform samples
 
 ```
 
@@ -80,4 +80,79 @@ histogram(Z_s, nbins = 75,
     xlabel="Z sample",
     ylabel="Frequency",
     title="Histogram of Z_s")
+```
+
+#### Python
+The following libraries are required:
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import uniform, norm
+import math 
+```
+1. evaluate pdf
+```{python}
+# Uniform distribution (X ∼ Uniform(0,1))
+pdf_uniform = uniform.pdf(0.8, loc=0, scale=1)  # loc and scale for the range [0,1]
+# Normal distribution (Y ∼ Normal(2,10))
+pdf_normal = norm.pdf(0.8, loc=2, scale=10)  # loc=2 is the mean, scale=10 is the standard deviation
+# Print the probability densities
+print(f"fX(0.8) = {pdf_uniform}")
+print(f"fY(0.8) = {pdf_normal}")
+```
+2. sample from distributions and plot them
+```{python}
+# Generate 10,000 samples from X ∼ Uniform(0,1)
+xs = uniform.rvs(loc=0, scale=1, size=10000)
+# Generate 10,000 samples from Y ∼ Normal(2,10)
+ys = norm.rvs(loc=2, scale=10, size=10000)
+```
+
+```{python}
+# Visualize the histograms of the samples
+plt.figure(figsize=(14, 6))
+
+# Histogram for Uniform distribution
+plt.subplot(1, 2, 1)
+sns.histplot(xs, kde=False, bins=30, color='blue', alpha=0.6)
+plt.title('Histogram of xs')
+plt.xlabel('xs')
+plt.ylabel('Frequency')
+
+# Histogram for Normal distribution
+plt.subplot(1, 2, 2)
+sns.histplot(ys, kde=False, bins=30, color='red', alpha=0.6)
+plt.title('Histogram of ys')
+plt.xlabel('ys')
+plt.ylabel('Frequency')
+
+# Display the histograms
+plt.tight_layout()
+plt.show()
+```
+
+3. sample from $Z$
+```{python}
+# Generate 10,000 samples from X ∼ Uniform(0,1)
+xs = uniform.rvs(loc=0, scale=1, size=10000)
+# Define the transformation function for Z
+def transform_X_to_Z(X):
+    return math.sin(2 * math.pi * X) * math.sqrt(X)
+
+# Apply the transformation function to the samples from X to generate samples for Z
+zs = [transform_X_to_Z(x) for x in xs]
+```
+
+```{python}
+# Visualize the histograms of the samples
+plt.figure(figsize=(14, 6))
+
+sns.histplot(zs, kde=False, bins=75, color='green', alpha=0.6)
+plt.title('Histogram of zs')
+plt.xlabel('zs')
+plt.ylabel('Frequency')
+
+# Display the histograms
+plt.tight_layout()
+plt.show()
 ```

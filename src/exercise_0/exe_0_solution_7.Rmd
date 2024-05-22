@@ -72,3 +72,59 @@ C_new = rand(nrow(growth_dat))
 # add new column
 growth_dat.Cnew = C_new
 ```
+
+#### Python
+
+a.
+```{python}
+import pandas as pd
+
+## Loading data
+# Specify the path to the CSV file
+file_path = r"../../data/model_growth.csv"
+
+# Load the CSV file into a pandas DataFrame
+growth_dat = pd.read_csv(file_path, sep=" ")
+
+# Access the 'C_M' and 'C_S' columns from the DataFrame
+t = growth_dat['t']
+C_M = growth_dat['C_M']
+C_S = growth_dat['C_S']
+```
+
+```{python}
+## Plotting data
+# Set the figure size (width, height) in inches
+plt.figure(figsize=(14, 6))
+
+# Create a line plot for 'C_S' against 't'
+sns.lineplot(x=t, y=C_S, marker='o', label='Substrate')
+
+# Create a line plot for 'C_M' against 't'
+sns.lineplot(x=t, y=C_M, marker='^', color='red', label='Microorganisms')
+
+# Add x-axis and y-axis labels
+plt.xlabel('Time')
+plt.ylabel('Concentration')
+
+# Add a legend to the plot
+plt.legend(loc='upper right')
+
+# Display the plot
+plt.show()
+```
+
+b.
+```{python}
+# Number of rows in the growth_dat dataframe
+n = len(growth_dat)
+
+# Generate an array of normally distributed random numbers with the same number of rows as growth_dat
+y = np.random.normal(size=n)
+
+# Add the new row to the dataframe as a new column named 'C_new'
+growth_dat['C_new'] = y
+
+# Display the first few rows of the updated dataframe
+print(growth_dat.head())
+```
