@@ -110,6 +110,9 @@ plt.ylabel('Concentration')
 # Add a legend to the plot
 plt.legend(loc='upper right')
 
+# Optimize the plot space
+plt.tight_layout()
+
 # Display the plot
 plt.show()
 ```

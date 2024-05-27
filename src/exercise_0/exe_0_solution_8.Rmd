@@ -141,7 +141,9 @@ plt.title('Histogram of fun(X)')
 plt.xlabel('fun(X)')
 plt.ylabel('Frequency')
 
-# Display the plots
+# Optimize the plot space
 plt.tight_layout()
+
+# Display the plots
 plt.show()
 ```

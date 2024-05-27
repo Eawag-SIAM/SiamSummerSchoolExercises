@@ -270,7 +270,8 @@ plt.title('Absolute Sensitivities')
 # Add a legend
 plt.legend(loc='upper left')
 
-# Display the plot
+# Adjust layout and display the plots
+plt.tight_layout()
 plt.show()
 ```
 

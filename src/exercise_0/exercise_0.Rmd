@@ -198,7 +198,7 @@ independent variables look like?
 #### Python
  You can use `numpy.random.normal()` and `numpy.random.multivariate_normal()` to 
  sample the required distributions. Additionally, you can use `np.column_stack` 
- to can combine vectors to a matrix.
+ to combine vectors to a matrix.
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_5.Rmd"}}
 ```
@@ -334,15 +334,29 @@ foo(a, b) = a + b
 #### Python
 In python, one can define a function as follows:
 ```{python, eval = FALSE}
-def square(number):
+def fun_square(number):
     """
+    This part is optional and is preferable used to describe what the function
+    does to the users.
     This function returns the square of the given number.
+    
+    Arguments:
+    ----------
+    - number: number to be processed.
+    
+    Returns:
+    -------
+    - result: the squared given number.
     """
-    return number * number
+    
+    result = number * number
+    
+    return result
 
 # Example usage
 num = 4
-result = square(num)
+result = fun_square(num)
+print(results) # The output will be 16
 ```
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_8.Rmd"}}

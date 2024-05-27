@@ -259,15 +259,11 @@ covariance_dep = np.cov(y_obs_dep, rowvar=False)
 correlation_indep = np.corrcoef(y_obs_indep, rowvar=False)
 correlation_dep = np.corrcoef(y_obs_dep, rowvar=False)
 
-print("Covariance matrix of y.obs.indep:")
-print(covariance_indep)
+print("Covariance matrix of y.obs.indep:", covariance_indep)
 
-print("\nCovariance matrix of y.obs.dep:")
-print(covariance_dep)
+print("\nCovariance matrix of y.obs.dep:", covariance_dep)
 
-print("\nCorrelation matrix of y.obs.indep:")
-print(correlation_indep)
+print("\nCorrelation matrix of y.obs.indep:", correlation_indep)
 
-print("\nCorrelation matrix of y.obs.dep:")
-print(correlation_dep)
+print("\nCorrelation matrix of y.obs.dep:", correlation_dep)
 ```

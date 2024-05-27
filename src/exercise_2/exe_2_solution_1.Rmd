@@ -348,6 +348,7 @@ plt.ylabel(r'$\lambda$')
 plt.xlabel('Sample Index')
 
 # Display the plot
+plt.tight_layout()
 plt.show()
 ```
 
@@ -389,5 +390,6 @@ plt.xlabel(r'$\lambda$')
 plt.title("")
 
 # Show the plot
+plt.tight_layout()
 plt.show()
 ```

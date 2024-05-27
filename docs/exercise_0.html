@@ -1520,7 +1520,6 @@ document.addEventListener("DOMContentLoaded", function(){
 </script>
 <!-- activate julia environment -->
 <!-- activate conda environment for python -->
-<pre><code>## Warning: Paket &#39;reticulate&#39; wurde unter R Version 4.3.3 erstellt</code></pre>
 <p>Note, for the first three exercises you need only pencil and
 paper.</p>
 <div id="joint-marginal-and-conditional-distributions-i" class="section level1">
@@ -1713,7 +1712,7 @@ independent variables look like?</p>
 <p>You can use <code>numpy.random.normal()</code> and
 <code>numpy.random.multivariate_normal()</code> to sample the required
 distributions. Additionally, you can use <code>np.column_stack</code> to
-can combine vectors to a matrix.</p>
+combine vectors to a matrix.</p>
 </div>
 </div>
 </div>
@@ -1858,15 +1857,29 @@ end</code></pre>
 <div id="python-4" class="section level4">
 <h4>Python</h4>
 <p>In python, one can define a function as follows:</p>
-<pre class="python"><code>def square(number):
+<pre class="python"><code>def fun_square(number):
     &quot;&quot;&quot;
+    This part is optional and is preferable used to describe what the function
+    does to the users.
     This function returns the square of the given number.
+    
+    Arguments:
+    ----------
+    - number: number to be processed.
+    
+    Returns:
+    -------
+    - result: the squared given number.
     &quot;&quot;&quot;
-    return number * number
+    
+    result = number * number
+    
+    return result
 
 # Example usage
 num = 4
-result = square(num)</code></pre>
+result = fun_square(num)
+print(results) # The output will be 16</code></pre>
 </div>
 </div>
 </div>

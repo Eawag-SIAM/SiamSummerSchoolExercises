@@ -30,3 +30,20 @@ TODO
 #### Check convergence and mixing
 
 #### Residual diagnostics
+
+
+
+
+### Python
+
+TODO
+
+#### Read data
+
+#### Define likelihood, prior, and posterior
+
+#### Run MCMC sampler
+
+#### Check convergence and mixing
+
+#### Residual diagnostics

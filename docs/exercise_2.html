@@ -1766,8 +1766,15 @@ end</code></pre>
 <div id="python-3" class="section level4">
 <h4>Python</h4>
 <pre class="python"><code>def logposterior_survival(par, data):
-  
-
+    # Calculate log-likelihood
+    log_likelihood = ??
+    
+    # Calculate log-prior
+    log_prior = ??
+    
+    # Calculate log-posterior
+    log_posterior = log_likelihood + log_prior
+    
     return log_posterior</code></pre>
 </div>
 </div>
@@ -1986,6 +1993,77 @@ function logposterior_monod(par::ComponentVector)
     end
 end</code></pre>
 </div>
+<div id="python-5" class="section level3">
+<h3>Python</h3>
+<pre class="python"><code># Define the prior mean and standard deviation
+prior_monod_mean = 0.5 * np.array([5, 3, 0.5])  # r_max, K, sigma
+prior_monod_sd = 0.5 * prior_monod_mean
+
+# Log prior for Monod model
+def logprior_monod(par, mean, sd):
+    &quot;&quot;&quot;
+    Log-prior function for the Monod model.
+
+    Parameters:
+    - par: array-like, the parameters to evaluate the prior (e.g., [&#39;r_max&#39;, &#39;K&#39;, &#39;sigma&#39;])
+    - mean: array-like, the mean values for the parameters
+    - sd: array-like, the standard deviation values for the parameters
+
+    Returns:
+    - log_prior: the sum of log-prior values calculated from the log-normal distribution
+    &quot;&quot;&quot;
+    
+    # Calculate sdlog and meanlog for log-normal distribution
+    var = ??
+    sdlog = ??
+    meanlog = ??
+
+    # Calculate the sum of log probabilities from the log-normal distribution
+    log_prior = np.sum(??)
+
+    return log_prior
+
+def loglikelihood_monod(y, C, par):
+    &quot;&quot;&quot;
+    Log-likelihood function for the Monod model.
+
+    Parameters:
+    - y: observed growth rates
+    - C: substrate concentrations
+    - par: dictionary containing the parameters (&#39;r_max&#39;, &#39;K&#39;, &#39;sigma&#39;)
+
+    Returns:
+    - log_likelihood: the sum of log-likelihood values
+    &quot;&quot;&quot;
+    # Calculate growth rate using Monod model
+    y_det = ??
+    
+    # Calculate log-likelihood assuming a normal distribution
+    log_likelihood = np.sum(??)
+    
+    return log_likelihood
+
+def logposterior_monod(par):
+    &quot;&quot;&quot;
+    Log-posterior function for the Monod model.
+
+    Parameters:
+    - par: dictionary containing the parameters (&#39;r_max&#39;, &#39;K&#39;, &#39;sigma&#39;)
+
+    Returns:
+    - log_posterior: the log posterior probability
+    &quot;&quot;&quot;
+    # Calculate the log prior
+    lp = ??
+    
+    # If log prior is finite, calculate log likelihood and sum
+    if np.isfinite(lp):
+        log_posterior = ?? + ??
+        return log_posterior
+    else:
+        # Return negative infinity if log prior is not finite
+        return -np.inf</code></pre>
+</div>
 </div>
 <div id="create-initial-chain" class="section level2 tabset">
 <h2 class="tabset">Create initial chain</h2>
@@ -2055,6 +2133,64 @@ corner(chn)
 
 Array(chn)                      # convert it to normal Array</code></pre>
 </div>
+<div id="python-6" class="section level3">
+<h3>Python</h3>
+<p>The code below uses the module <code>emcee</code>, which provides a
+mcmc sampler.</p>
+<pre class="python"><code>import emcee
+from emcee.moves import GaussianMove
+
+# Number of dimensions (parameters)
+ndim = 3  # For our model, 3 dimensions for r_max, K, sigma
+
+# Create a diagonal covariance matrix 
+jump_cov = ??
+
+# Create an instance of GaussianMove using the jump covariance matrix
+move = GaussianMove(jump_cov)
+
+# Define the initial parameter values (mean of the prior)
+par_init = np.array([2.5, 1.5, 0.25])  # r_max, K, sigma
+
+# Define the number of samples
+n_samples = ??
+
+# Define the number of dimensions (parameters)
+ndim = len(par_init)
+
+# Define the number of walkers for the MCMC chain
+nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensions
+
+# Initialize the walkers around the initial parameter values with a small random perturbation
+init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
+
+# Initialize the `emcee` sampler
+sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior_monod, moves=move)
+
+# Run the MCMC chain
+sampler.run_mcmc(init_pos, n_samples, progress=False) 
+# If set to True, the progress bar gives a overview of the processing time</code></pre>
+<p>Check out the results:</p>
+<pre class="python"><code># Retrieve the acceptance rate
+print(&quot;Mean acceptance fraction: {:.3f}&quot;.format(np.mean(sampler.acceptance_fraction)))
+
+# Have an overview of the results
+# Reshape the chain_samples to 2D by combining chain and iteration dimensions
+# Combine the second and first dimensions (walker and iteration) into a single dimension
+# By computing the mean of the walkers
+reshaped_chain = np.mean(chain_samples, axis=1)
+
+# Or by selecting one of them
+reshaped_chain = chain_samples[:, 0, :]
+
+# Convert reshaped chain samples to pandas DataFrame
+chain_df = pd.DataFrame(reshaped_chain, columns=[&#39;r_max&#39;, &#39;K&#39;, &#39;sigma&#39;])
+
+# Calculate and display summary statistics (mean, SD, quantiles, etc.)
+summary = chain_df.describe(percentiles=[0.025, 0.25, 0.5, 0.75, 0.975])
+
+print(&quot;Summary statistics:&quot;, summary)</code></pre>
+</div>
 </div>
 <div id="improve-jump-distribution" class="section level2 tabset">
 <h2 class="tabset">Improve jump distribution</h2>
@@ -2078,6 +2214,15 @@ correlated jump distribution work better?</p></li>
 <p>Adapt the covariance matrix <code>Σjump</code> of the jump
 distribution that is used in the function
 <code>sample_proposal</code>.</p>
+</div>
+<div id="python-7" class="section level3">
+<h3>Python</h3>
+<p>In emcee, there is a default move type used in the EnsembleSampler so
+called stretch move (StretchMove). This move is well-suited for a wide
+range of models and performs efficiently in high-dimensional parameter
+spaces. The stretch move works by randomly choosing a pair of walkers
+and proposing a new position for one walker based on a stretch factor
+relative to the other walker’s position.</p>
 </div>
 </div>
 <div id="residual-diagnostics" class="section level2 tabset">
@@ -2107,6 +2252,12 @@ helpful.</p>
 <h3>Julia</h3>
 <p>The function <code>StatsBase.autocor</code> and
 <code>StatPlots.qqnorm(x)</code> can be helpful.</p>
+</div>
+<div id="python-8" class="section level3">
+<h3>Python</h3>
+<p>The function <code>acf</code> from
+<code>statsmodels.tsa.stattools</code> and the function
+<code>stats</code> from <code>scipy</code> might be useful.</p>
 </div>
 </div>
 </div>

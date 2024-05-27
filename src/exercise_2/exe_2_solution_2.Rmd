@@ -291,21 +291,7 @@ bar(0:(length(acf)-1), acf, label=false, xlab="lag", ylab="correlation")
 #### Read data
 
 ```{python}
-# If models.py are not stored in the same directory as the scripts, one should 
-# perform the following trick:
-###############################################################################
-import sys
-
-# Add the directory containing your modules to the Python path
-sys.path.append('../../models/')
-
-# Now you can import the modules
 from models import model_monod, model_growth
-
-# Now, remove the directory from the Python path to avoid conflicts
-sys.path.remove('../../models/')
-###############################################################################
-
 import emcee
 from emcee.moves import GaussianMove
 import seaborn as sns
@@ -345,6 +331,18 @@ prior_monod_sd = 0.5 * prior_monod_mean
 
 # Log prior for Monod model
 def logprior_monod(par, mean, sd):
+    """
+    Log-prior function for the Monod model.
+
+    Parameters:
+    - par: array-like, the parameters to evaluate the prior (e.g., ['r_max', 'K', 'sigma'])
+    - mean: array-like, the mean values for the parameters
+    - sd: array-like, the standard deviation values for the parameters
+
+    Returns:
+    - log_prior: the sum of log-prior values calculated from the log-normal distribution
+    """
+    
     # Calculate sdlog and meanlog for log-normal distribution
     var = (sd**2) / (mean**2)
     sdlog = np.sqrt(np.log(1 + var))
@@ -427,15 +425,11 @@ nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensi
 # Initialize the walkers around the initial parameter values with a small random perturbation
 init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
 
-# Define the log posterior function
-def logposterior(par):
-    return logposterior_monod(par)
-
 # Initialize the `emcee` sampler
-sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior, moves=move)
+sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior_monod, moves=move)
 
 # Run the MCMC chain
-sampler.run_mcmc(init_pos, n_samples, progress=True)
+sampler.run_mcmc(init_pos, n_samples, progress=False)
 
 # Get the chain samples
 chain_samples = sampler.get_chain()
@@ -448,7 +442,7 @@ print("Chain shape: ", chain_samples.shape)
 
 # Reshape the chain_samples to 2D by combining chain and iteration dimensions
 # Combine the second and first dimensions (walker and iteration) into a single dimension
-reshaped_chain = chain_samples[:, 0, :]
+reshaped_chain = np.mean(chain_samples, axis=1)
 
 # Convert reshaped chain samples to pandas DataFrame
 chain_df = pd.DataFrame(reshaped_chain, columns=['r_max', 'K', 'sigma'])
@@ -462,10 +456,10 @@ print(summary)
 
 The acceptance rate is very low:
 ```{python}
-print(np.mean(sampler.acceptance_fraction))
+print("Mean acceptance fraction: {:.3f}".format(np.mean(sampler.acceptance_fraction)))
 ```
 
-Them poor mixing is also visible from the chain plots:
+The poor mixing is also visible from the chain plots:
 ```{python}
 # Assuming `reshaped_chain` is the reshaped 2D array from the MCMC chain
 # Each column represents a parameter and each row represents an iteration
@@ -508,18 +502,20 @@ param_names = ['r_max', 'K', 'sigma']
 df = pd.DataFrame(reshaped_chain, columns=param_names)
 
 # Create pairwise scatter plots between the variables using seaborn's pairplot
-sns.pairplot(df)
+pairplot = sns.pairplot(df)
+
+# Manually adjust the layout if needed
+pairplot.fig.tight_layout()
+
+# Show the plots
+plt.show()
 ```
 
 #### Improve jump distribution
 
-In emcee, the default move type used in the EnsembleSampler is the stretch move 
-(StretchMove). This move is well-suited for a wide range of models and performs 
-efficiently in high-dimensional parameter spaces. The stretch move works by 
-randomly choosing a pair of walkers and proposing a new position for one walker
-based on a stretch factor relative to the other walker’s position.
-
 ```{python, results = 'hide'}
+from emcee.moves import StretchMove
+
 # Define the initial parameter values (mean of the prior)
 par_init = np.array([2.5, 1.5, 0.25])  # r_max, K, sigma
 
@@ -529,6 +525,9 @@ n_samples = 5000
 # Define the number of dimensions (parameters)
 ndim = len(par_init)
 
+# Create an instance of the StretchMove
+move = StretchMove()
+
 # Define the number of walkers for the MCMC chain
 nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensions
 
@@ -536,10 +535,10 @@ nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensi
 init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
 
 # Initialize the `emcee` sampler
-sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior)
+sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior_monod, moves=move)
 
 # Run the MCMC chain
-sampler.run_mcmc(init_pos, n_samples, progress=True)
+sampler.run_mcmc(init_pos, n_samples, progress=False)
 
 # Get the chain samples
 chain_samples = sampler.get_chain()
@@ -547,13 +546,13 @@ chain_samples = sampler.get_chain()
 
 Everything looks much better now!
 ```{python}
-np.mean(sampler.acceptance_fraction)
+print("Mean acceptance fraction: {:.3f}".format(np.mean(sampler.acceptance_fraction)))
 ```
 
 ```{python}
 # Reshape the chain_samples to 2D by combining chain and iteration dimensions
 # Combine the second and first dimensions (walker and iteration) into a single dimension
-reshaped_chain = chain_samples[:, 0, :]
+reshaped_chain = np.mean(chain_samples, axis=1)
 
 # Convert reshaped chain samples to pandas DataFrame
 chain_df = pd.DataFrame(reshaped_chain, columns=['r_max', 'K', 'sigma'])
@@ -573,15 +572,19 @@ param_names = ['r_max', 'K', 'sigma']
 df = pd.DataFrame(reshaped_chain, columns=param_names)
 
 # Create pairwise scatter plots between the variables using seaborn's pairplot
-sns.pairplot(df)
+pairplot = sns.pairplot(df)
+
+# Manually adjust the layout if needed
+pairplot.fig.tight_layout()
+
+# Show the plots
+plt.show()
 ```
 
 #### Residual Diagnostics
 
-
 First we compute the residuals with the 'best' parameters
 ```{python}
-
 from scipy import stats
 
 #Get the log-posterior values for each sample in the chain
@@ -616,6 +619,7 @@ plt.title("Observed Data vs. Residuals")
 plt.axhline(y=0, color='red', linestyle='--')
 
 # Show the plot
+plt.tight_layout()
 plt.show()
 ```
 
@@ -636,6 +640,7 @@ plt.ylabel("Sample Quantiles")
 plt.title("Q-Q Plot of Residuals")
 
 # Show the plot
+plt.tight_layout()
 plt.show()
 ```
 
@@ -660,5 +665,6 @@ plt.title("Autocorrelation Function (ACF) of Residuals")
 plt.axhline(y=0, color='gray', linestyle='--')
 
 # Show the plot
+plt.tight_layout()
 plt.show()
 ```

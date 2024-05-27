@@ -218,6 +218,12 @@ You can load it with `source("path_to/models.r")` in your scripts.
 
 You can load it with `include("path_to/models.jl")` in your scripts.
 
+#### Python
+- [`models.py`]("https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/models/models.py"){target="_blank"}
+
+The easiest way to load the models into your scripts is by storing the models.py file in the same location as the scripts.
+If models.py are not stored in the same directory as the scripts, one should change the working directory to the given location
+before importing the functions. 
 
 # Exercises
 

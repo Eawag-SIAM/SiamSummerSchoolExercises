@@ -137,20 +137,7 @@ loglikelihood_linear(3,2,1, x, y)
 
 The following libraries and modules are required:
 ```{python}
-# If models.py are not stored in the same directory as the scripts, one should 
-# perform the following trick:
-###############################################################################
-import sys
-
-# Add the directory containing your modules to the Python path
-sys.path.append('../../models/')
-
-# Now you can import the modules
 from models import model_monod, model_growth
-
-# Now, remove the directory from the Python path to avoid conflicts
-sys.path.remove('../../models/')
-###############################################################################
 import pandas as pd
 import numpy as np
 from scipy.stats import norm, multinomial
@@ -316,7 +303,8 @@ plt.xlabel('x')
 plt.ylabel('y')
 plt.legend()
 
-# Show the plot
+# Adjust layout and display the plots
+plt.tight_layout()
 plt.show()
 ```
 

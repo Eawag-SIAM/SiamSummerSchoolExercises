@@ -373,7 +373,7 @@ information</a></li>
 <ul>
 <li><a href="#r-2" id="toc-r-2">R</a></li>
 <li><a href="#julia-2" id="toc-julia-2">Julia</a></li>
-<li><a href="#python-1" id="toc-python-1">Python</a></li>
+<li><a href="#python-2" id="toc-python-2">Python</a></li>
 </ul></li>
 </ul>
 </div>
@@ -614,6 +614,17 @@ scripts.</p>
 <p>You can load it with <code>include(&quot;path_to/models.jl&quot;)</code> in
 your scripts.</p>
 </div>
+<div id="python-1" class="section level4">
+<h4>Python</h4>
+<ul>
+<li><a href="%22https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/models/models.py%22" target="_blank"><code>models.py</code></a></li>
+</ul>
+<p>The easiest way to load the models into your scripts is by storing
+the models.py file in the same location as the scripts. If models.py are
+not stored in the same directory as the scripts, one should change the
+working directory to the given location before importing the
+functions.</p>
+</div>
 </div>
 </div>
 <div id="exercises" class="section level1">
@@ -674,13 +685,19 @@ Here you find the exact package versions used to compile the solutions:
 ## [1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] adaptMCMC_1.4     Matrix_1.5-4      coda_0.19-4       deSolve_1.35      reticulate_1.37.0 JuliaCall_0.17.5  knitr_1.43        rmarkdown_2.21   
+##  [1] sensitivity_1.28.1 mvtnorm_1.1-3      adaptMCMC_1.4      Matrix_1.5-4       coda_0.19-4        deSolve_1.35       reticulate_1.37.0  JuliaCall_0.17.5  
+##  [9] knitr_1.43         rmarkdown_2.21    
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] vctrs_0.6.2     cli_3.6.1       rlang_1.1.1     xfun_0.39       highr_0.10      png_0.1-8       jsonlite_1.8.4  glue_1.6.2      htmltools_0.5.5
-## [10] sass_0.4.6      fansi_1.0.4     rappdirs_0.3.3  grid_4.3.0      evaluate_0.21   jquerylib_0.1.4 fastmap_1.1.1   yaml_2.3.7      lifecycle_1.0.3
-## [19] compiler_4.3.0  Rcpp_1.0.10     lattice_0.21-8  digest_0.6.31   R6_2.5.1        utf8_1.2.3      pillar_1.9.0    bslib_0.4.2     tools_4.3.0    
-## [28] withr_2.5.0     cachem_1.0.8</code></pre>
+##  [1] gtable_0.3.3       xfun_0.39          bslib_0.4.2        ggplot2_3.4.2      shinyjs_2.1.0      ggrepel_0.9.3      lattice_0.21-8     vctrs_0.6.2       
+##  [9] tools_4.3.0        generics_0.1.3     stats4_4.3.0       tibble_3.2.1       proxy_0.4-27       fansi_1.0.4        highr_0.10         cluster_2.1.4     
+## [17] pkgconfig_2.0.3    RcppParallel_5.1.7 lifecycle_1.0.3    compiler_4.3.0     stringr_1.5.0      munsell_0.5.0      codetools_0.2-19   clue_0.3-64       
+## [25] httpuv_1.6.11      htmltools_0.5.5    numbers_0.8-5      class_7.3-21       sass_0.4.6         yaml_2.3.7         pillar_1.9.0       later_1.3.1       
+## [33] jquerylib_0.1.4    ellipsis_0.3.2     cachem_1.0.8       iterators_1.0.14   boot_1.3-28.1      foreach_1.5.2      mime_0.12          RSpectra_0.16-1   
+## [41] tidyselect_1.2.0   digest_0.6.31      stringi_1.7.12     dplyr_1.1.2        reshape2_1.4.4     flexclust_1.4-1    fastmap_1.1.1      grid_4.3.0        
+## [49] colorspace_2.1-0   cli_3.6.1          magrittr_2.0.3     utf8_1.2.3         withr_2.5.0        promises_1.2.0.1   scales_1.2.1       rappdirs_0.3.3    
+## [57] dtwclust_5.5.12    png_0.1-8          modeltools_0.2-23  shiny_1.7.4        evaluate_0.21      dtw_1.23-1         rlang_1.1.1        Rcpp_1.0.10       
+## [65] xtable_1.8-4       glue_1.6.2         jsonlite_1.8.4     R6_2.5.1           plyr_1.8.8</code></pre>
 </div>
 <div id="julia-2" class="section level2">
 <h2>Julia</h2>
@@ -721,7 +738,7 @@ Here you find the exact package versions used to compile the solutions:
 ##   [10745b16] Statistics v1.10.0
 ## Info Packages marked with ⌃ have new versions available and may be upgradable.</code></pre>
 </div>
-<div id="python-1" class="section level2">
+<div id="python-2" class="section level2">
 <h2>Python</h2>
 <pre><code>##                package     version                requirement     channel
 ## 1                 blas         1.0                   blas=1.0   pkgs/main
@@ -803,7 +820,7 @@ Here you find the exact package versions used to compile the solutions:
 ## 77                zlib      1.2.13                zlib=1.2.13   pkgs/main
 ## 78                zstd       1.5.5                 zstd=1.5.5   pkgs/main</code></pre>
 </details>
-<p>Built at 22 Mai, 2024.</p>
+<p>Built at 27 Mai, 2024.</p>
 <hr />
 <p><a href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFgAAAAfCAMAAABUFvrSAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjnz7UZMAAAAgY0hSTQAAeiUAAICDAAD5/wAAgOkAAHUwAADqYAAAOpgAABdvkl/FRgAAAf5QTFRFAAAAAAAA////////////8fHx7+/v6Ofn4+Pj4N/g39/f1tXV09bS0tXS0tXR0dTR0dTQ0NTQ0NPPz9PPztLOztHNzdHNzdHMz8/PzdDMzNDMzNDLzM/Ly8/Ly8/Ky87Kys3Jyc3Jyc3Iy8rLyMzIyMzHx8vHxsrGycjIxsrFxcnFyMfHxcnExMnExMjDw8jDxMfDw8fCwsfCwcXAwMXAwMW/wMS/v8S+v8O+vsO+vsK9vcK9vcK8v7+/vMG8vMG7vMC8u8C7u8C6ur+6ur+5ub65ub64uL23t7y2urm5tru1tbq0tLqztLmzs7iysrixtbW1srexsbewsLavsLWvr7Wur7SusLOvrrStrrOtr7KvrbOsrLKrr6+vq7GqrKurpqqmo6ijoqaho6Ghn6OenqCdn5+fnp2dn5aampiZlpmWlZmUmJaXk5iTkZSRkZORkY+Pj4+PiYyJjIqLjoeLh4aHhIaEhIWEgoWChIGCf4F+gICAfX98fH98fnt8en15eXx5eHV2dnN0dXJzcHJvcHBwbmxsaGVmY19hYGBgXV5dWldYUFFQUFBQQ0RDQEBAPj8+Pzs8Pzc5NTY1MjMxMjExMDAwMS0uLS0tKioqKSopKSkpKCkoKCgoKicnKCUmJCQkIx8gICAgHxscGxsbGRkZEBAQDg4ODQ4NDQwNNUYWmgAAAAR0Uk5T/wAKDnDBpeYAAAPASURBVHjatZaNf1JVHMaf6kAEbF6vsgyQ6ygsmjKJptNG2NoY23Lm1mq2DSp1682xrLSF1qKocAO0F1ZCL4cm4n/Zb4fdl27zM8XPHuBzPvfLPQ+H53fP7148hh3RIwBGE/HY8Uh3MNCpeN1ur+9AIBiK9MYGE6Nj429MTU/PJB9cEL4DfUfDQb/PJUttTmfbLtm13x8M9/QNbDhPTk3PtOhMvi+GDiou6UqxAVKjeFna6wscjrxEzqcnJs9OzyxXQKos6/O2JQDi5BvwyOl1aFpfkN3+Q5G+wcSpMxNTH1WBUi5XAqoXk0IXtycAYkdDAbe0CqCez0SjmXwdwOqRJ/2He2LxkbHx9+6gYGckewF3xKzz90EAHA8f9JAv6hkra2qOrKtH3IFwb//Q6JkK8sSAjS9QTZKqgiyumIitq8umEQCRoCKTb9nONFnLwKrsC0b64iNXUXCoxqyAZUoTv35AvrfvZm0aoXPOcdKwIE3j7mdcafIVyzU6L+z1h471J27BrnM7KslkBX/xmz8g8zlSGrGzLv7Tj1nOFwURxkGftI76PvYfWetYl/YHIy/HUWKkPJBnpBJoTunbbzjnWZtDJ8zyPv+MsXm+JogwDnRcATLMpDngsisQPjGAHCOBxEg50BwiXVkAWYdOLH/zPyhmzh8n0jTu3FNEnYKIFkqlTHP4hCbUUZQPUBZbG5NHdo3zlWGNvP5bVBg/oRkrUgN5MgRIpVkx0HEejV2+Qz2v/D8KQSzzzMFJN1UyfO45xlKc61F42wFaYhk1e7Q2V0bZPlubE1m0eYOR2O/N4gGG4hFZ4WtryKa++kcl85wvLf3JP9aL53ECUcZEztog/oHT/Wwk9iUKzHy5EbEt3b67aDGSJU763iLI/RgP3dI3SM64QT5dMZGnUylHk5ijsO6rZSiKjUGPYuidlra0XrzNqmnFy6EhKVS8odferQDlfK6st5zz1W2JuNxWUWfa5TZbEgOroSh3ho69mjg1/ubXLbXNQEeasth6g7xwYnBkbIJ6fSuN/nmxpe332tKjp1s1piZ0YasmlHb5u3v7qdVPnp1pyRjXFPk6ORvakF20TeULPKS+8+42Nnprpg78LHmu4aF11b37uunWJD31IVQ19wfER0g9IG46iZmdvfIF4800LXt0X7DNN9NJ89j0UwKY01BcUlq9/S9ILsWYg9o2DWTzZZDaTmDSL2/7OvZI7U5nu0QPLG/dgEF6EEbCzAtUgVk3Lp1UvB6PVzl5iWyxzYpVc3MdGHZcj+7Q0+a/KrvgUC2hl58AAAAASUVORK5CYII=" alt="license" /></a> This work is licensed under a <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
 Commons Attribution-NonCommercial-ShareAlike 4.0 International

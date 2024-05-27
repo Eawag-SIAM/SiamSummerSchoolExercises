@@ -107,6 +107,9 @@ sns.lineplot(x=C_monod, y=r_det, color='red')
 plt.ylabel('r')
 plt.xlabel('C')
 plt.title('Model Monod output')
+
+# Adjust layout and display the plots
+plt.tight_layout()
 plt.show()
 ```
 
@@ -277,6 +280,7 @@ plt.ylabel('r')
 # Add a legend
 plt.legend()
 
-# Show the plot
+# Adjust layout and display the plots
+plt.tight_layout()
 plt.show()
 ```

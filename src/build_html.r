@@ -19,7 +19,7 @@ src.dir <- "."
 
 ## --- compile all exercises
 exercises <- c("exercise_0", "exercise_1", "exercise_2",
-               "exercise_3", "exercise_4", "exercise_5")[3]
+               "exercise_3", "exercise_4", "exercise_5")[2]
 
 exercises <- c(exercises, "index")
 for(exer in exercises){

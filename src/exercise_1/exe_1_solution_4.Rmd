@@ -186,7 +186,8 @@ plt.xlabel("Time")
 plt.ylabel("# Deaths")
 plt.title("Boxplot of # Deaths at Different Times")
 
-# Show the plot
+# Adjust layout and display the plots
+plt.tight_layout()
 plt.show()
 ```
 

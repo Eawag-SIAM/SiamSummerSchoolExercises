@@ -275,8 +275,15 @@ end
 #### Python
 ```{python, eval = FALSE}
 def logposterior_survival(par, data):
-  
-
+    # Calculate log-likelihood
+    log_likelihood = ??
+    
+    # Calculate log-prior
+    log_prior = ??
+    
+    # Calculate log-posterior
+    log_posterior = log_likelihood + log_prior
+    
     return log_posterior
 ```
 
@@ -519,7 +526,79 @@ function logposterior_monod(par::ComponentVector)
 end
 ```
 
+### Python
 
+```{python, eval=FALSE}
+# Define the prior mean and standard deviation
+prior_monod_mean = 0.5 * np.array([5, 3, 0.5])  # r_max, K, sigma
+prior_monod_sd = 0.5 * prior_monod_mean
+
+# Log prior for Monod model
+def logprior_monod(par, mean, sd):
+    """
+    Log-prior function for the Monod model.
+
+    Parameters:
+    - par: array-like, the parameters to evaluate the prior (e.g., ['r_max', 'K', 'sigma'])
+    - mean: array-like, the mean values for the parameters
+    - sd: array-like, the standard deviation values for the parameters
+
+    Returns:
+    - log_prior: the sum of log-prior values calculated from the log-normal distribution
+    """
+    
+    # Calculate sdlog and meanlog for log-normal distribution
+    var = ??
+    sdlog = ??
+    meanlog = ??
+
+    # Calculate the sum of log probabilities from the log-normal distribution
+    log_prior = np.sum(??)
+
+    return log_prior
+
+def loglikelihood_monod(y, C, par):
+    """
+    Log-likelihood function for the Monod model.
+
+    Parameters:
+    - y: observed growth rates
+    - C: substrate concentrations
+    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
+
+    Returns:
+    - log_likelihood: the sum of log-likelihood values
+    """
+    # Calculate growth rate using Monod model
+    y_det = ??
+    
+    # Calculate log-likelihood assuming a normal distribution
+    log_likelihood = np.sum(??)
+    
+    return log_likelihood
+
+def logposterior_monod(par):
+    """
+    Log-posterior function for the Monod model.
+
+    Parameters:
+    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
+
+    Returns:
+    - log_posterior: the log posterior probability
+    """
+    # Calculate the log prior
+    lp = ??
+    
+    # If log prior is finite, calculate log likelihood and sum
+    if np.isfinite(lp):
+        log_posterior = ?? + ??
+        return log_posterior
+    else:
+        # Return negative infinity if log prior is not finite
+        return -np.inf
+
+```
 ## Create initial chain {.tabset}
 
 First run an initial chain, which most likely has not yet a good mixing.
@@ -599,6 +678,69 @@ corner(chn)
 Array(chn)                      # convert it to normal Array
 ```
 
+### Python
+The code below uses the module `emcee`, which provides a mcmc sampler.
+
+```{python, eval=FALSE}
+import emcee
+from emcee.moves import GaussianMove
+
+# Number of dimensions (parameters)
+ndim = 3  # For our model, 3 dimensions for r_max, K, sigma
+
+# Create a diagonal covariance matrix 
+jump_cov = ??
+
+# Create an instance of GaussianMove using the jump covariance matrix
+move = GaussianMove(jump_cov)
+
+# Define the initial parameter values (mean of the prior)
+par_init = np.array([2.5, 1.5, 0.25])  # r_max, K, sigma
+
+# Define the number of samples
+n_samples = ??
+
+# Define the number of dimensions (parameters)
+ndim = len(par_init)
+
+# Define the number of walkers for the MCMC chain
+nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensions
+
+# Initialize the walkers around the initial parameter values with a small random perturbation
+init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
+
+# Initialize the `emcee` sampler
+sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior_monod, moves=move)
+
+# Run the MCMC chain
+sampler.run_mcmc(init_pos, n_samples, progress=False) 
+# If set to True, the progress bar gives a overview of the processing time
+```
+
+Check out the results:
+
+```{python, eval=FALSE}
+# Retrieve the acceptance rate
+print("Mean acceptance fraction: {:.3f}".format(np.mean(sampler.acceptance_fraction)))
+
+# Have an overview of the results
+# Reshape the chain_samples to 2D by combining chain and iteration dimensions
+# Combine the second and first dimensions (walker and iteration) into a single dimension
+# By computing the mean of the walkers
+reshaped_chain = np.mean(chain_samples, axis=1)
+
+# Or by selecting one of them
+reshaped_chain = chain_samples[:, 0, :]
+
+# Convert reshaped chain samples to pandas DataFrame
+chain_df = pd.DataFrame(reshaped_chain, columns=['r_max', 'K', 'sigma'])
+
+# Calculate and display summary statistics (mean, SD, quantiles, etc.)
+summary = chain_df.describe(percentiles=[0.025, 0.25, 0.5, 0.75, 0.975])
+
+print("Summary statistics:", summary)
+```
+
 ## Improve jump distribution  {.tabset}
 
 The plot of the previous chain gives us some indication how a more
@@ -623,6 +765,13 @@ scale: vector with the variances _or_ covariance matrix of the jump
 Adapt the covariance matrix `Σjump` of the jump
 distribution that is used in the function `sample_proposal`.
 
+### Python
+
+In emcee, there is a default move type used in the EnsembleSampler so called stretch move 
+(StretchMove). This move is well-suited for a wide range of models and performs 
+efficiently in high-dimensional parameter spaces. The stretch move works by 
+randomly choosing a pair of walkers and proposing a new position for one walker
+based on a stretch factor relative to the other walker’s position.
 
 ## Residual Diagnostics {.tabset}
 
@@ -645,6 +794,10 @@ The function `qqnorm` and `acf` can be helpful.
 
 ### Julia
 The function `StatsBase.autocor` and `StatPlots.qqnorm(x)` can be helpful.
+
+### Python
+The function `acf` from `statsmodels.tsa.stattools` and the function `stats` from
+`scipy` might be useful.
 
 ```{r, child = if(params$showsolutions){"exe_2_solution_2.Rmd"}}
 ```

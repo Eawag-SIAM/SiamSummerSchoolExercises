@@ -215,7 +215,8 @@ plt.xlabel('Substrate concentration (C)')
 plt.ylabel('Growth rate (r)')
 plt.legend()
 
-# Show the plot
+# Adjust layout and display the plots
+plt.tight_layout()
 plt.show()
 ```
 
