@@ -42,6 +42,14 @@ for(exer in exercises){
     }
 }
 
+## --- As models.py has to be loc in the current dir, copy it to models
+
+# Define the source and destination file paths
+source_file <- "models.py"
+destination_file <- "../models/models.py"
+
+# Copy the file
+file.copy(source_file, destination_file, overwrite = TRUE)
 
 ## --- zip all data files for easy download
 

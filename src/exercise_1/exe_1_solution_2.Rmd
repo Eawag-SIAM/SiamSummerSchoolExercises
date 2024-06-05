@@ -140,8 +140,8 @@ def loglikelihood_monod(yobs, C, par):
         Observed data.
     - C: array-like
         Substrate concentration.
-    - par: dictionary
-        Parameters including:
+    - par: array with the parameters
+        Parameters including (in this order):
         - 'r_max': maximum growth rate
         - 'K': half-saturation concentration
         - 'sigma': standard deviation of the normal distribution for the likelihood

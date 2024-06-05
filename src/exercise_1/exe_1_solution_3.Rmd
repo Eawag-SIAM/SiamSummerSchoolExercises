@@ -244,7 +244,7 @@ def simulate_monod_stoch(par, C):
 
 # Parameters
 C_monod = np.arange(0, 10.1, 0.1)  # concentrations at which model output should be calculated
-par_monod = [5,  3,  0.2]  # define parameter dictionary for the model "Monod"
+par_monod = [5,  3,  0.2]  # define parameter array for the model "Monod"
 n_rep = 1000  # number of simulations
 
 # Run `n_rep` simulations

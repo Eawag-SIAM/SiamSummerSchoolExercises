@@ -202,7 +202,7 @@ def local_sa(model, par_vector, par, delta_rel=0.1, *args, **kwargs):
     
     Parameters:
     - model: Function representing the model.
-    - par_vector: Dictionary of model parameters.
+    - par_vector: Array of model parameters.
     - par: Name of the parameter to perform sensitivity analysis on.
     - delta_rel: Relative change in the parameter value.
     - *args, **kwargs: Additional arguments for the model function.
@@ -210,13 +210,13 @@ def local_sa(model, par_vector, par, delta_rel=0.1, *args, **kwargs):
     Returns:
     Dictionary containing absolute and relative sensitivity indices.
     """
-    # Copy the parameter dictionary to adjust the parameter of interest
+    # Copy the parameter array to adjust the parameter of interest
     par_vector2 = par_vector.copy()
     
     # Adjust the specified parameter by the relative delta
     par_vector2[par] *= (1 + delta_rel)
     
-    # Run the model with the original and adjusted parameter dictionary
+    # Run the model with the original and adjusted parameter array
     Y = model(par_vector, *args, **kwargs)
     Y2 = model(par_vector2, *args, **kwargs)
 
@@ -312,7 +312,7 @@ plt.show()
 We use the function `fast99` to compute `2*n` parameter combinations
 for which we will evaluate the model:
 ```{python}
-# Define par.monod dictionary
+# Define par_monod array
 par_monod = [5, 3]  # Example values, adjust as needed
 
 # Calculate lower and upper bounds

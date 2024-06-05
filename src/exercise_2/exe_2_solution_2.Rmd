@@ -292,8 +292,6 @@ bar(0:(length(acf)-1), acf, label=false, xlab="lag", ylab="correlation")
 
 ```{python}
 from models import model_monod, model_growth
-import emcee
-from emcee.moves import GaussianMove
 import seaborn as sns
 ```
 
@@ -319,17 +317,27 @@ plt.ylabel("r")
 # Set title
 plt.title('"model_monod_stoch.csv"')
 
+# Optimize the plot area and visualization
+plt.tight_layout()
+
 # Display the plot
 plt.show()
 ```
 
 #### Define likelihood, prior, and posterior
 ```{python}
+import numpy as np
+import pandas as pd
+from scipy.stats import lognorm, norm
+import warnings
+
+# Suppress all warnings
+warnings.filterwarnings("ignore")
+
 # Define the prior mean and standard deviation
 prior_monod_mean = 0.5 * np.array([5, 3, 0.5])  # r_max, K, sigma
 prior_monod_sd = 0.5 * prior_monod_mean
 
-# Log prior for Monod model
 def logprior_monod(par, mean, sd):
     """
     Log-prior function for the Monod model.
@@ -342,15 +350,10 @@ def logprior_monod(par, mean, sd):
     Returns:
     - log_prior: the sum of log-prior values calculated from the log-normal distribution
     """
-    
-    # Calculate sdlog and meanlog for log-normal distribution
     var = (sd**2) / (mean**2)
     sdlog = np.sqrt(np.log(1 + var))
     meanlog = np.log(mean) - 0.5 * sdlog**2
-
-    # Calculate the sum of log probabilities from the log-normal distribution
     log_prior = np.sum(lognorm.logpdf(par, s=sdlog, scale=np.exp(meanlog)))
-
     return log_prior
 
 def loglikelihood_monod(y, C, par):
@@ -360,149 +363,128 @@ def loglikelihood_monod(y, C, par):
     Parameters:
     - y: observed growth rates
     - C: substrate concentrations
-    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
+    - par: array-like, the parameters ('r_max', 'K', 'sigma')
 
     Returns:
     - log_likelihood: the sum of log-likelihood values
     """
-    # Calculate growth rate using Monod model
     y_det = model_monod(par, C)
-    
-    # Calculate log-likelihood assuming a normal distribution
     log_likelihood = np.sum(norm.logpdf(y, loc=y_det, scale=par[2]))
-    
     return log_likelihood
 
-
-def logposterior_monod(par):
+def logposterior_monod(par, data, prior_mean, prior_sd):
     """
     Log-posterior function for the Monod model.
 
     Parameters:
-    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
+    - par: array-like, the parameters ('r_max', 'K', 'sigma')
+    - data: pandas DataFrame, the data containing observed growth rates and substrate concentrations
+    - prior_mean: array-like, the mean values for the parameters
+    - prior_sd: array-like, the standard deviation values for the parameters
 
     Returns:
     - log_posterior: the log posterior probability
     """
-    # Calculate the log prior
-    lp = logprior_monod(par, prior_monod_mean, prior_monod_sd)
-    
-    # If log prior is finite, calculate log likelihood and sum
+    lp = logprior_monod(par, prior_mean, prior_sd)
     if np.isfinite(lp):
-        log_posterior = lp + loglikelihood_monod(data_monod['r'], data_monod['C'], par)
+        log_posterior = lp + loglikelihood_monod(data['r'], data['C'], par)
         return log_posterior
     else:
-        # Return negative infinity if log prior is not finite
         return -np.inf
+```
 
-# Make sure you have `data_monod` as a pandas DataFrame with columns 'r' and 'C'.
+#### Write your own chain function
+```{python, results = 'hide'}
+def run_mcmc_monod(logposterior_func, data, prior_mean, prior_sd, par_init, sampsize=5000, scale=np.diag([1, 1, 1])):
+    """
+    Run MCMC for the model.
+
+    Parameters:
+    - logposterior_func: function, the log-posterior function to use
+    - data: pandas DataFrame, the data containing observed growth rates and substrate concentrations
+    - prior_mean: array-like, the mean values for the parameters
+    - prior_sd: array-like, the standard deviation values for the parameters
+    - par_init: array-like, the initial parameter values
+    - sampsize: int, the number of samples to draw (default: 5000)
+    - scale: array-like, the covariance matrix for the proposal distribution
+
+    Returns:
+    - chain: array, the chain of parameter samples and their log-posterior values
+    - acceptance_rate: float, the acceptance rate of the MCMC run
+    """
+    chain = np.zeros((sampsize, len(par_init) + 1))
+    chain[0, :-1] = par_init
+    chain[0, -1] = logposterior_func(par_init, data, prior_mean, prior_sd)
+    
+    accepted = 0
+    for i in range(1, sampsize):
+        par_prop = chain[i-1, :-1] + np.random.multivariate_normal(np.zeros(len(par_init)), scale)
+        logpost_prop = logposterior_func(par_prop, data, prior_mean, prior_sd)
+        acc_prob = min(1, np.exp(logpost_prop - chain[i-1, -1]))
+        
+        if np.random.rand() < acc_prob:
+            chain[i, :-1] = par_prop
+            chain[i, -1] = logpost_prop
+            accepted += 1
+        else:
+            chain[i, :] = chain[i-1, :]
+    
+    acceptance_rate = accepted / sampsize
+
+    
+    return chain, acceptance_rate
 ```
 
 #### Create initial chain
 
 ```{python, results = 'hide'}
-# Number of dimensions (parameters)
-ndim = 3  # For your example, 3 dimensions for r_max, K, sigma
+# Define the initial parameters
+par_init = [2.5, 1.5, 0.25]
 
-# Create a diagonal covariance matrix with each diagonal entry equal to 1
-jump_cov = np.diag([1.0] * ndim)
-
-# Create an instance of GaussianMove using the jump covariance matrix
-move = GaussianMove(jump_cov)
-
-# Define the initial parameter values (mean of the prior)
-par_init = np.array([2.5, 1.5, 0.25])  # r_max, K, sigma
-
-# Define the number of samples
-n_samples = 5000
-
-# Define the number of dimensions (parameters)
-ndim = len(par_init)
-
-# Define the number of walkers for the MCMC chain
-nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensions
-
-# Initialize the walkers around the initial parameter values with a small random perturbation
-init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
-
-# Initialize the `emcee` sampler
-sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior_monod, moves=move)
-
-# Run the MCMC chain
-sampler.run_mcmc(init_pos, n_samples, progress=False)
-
-# Get the chain samples
-chain_samples = sampler.get_chain()
-
+# Run the chain
+chain, acceptance_rate = run_mcmc_monod(logposterior_func=logposterior_monod, data=data_monod, 
+                                             prior_mean=prior_monod_mean, prior_sd=prior_monod_sd, 
+                                             par_init=par_init, sampsize=5000, 
+                                             scale=np.diag([1, 1, 1]))
 ```
 
 ```{python}
-# Display a summary of the chain
-print("Chain shape: ", chain_samples.shape)
+# Convert the results into a dataframe
+df_chain = pd.DataFrame(chain, columns=['r_max', 'K', 'sigma', 'logposterior']) # this is useful for plotting
 
-# Reshape the chain_samples to 2D by combining chain and iteration dimensions
-# Combine the second and first dimensions (walker and iteration) into a single dimension
-reshaped_chain = np.mean(chain_samples, axis=1)
-
-# Convert reshaped chain samples to pandas DataFrame
-chain_df = pd.DataFrame(reshaped_chain, columns=['r_max', 'K', 'sigma'])
-
-# Calculate and display summary statistics (mean, SD, quantiles, etc.)
-summary = chain_df.describe(percentiles=[0.025, 0.25, 0.5, 0.75, 0.975])
-
-print("Summary statistics:")
-print(summary)
+# Visualize the results
+df_chain.describe()
 ```
 
 The acceptance rate is very low:
 ```{python}
-print("Mean acceptance fraction: {:.3f}".format(np.mean(sampler.acceptance_fraction)))
+print("Mean acceptance fraction: {:.3f}".format(acceptance_rate))
 ```
 
 The poor mixing is also visible from the chain plots:
 ```{python}
-# Assuming `reshaped_chain` is the reshaped 2D array from the MCMC chain
-# Each column represents a parameter and each row represents an iteration
+# Plot trace plots
+fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(12, 10))
 
-# List of parameter names
-param_names = ['r_max', 'K', 'sigma']
+parameters = ['r_max', 'K', 'sigma']
+for i, param in enumerate(parameters):
+    axes[i, 0].plot(df_chain[param])
+    axes[i, 0].set_title(f'Trace plot of {param}')
+    axes[i, 0].set_xlabel('Iteration')
+    axes[i, 0].set_ylabel(param)
+    axes[i, 1].hist(df_chain[param], bins=30, density=True)
+    axes[i, 1].set_title(f'Histogram of {param}')
+    axes[i, 1].set_xlabel(param)
+    axes[i, 1].set_ylabel('Density')
 
-# Number of parameters (for each variable)
-n_params = len(param_names)
-
-# Create a 3x2 grid of subplots
-fig, axs = plt.subplots(n_params, 2, figsize=(12, 8))
-
-# Iterate through each parameter
-for i in range(n_params):
-    # Plot trace on the left subplot (left column)
-    axs[i, 0].plot(reshaped_chain[:, i])
-    axs[i, 0].set_ylabel(param_names[i])
-    axs[i, 0].set_xlabel('Iteration')
-    axs[i, 0].set_title(f'Trace of {param_names[i]}')
-    axs[i, 0].grid(True)
-    
-    # Plot KDE (kernel density estimation) on the right subplot (right column)
-    sns.kdeplot(reshaped_chain[:, i], ax=axs[i, 1], color='blue')
-    axs[i, 1].set_title(f'Density of {param_names[i]}')
-    axs[i, 1].grid(True)
-    axs[i, 1].set_xlabel(param_names[i])
-
-# Adjust layout and display the plots
 plt.tight_layout()
 plt.show()
 ```
 
 Here we see a strong correlation between $K$ and $r_{max}$:
 ```{python}
-# Define the parameter names (use appropriate names for your parameters)
-param_names = ['r_max', 'K', 'sigma']
-
-# Convert the reshaped_chain array to a pandas DataFrame with appropriate column names
-df = pd.DataFrame(reshaped_chain, columns=param_names)
-
 # Create pairwise scatter plots between the variables using seaborn's pairplot
-pairplot = sns.pairplot(df)
+pairplot = sns.pairplot(df_chain.iloc[:, :-1])
 
 # Manually adjust the layout if needed
 pairplot.fig.tight_layout()
@@ -514,70 +496,46 @@ plt.show()
 #### Improve jump distribution
 
 ```{python, results = 'hide'}
-from emcee.moves import StretchMove
+# Calculate the covariance of the samples
+sigma_jump = np.cov(df_chain[['r_max', 'K', 'sigma']], rowvar=False) * (1/2)**2
 
-# Define the initial parameter values (mean of the prior)
-par_init = np.array([2.5, 1.5, 0.25])  # r_max, K, sigma
-
-# Define the number of samples
-n_samples = 5000
-
-# Define the number of dimensions (parameters)
-ndim = len(par_init)
-
-# Create an instance of the StretchMove
-move = StretchMove()
-
-# Define the number of walkers for the MCMC chain
-nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensions
-
-# Initialize the walkers around the initial parameter values with a small random perturbation
-init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
-
-# Initialize the `emcee` sampler
-sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior_monod, moves=move)
-
-# Run the MCMC chain
-sampler.run_mcmc(init_pos, n_samples, progress=False)
-
-# Get the chain samples
-chain_samples = sampler.get_chain()
+# Run the chain
+chain2, acceptance_rate2 = run_mcmc_monod(logposterior_func=logposterior_monod, data=data_monod, 
+                                             prior_mean=prior_monod_mean, prior_sd=prior_monod_sd, 
+                                             par_init=par_init, sampsize=5000, 
+                                             scale=sigma_jump)
+                                            
 ```
 
 Everything looks much better now!
 ```{python}
-print("Mean acceptance fraction: {:.3f}".format(np.mean(sampler.acceptance_fraction)))
+print("Mean acceptance fraction: {:.3f}".format(acceptance_rate2))
 ```
 
 ```{python}
-# Reshape the chain_samples to 2D by combining chain and iteration dimensions
-# Combine the second and first dimensions (walker and iteration) into a single dimension
-reshaped_chain = np.mean(chain_samples, axis=1)
+# Convert the results into a dataframe
+df_chain2 = pd.DataFrame(chain2, columns=['r_max', 'K', 'sigma', 'logposterior']) # this is useful for plotting 
 
-# Convert reshaped chain samples to pandas DataFrame
-chain_df = pd.DataFrame(reshaped_chain, columns=['r_max', 'K', 'sigma'])
-
-# Calculate and display summary statistics (mean, SD, quantiles, etc.)
-summary = chain_df.describe(percentiles=[0.025, 0.25, 0.5, 0.75, 0.975])
-
-print("Summary statistics:")
-print(summary)
+# Visualize the results
+df_chain2.describe()
 ```
 
 ```{python}
-# Define the parameter names (use appropriate names for your parameters)
-param_names = ['r_max', 'K', 'sigma']
+# Plot trace plots
+fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(12, 10))
 
-# Convert the reshaped_chain array to a pandas DataFrame with appropriate column names
-df = pd.DataFrame(reshaped_chain, columns=param_names)
+parameters = ['r_max', 'K', 'sigma']
+for i, param in enumerate(parameters):
+    axes[i, 0].plot(df_chain2[param])
+    axes[i, 0].set_title(f'Trace plot of {param}')
+    axes[i, 0].set_xlabel('Iteration')
+    axes[i, 0].set_ylabel(param)
+    axes[i, 1].hist(df_chain2[param], bins=30, density=True)
+    axes[i, 1].set_title(f'Histogram of {param}')
+    axes[i, 1].set_xlabel(param)
+    axes[i, 1].set_ylabel('Density')
 
-# Create pairwise scatter plots between the variables using seaborn's pairplot
-pairplot = sns.pairplot(df)
-
-# Manually adjust the layout if needed
-pairplot.fig.tight_layout()
-
-# Show the plots
+plt.tight_layout()
 plt.show()
 ```
 
@@ -587,17 +545,8 @@ First we compute the residuals with the 'best' parameters
 ```{python}
 from scipy import stats
 
-#Get the log-posterior values for each sample in the chain
-log_posterior_values = sampler.get_log_prob(flat=False)
-
-# Select one walker
-log_posterior_values=log_posterior_values[:, 0]
-
-# Get the index of the maximum log-posterior probability
-max_log_p_index = np.argmax(log_posterior_values)
-
-# Get the parameter set that maximizes the log-posterior
-par_max = reshaped_chain[max_log_p_index, :]
+# Get the parameter set that maximizes the log-posterior (As we may have many, we take the mean)
+par_max = df_chain2[df_chain2.logposterior==df_chain2.logposterior.max()].mean()[0:2]
 
 # Calculate residuals: observed data minus modeled data using par_max
 modeled_data = model_monod(par_max, data_monod['C'])

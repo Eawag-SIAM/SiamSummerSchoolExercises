@@ -374,7 +374,6 @@ end
 ### Python
 
 ```{python, eval=FALSE}
-
 # Set sample size (make it feasible)
 sampsize = 5000
 
@@ -564,8 +563,8 @@ def loglikelihood_monod(y, C, par):
     Parameters:
     - y: observed growth rates
     - C: substrate concentrations
-    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
-
+    - par: array-like, the parameters ('r_max', 'K', 'sigma')
+    
     Returns:
     - log_likelihood: the sum of log-likelihood values
     """
@@ -577,25 +576,24 @@ def loglikelihood_monod(y, C, par):
     
     return log_likelihood
 
-def logposterior_monod(par):
+def logposterior_monod(par, data, prior_mean, prior_sd):
     """
     Log-posterior function for the Monod model.
 
     Parameters:
-    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
+    - par: array-like, the parameters ('r_max', 'K', 'sigma')
+    - data: pandas DataFrame, the data containing observed growth rates and substrate concentrations
+    - prior_mean: array-like, the mean values for the parameters
+    - prior_sd: array-like, the standard deviation values for the parameters
 
     Returns:
     - log_posterior: the log posterior probability
     """
-    # Calculate the log prior
     lp = ??
-    
-    # If log prior is finite, calculate log likelihood and sum
     if np.isfinite(lp):
-        log_posterior = ?? + ??
+        log_posterior = lp + ??
         return log_posterior
     else:
-        # Return negative infinity if log prior is not finite
         return -np.inf
 
 ```
@@ -679,66 +677,60 @@ Array(chn)                      # convert it to normal Array
 ```
 
 ### Python
-The code below uses the module `emcee`, which provides a mcmc sampler.
+For this exercise, we provide the function below, which is simply an adaptation of
+the chain you wrote in exercise 1. In the function doc strings you have an overview 
+of how to run your function for your model. Of course, feel free to use your own 
+implementation instead!
 
 ```{python, eval=FALSE}
-import emcee
-from emcee.moves import GaussianMove
+def run_mcmc_monod(logposterior_func, data, prior_mean, prior_sd, par_init, sampsize=5000, scale=np.diag([1, 1, 1])):
+    """
+    Run MCMC for the model.
 
-# Number of dimensions (parameters)
-ndim = 3  # For our model, 3 dimensions for r_max, K, sigma
+    Parameters:
+    - logposterior_func: function, the log-posterior function to use
+    - data: pandas DataFrame, the data containing observed growth rates and substrate concentrations
+    - prior_mean: array-like, the mean values for the parameters
+    - prior_sd: array-like, the standard deviation values for the parameters
+    - par_init: array-like, the initial parameter values
+    - sampsize: int, the number of samples to draw (default: 5000)
+    - scale: array-like, the covariance matrix for the proposal distribution
 
-# Create a diagonal covariance matrix 
-jump_cov = ??
+    Returns:
+    - chain: array, the chain of parameter samples and their log-posterior values
+    - acceptance_rate: float, the acceptance rate of the MCMC run
+    """
+    chain = np.zeros((sampsize, len(par_init) + 1))
+    chain[0, :-1] = par_init
+    chain[0, -1] = logposterior_func(par_init, data, prior_mean, prior_sd)
+    
+    accepted = 0
+    for i in range(1, sampsize):
+        par_prop = chain[i-1, :-1] + np.random.multivariate_normal(np.zeros(len(par_init)), scale)
+        logpost_prop = logposterior_func(par_prop, data, prior_mean, prior_sd)
+        acc_prob = min(1, np.exp(logpost_prop - chain[i-1, -1]))
+        
+        if np.random.rand() < acc_prob:
+            chain[i, :-1] = par_prop
+            chain[i, -1] = logpost_prop
+            accepted += 1
+        else:
+            chain[i, :] = chain[i-1, :]
+    
+    acceptance_rate = accepted / sampsize
 
-# Create an instance of GaussianMove using the jump covariance matrix
-move = GaussianMove(jump_cov)
-
-# Define the initial parameter values (mean of the prior)
-par_init = np.array([2.5, 1.5, 0.25])  # r_max, K, sigma
-
-# Define the number of samples
-n_samples = ??
-
-# Define the number of dimensions (parameters)
-ndim = len(par_init)
-
-# Define the number of walkers for the MCMC chain
-nwalkers = 10 * ndim  # A common rule of thumb is 10 times the number of dimensions
-
-# Initialize the walkers around the initial parameter values with a small random perturbation
-init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
-
-# Initialize the `emcee` sampler
-sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior_monod, moves=move)
-
-# Run the MCMC chain
-sampler.run_mcmc(init_pos, n_samples, progress=False) 
-# If set to True, the progress bar gives a overview of the processing time
+    
+    return chain, acceptance_rate
 ```
 
-Check out the results:
+Convert the chain to a data frame so you can improve the visualization of the results
 
 ```{python, eval=FALSE}
-# Retrieve the acceptance rate
-print("Mean acceptance fraction: {:.3f}".format(np.mean(sampler.acceptance_fraction)))
+# Convert the results into a dataframe
+df_chain = pd.DataFrame(chain, columns=['r_max', 'K', 'sigma', 'logposterior']) # this is useful for plotting
 
-# Have an overview of the results
-# Reshape the chain_samples to 2D by combining chain and iteration dimensions
-# Combine the second and first dimensions (walker and iteration) into a single dimension
-# By computing the mean of the walkers
-reshaped_chain = np.mean(chain_samples, axis=1)
-
-# Or by selecting one of them
-reshaped_chain = chain_samples[:, 0, :]
-
-# Convert reshaped chain samples to pandas DataFrame
-chain_df = pd.DataFrame(reshaped_chain, columns=['r_max', 'K', 'sigma'])
-
-# Calculate and display summary statistics (mean, SD, quantiles, etc.)
-summary = chain_df.describe(percentiles=[0.025, 0.25, 0.5, 0.75, 0.975])
-
-print("Summary statistics:", summary)
+# Visualize the results
+df_chain.describe()
 ```
 
 ## Improve jump distribution  {.tabset}
@@ -766,12 +758,8 @@ Adapt the covariance matrix `Σjump` of the jump
 distribution that is used in the function `sample_proposal`.
 
 ### Python
-
-In emcee, there is a default move type used in the EnsembleSampler so called stretch move 
-(StretchMove). This move is well-suited for a wide range of models and performs 
-efficiently in high-dimensional parameter spaces. The stretch move works by 
-randomly choosing a pair of walkers and proposing a new position for one walker
-based on a stretch factor relative to the other walker’s position.
+The provided function "run_mcmc_monod" takes argument `scale` to modify the 
+jump distribution. 
 
 ## Residual Diagnostics {.tabset}
 

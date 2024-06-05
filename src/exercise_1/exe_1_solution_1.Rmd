@@ -136,7 +136,7 @@ loglikelihood_linear(3,2,1, x, y)
 #### Python
 
 The following libraries and modules are required:
-```{python}
+```{python, results = 'hide'}
 from models import model_monod, model_growth
 import pandas as pd
 import numpy as np
