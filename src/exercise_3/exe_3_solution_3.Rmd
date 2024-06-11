@@ -90,3 +90,162 @@ corner(chn)
 # removing burn-in:
 corner(chn[250:end,:,:])
 ```
+
+### Python
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from models import model_monod
+import emcee
+from emcee.moves import StretchMove
+from scipy.stats import multinomial, gaussian_kde, lognorm, norm
+```
+First we read and plot the data.
+```{python}
+# Specify the path to the CSV file
+file_path = r"../../data/model_monod_stoch.csv"
+
+# Load the CSV file into a pandas DataFrame
+data_monod = pd.read_csv(file_path, sep=" ")
+
+# Plot 'C' against 'r'
+plt.figure(figsize=(10, 6))
+plt.scatter(data_monod['C'], data_monod['r'])
+
+# Set x-axis label
+plt.xlabel("C")
+
+# Set y-axis label
+plt.ylabel("r")
+
+# Set title
+plt.title('"model_monod_stoch.csv"')
+
+# Display the plot
+plt.show()
+```
+Define the prior, likelihood and posterior:
+```{python}
+# Define the prior mean and standard deviation
+prior_monod_mean = 0.5 * np.array([5, 3, 0.5])  # r_max, K, sigma
+prior_monod_sd = 0.5 * prior_monod_mean
+
+# Log prior for Monod model
+def logprior_monod(par, mean, sd):
+    # Calculate sdlog and meanlog for log-normal distribution
+    var = (sd**2) / (mean**2)
+    sdlog = np.sqrt(np.log(1 + var))
+    meanlog = np.log(mean) - 0.5 * sdlog**2
+
+    # Calculate the sum of log probabilities from the log-normal distribution
+    log_prior = np.sum(lognorm.logpdf(par, s=sdlog, scale=np.exp(meanlog)))
+
+    return log_prior
+
+def loglikelihood_monod(y, C, par):
+    """
+    Log-likelihood function for the Monod model.
+
+    Parameters:
+    - y: observed growth rates
+    - C: substrate concentrations
+    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
+
+    Returns:
+    - log_likelihood: the sum of log-likelihood values
+    """
+    # Calculate growth rate using Monod model
+    y_det = model_monod(par, C)
+    
+    # Calculate log-likelihood assuming a normal distribution
+    log_likelihood = np.sum(norm.logpdf(y, loc=y_det, scale=par[2]))
+    
+    return log_likelihood
+
+
+def logposterior_monod(par):
+    """
+    Log-posterior function for the Monod model.
+
+    Parameters:
+    - par: dictionary containing the parameters ('r_max', 'K', 'sigma')
+
+    Returns:
+    - log_posterior: the log posterior probability
+    """
+    # Calculate the log prior
+    lp = logprior_monod(par, prior_monod_mean, prior_monod_sd)
+    
+    # If log prior is finite, calculate log likelihood and sum
+    if np.isfinite(lp):
+        log_posterior = lp + loglikelihood_monod(data_monod['r'], data_monod['C'], par)
+        return log_posterior
+    else:
+        # Return negative infinity if log prior is not finite
+        return -np.inf
+```
+Define the initial parameters. Additionally, for each walker (chain) an initial starting point must be defined. In
+general, it is better to choose it in a region with high density. We could use an
+optimizer to fine the mode, but here we just use a rather wide coverage.
+
+```{python}
+ndim = 3
+
+# Define the initial parameter values (mean of the prior)
+par_init = np.array([2.5, 1.5, 0.25])  # r_max, K, sigma
+
+# Define the number of samples
+n_samples = 5000
+
+# Create an instance of the StretchMove
+move = StretchMove()
+
+# Define the number of walkers for the MCMC chain
+nwalkers = 20
+
+# Initialize the walkers around the initial parameter values with a small random perturbation
+init_pos = par_init + 1e-4 * np.random.randn(nwalkers, ndim)
+
+# Initialize the `emcee` sampler
+sampler = emcee.EnsembleSampler(nwalkers, ndim, logposterior_monod, moves=move)
+
+# Run the MCMC chain
+sampler_run = sampler.run_mcmc(init_pos, n_samples, progress=False)
+
+# Get the chain samples
+chain_samples = sampler.get_chain()
+```
+
+```{python}
+# Display a summary of the chain
+print("Mean acceptance fraction: {:.3f}".format(np.mean(sampler.acceptance_fraction)))
+print("Chain shape: ", chain_samples.shape)
+```
+
+```{python}
+# Parameters for plotting
+parameters = ['r_max', 'K', 'sigma']
+num_samples, num_walkers, num_parameters = chain_samples.shape
+
+# Create the (3, 2) subplot
+fig, axes = plt.subplots(3, 2, figsize=(12, 10))
+
+for i, param in enumerate(parameters):
+    # Trace plot (first column)
+    for walker in range(num_walkers):
+        axes[i, 0].plot(chain_samples[:, walker, i], alpha=0.5)
+    axes[i, 0].set_title(f'Trace plot for {param}')
+    axes[i, 0].set_xlabel('Samples')
+    axes[i, 0].set_ylabel(param)
+    
+    # Histogram plot (second column)
+    axes[i, 1].hist(chain_samples[:, :, i].flatten(), bins=30, alpha=0.75)
+    axes[i, 1].set_title(f'Histogram for {param}')
+    axes[i, 1].set_xlabel(param)
+    axes[i, 1].set_ylabel('Frequency')
+
+plt.tight_layout()
+plt.show()
+```

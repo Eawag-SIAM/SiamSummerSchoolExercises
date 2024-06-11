@@ -338,6 +338,20 @@ corner(chn)
 
 - What is the influence of the number of walkers?
 
+### Python
+
+Population based samplers are implemented in the package
+`emcee`. 
+
+```python
+sampler = emcee.EnsembleSampler(nwalkers, ndim, 
+logposterior_monod, moves)
+```
+
+- What is the influence of the number of walkers?
+
+- Which method works better in this case?
+
 
 ```{r, child = if(params$showsolutions){"exe_3_solution_3.Rmd"}}
 ```
