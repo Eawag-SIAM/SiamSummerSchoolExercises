@@ -109,3 +109,85 @@ plot(Cstar, upper_quantile,
 plot!(Cstar, med_quantile, marker=:circle,
       labels = false)
 ```
+
+### Python
+
+We take the function for forward simulations from exercises 1:
+```{python}
+def simulate_monod_stoch(par, C):
+    """
+    Simulate the Monod model with stochastic noise.
+    
+    Arguments:
+    ----------
+    - par: Array containing the following parameters:
+        - r_max: maximum growth rate
+        - K: half-saturation concentration
+        - sigma: standard deviation of noise
+    - C: numpy array containing substrate concentrations
+    
+    Value:
+    ------
+    A numpy array representing the growth rate with stochastic noise added.
+    """
+    # Run deterministic model
+    r_det = model_monod(par, C)
+
+    # Generate noise using a normal distribution with mean 0 and standard deviation `sigma`
+    sigma = par[-1]
+    z = np.random.normal(0, sigma, size=len(C))
+    
+    # Add noise to the deterministic model results
+    return r_det + z
+```
+We can also select the samples from the previous exercise to work with:
+
+```{python}
+# Here we select the mean of the walkers defined in the previous exercise as a single sampler chain
+reshaped_chain = np.mean(chain_samples, axis=1)
+
+# Convert reshaped chain samples to pandas DataFrame
+chain_df = pd.DataFrame(reshaped_chain, columns=['r_max', 'K', 'sigma'])
+```
+
+```{python}
+m = 1000  # number of samples
+Cstar = np.array([10, 12, 14, 16])  # new inputs
+
+# Extract posterior samples, removing burn-in
+post_samples = chain_df.iloc[1000:].values  # Adjust the slicing as needed based on your data
+
+# Initialize the Ystar matrix
+Ystar = np.empty((m, len(Cstar)))
+columns = [f"C_{c}" for c in Cstar]
+
+# Perform the sampling and forward simulation
+for k in range(m):
+    # 1) Take a sample from posterior
+    i = np.random.randint(post_samples.shape[0])
+    theta = post_samples[i, :]
+
+    # 2) Forward simulation from model
+    Ystar[k, :] = simulate_monod_stoch(theta, Cstar)
+
+# Convert Ystar to a DataFrame for better readability (optional)
+Ystar_df = pd.DataFrame(Ystar, columns=columns)
+print(Ystar_df)
+```
+
+We can also plots the predictions with uncertainty bands:
+```{python}
+# Compute quantiles
+Ystar_quants = np.quantile(Ystar, q=[0.05, 0.5, 0.95], axis=0)
+
+# Plot the result
+plt.figure(figsize=(10, 6))
+plt.plot(Cstar, Ystar_quants[1,], 'o-', color='red', label='Median', linewidth=2)
+plt.fill_between(Cstar, Ystar_quants[0,], Ystar_quants[2,], color='grey', alpha=0.5, label='5th-95th Percentile')
+plt.xlabel('Cstar')
+plt.ylabel('r')
+plt.ylim(0, 5)
+plt.title('Quantile Plot')
+plt.legend()
+plt.show()
+```
