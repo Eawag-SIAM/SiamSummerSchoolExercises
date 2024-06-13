@@ -21,8 +21,8 @@ params:
 **Prerequisites**
 
 * `JAGS` installed from http://mcmc-jags.sourceforge.net/
-* `R` and `R` library
-  [`jagsUI](https://cran.r-project.org/web/packages/jagsUI/index.html)`
+* `R` and the `R` library
+  [`jagsUI`](https://cran.r-project.org/web/packages/jagsUI/index.html)
   to interface Jags (for Julia there is [`Jags.jl`](https://github.com/JagsJulia/Jags.jl))
 * Dataset `BomVarData.csv`
 
