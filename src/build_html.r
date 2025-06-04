@@ -2,7 +2,7 @@
 ##
 ## Build html for all exercises from *rmd files
 ##
-## January 17, 2023 -- Andreas Scheidegger
+## June  4, 2025 -- Andreas Scheidegger
 ## andreas.scheidegger@eawag.ch
 ## -------------------------------------------------------
 
@@ -12,14 +12,15 @@ library(rmarkdown)
 library(knitr)
 
 library(JuliaCall)  # needed for Julia
-julia_setup("C:/Users/nascimth/AppData/Local/Programs/Julia-1.10.3/bin")
+## julia_setup("C:/Users/nascimth/AppData/Local/Programs/Julia-1.10.3/bin")
+
 ## --- settings
 out.dir <- "../docs"
 src.dir <- "."
 
 ## --- compile all exercises
 exercises <- c("exercise_0", "exercise_1", "exercise_2",
-               "exercise_3", "exercise_4", "exercise_5")[4]
+               "exercise_3", "exercise_4", "exercise_5")
 
 exercises <- c(exercises, "index")
 for(exer in exercises){
@@ -35,23 +36,19 @@ for(exer in exercises){
     
     ## compile with solutions
     if(exer != "index"){
+        ## `models.py` has to be located in the current dir, copy it from `models/`
+        file.copy("../models/models.py", file.path(src.dir, exer, "models.py"), overwrite = TRUE)
         rmarkdown::render(source,
                           output_file = gsub("\\.Rmd", "_solution.html", source.file),
                           output_dir = out.dir,
                           params = list(showsolutions=TRUE))
+        ## remove the copied `models.py` again
+        file.remove(file.path(src.dir, exer, "models.py"))
     }
 }
 
-## --- As models.py has to be loc in the current dir, copy it to models
-
-# Define the source and destination file paths
-source_file <- "models.py"
-destination_file <- "../models/models.py"
-
-# Copy the file
-file.copy(source_file, destination_file, overwrite = TRUE)
 
 ## --- zip all data files for easy download
 
 files2zip <- dir('../data', pattern="csv$", full.names = TRUE)
-zip(zipfile = 'data/exercise_data.zip', files = files2zip)
+zip(zipfile = '../data/exercise_data.zip', files = files2zip)

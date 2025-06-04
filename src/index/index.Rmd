@@ -58,7 +58,7 @@ distinct advantage of Julia is the availability of [Automatic
 Differentiation](https://juliadiff.org/) that can help a lot with
 optimization and posterior sampling.
 
-**Python** is a versatile and widely-used programming language known for its readability and simplicity. It has a rich ecosystem of libraries and frameworks for various applications. Libraries for data handling are comparable ot R (e.g., Pandas, NumPy) and deep learning learning frameworks such as Pytorch, Jax, Tensorflow are usually  best integrated with python. As an interpreted language, Python, like R, belongs to the slower languages (although Cython and Numba can often optimize performance-critical parts of the code).
+**Python** is a versatile and widely-used programming language known for its readability and simplicity. It has a rich ecosystem of libraries and frameworks for various applications. Libraries for data handling are comparable ot R (e.g., Pandas, NumPy) and deep learning learning frameworks such as Pytorch, Jax, Tensorflow are usually best integrated with Python. As an interpreted language, Python, like R, belongs to the slower languages (although Cython and Numba can often optimize performance-critical parts of the code).
 
 
 ## R
@@ -109,7 +109,6 @@ for(pkg in pkgs){
    are installed by typing  `] add packagename` in the Julia interpreter.
    - [Revise.jl](https://timholy.github.io/Revise.jl/stable/). Applies
      changes automatically when you save a file.
-   - [AbbreviatedStackTraces.jl](https://github.com/BioTurboNick/AbbreviatedStackTraces.jl). Shortens the sometimes very long error messages.
    - [BenchmarkTools.jl](https://github.com/JuliaCI/BenchmarkTools.jl). Measure
      the execution speed, very helpful if your care about fast code.
 
@@ -183,7 +182,7 @@ Python can be installed in many ways. For this exercises we used a `miniconda` i
 
 ### Install the packages used for the course
 
-The packages required are defined in [`environment.yml`](https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/src/environment.yml). The file defines the [conda environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) `SummerSchoolExercises`. 
+The packages required are defined in [`environment.yml`](https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/src/environment.yml). The file defines the [conda environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) `SummerSchoolExercises`.
 Download it to your working directory and create the `SummerSchoolExercises` environment with:
 ```
 conda env create -f environment.yml
@@ -223,7 +222,7 @@ You can load it with `include("path_to/models.jl")` in your scripts.
 
 The easiest way to load the models into your scripts is by storing the models.py file in the same location as the scripts.
 If models.py are not stored in the same directory as the scripts, one should change the working directory to the given location
-before importing the functions. 
+before importing the functions.
 
 # Exercises
 

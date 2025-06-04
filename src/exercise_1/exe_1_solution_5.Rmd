@@ -168,13 +168,16 @@ plot(C_monod, [S_rmax_10.S_rel  S_rmax_50.S_rel  S_K_10.S_rel  S_K_50.S_rel],
 
 ```{julia, out.width = '80%'}
 using GlobalSensitivity
-lower = par .* 0.7;
-upper = par .* 1.3;
-param_ranges = [(lower[i], upper[i]) for i in 1:2]
+using Distributions
+
+# Define a distribution for each paraemter
+param_dists = [Uniform(0.7*par[1], 1.3*par[1]),
+               Uniform(0.7*par[2], 1.3*par[2])]
+
 # We can run multible outputs (i.e. different concentrations at once)
 res = gsa(θ -> model_monod(C_monod, ComponentVector(r_max = θ[1], K = θ[2])),
           eFAST(num_harmonics=6),
-          param_ranges,
+          param_dists,
           samples = 200)
 # res.S1                          # direct effects
 # res.ST                          # total effects
@@ -191,7 +194,7 @@ p
 
 Because we have to do the same calculations for every parameters, it is
 a good idea to write a little function that computes the
-absolute an relative local sensitivity indices. 
+absolute an relative local sensitivity indices.
 ```{python}
 from SALib.sample import fast_sampler
 from SALib.analyze import fast
@@ -199,23 +202,23 @@ from SALib.analyze import fast
 def local_sa(model, par_vector, par, delta_rel=0.1, *args, **kwargs):
     """
     Perform local sensitivity analysis on the model function.
-    
+
     Parameters:
     - model: Function representing the model.
     - par_vector: Array of model parameters.
     - par: Name of the parameter to perform sensitivity analysis on.
     - delta_rel: Relative change in the parameter value.
     - *args, **kwargs: Additional arguments for the model function.
-    
+
     Returns:
     Dictionary containing absolute and relative sensitivity indices.
     """
     # Copy the parameter array to adjust the parameter of interest
     par_vector2 = par_vector.copy()
-    
+
     # Adjust the specified parameter by the relative delta
     par_vector2[par] *= (1 + delta_rel)
-    
+
     # Run the model with the original and adjusted parameter array
     Y = model(par_vector, *args, **kwargs)
     Y2 = model(par_vector2, *args, **kwargs)
@@ -349,7 +352,7 @@ for i in range(res_fast.shape[0]):
         res_fast[i, 0],
         res_fast[i, 1]
     ]
-    
+
     # Calculate the model_monod results for the given parameters and concentrations
     res_SA_monod[i, :] = model_monod(parameters, C_monod)
 ```

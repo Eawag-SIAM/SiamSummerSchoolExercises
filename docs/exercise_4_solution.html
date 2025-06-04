@@ -1547,8 +1547,7 @@ of Kéry &amp; Royle (2007) in <code>JAGS</code>.</li>
 <p><strong>Prerequisites</strong></p>
 <ul>
 <li><code>JAGS</code> installed from <a href="http://mcmc-jags.sourceforge.net/" class="uri">http://mcmc-jags.sourceforge.net/</a></li>
-<li><code>R</code> and <code>R</code> library
-[<code>jagsUI](https://cran.r-project.org/web/packages/jagsUI/index.html)</code>
+<li><code>R</code> and the <code>R</code> library <a href="https://cran.r-project.org/web/packages/jagsUI/index.html"><code>jagsUI</code></a>
 to interface Jags (for Julia there is <a href="https://github.com/JagsJulia/Jags.jl"><code>Jags.jl</code></a>)</li>
 <li>Dataset <code>BomVarData.csv</code></li>
 </ul>
@@ -1623,8 +1622,8 @@ y_{i} &amp; \sim \text{Bernoulli}(\theta_{i}) \\
 \mu &amp; \sim \text{Normal}(0, 0.001)\\
 \tau &amp; \sim \text{Gamma}(0.5, 0.5)
 \end{align*}\]</span></p>
-<p>where <span class="math inline">\(\text{logit}^{-1}(x) = \exp(x)/(1 +
-\exp(x))\)</span>.</p>
+<p>where <span class="math inline">\(\text{logit}^{-1}(x) =  \exp(x)/(1
++ \exp(x))\)</span>.</p>
 <!-- We here specify the intercept of occurrence probability as a
 random variable with its own model; in other words, we have added a
 random effect for region. -->
@@ -2249,12 +2248,12 @@ z_{i,t=1} \sim \text{Bernoulli}(\psi_{i,t=1})
 state in the previous year and the probabilities of colonization and
 persistence. Empty patches can get colonized in the next time step with
 probability <span class="math inline">\(\gamma\)</span> or remain empty
-with probability <span class="math inline">\(1- \gamma\)</span>.
-Occupied patches can either persist (i.e., remain occupied) with
-probability <span class="math inline">\(\phi\)</span> or go locally
-“extinct” with probability <span class="math inline">\(1- \phi\)</span>.
-The realization of this process over years <span class="math inline">\(t
-= 2, ...,T\)</span> can be formulated for each site <span class="math inline">\(i\)</span> and year <span class="math inline">\(t\)</span> as conditional on the true state in the
+with probability <span class="math inline">\(1-
+\gamma\)</span>. Occupied patches can either persist (i.e., remain
+occupied) with probability <span class="math inline">\(\phi\)</span> or
+go locally “extinct” with probability <span class="math inline">\(1-
+\phi\)</span>. The realization of this process over years <span class="math inline">\(t = 2, ...,T\)</span> can be formulated for each
+site <span class="math inline">\(i\)</span> and year <span class="math inline">\(t\)</span> as conditional on the true state in the
 previous time step and the two process probabilities:</p>
 <p><span class="math display">\[
 z_{i, t} \sim \text{Bernoulli}( (1-z_{i, t-1}) \gamma_{it} + z_{i, t-1}
