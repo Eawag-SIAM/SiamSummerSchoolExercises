@@ -3,3 +3,4 @@
 .ipynb_checkpoints/
 __pycache__/
 /src/exercise_4/JAGS_models/
+/.DS_Store
