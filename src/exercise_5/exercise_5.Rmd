@@ -1,5 +1,5 @@
 ---
-title: 'Exercise 5: Approximative Bayesian Computation (ABC)'
+title: 'Exercise 5: Approximate Bayesian Computation (ABC)'
 author: "Eawag Summer School in Environmental Systems Analysis"
 output:
   html_document:
@@ -17,18 +17,32 @@ params:
 ```
 
 
-Objectives
+**Objectives**
 
-* Understand when to use ABC and when not.
+* Understand when to use Approximate Bayesian Computation (ABC) and when not.
 * Understand the fundamental difference between ABC and likelihood-based inference.
-* Learn how to use the `SABC` function in the [`EasyABC`](https://cran.r-project.org/web/packages/EasyABC/index.html) package.
 * Understand why and how to use summary statistics in ABC.
 
-In this exercise, we run the Simulated Annealing ABC (SABC), for a Bayesian inference of the parameter of the model "survival", with a flat prior. In practice, we wouldn't use an ABC algorithm for this problem (why?).
+In this exercise, we run the Simulated Annealing ABC (SABC), for a
+Bayesian inference of the parameter of the model "survival", with a
+flat prior. Note, in practice, we would not want to use an ABC
+algorithm for this problem. Why?
 
-# Define prior and a function to sampler from the model
+# Define prior and a function to sample from the model {.tabset}
 
-We use the R package [`EasyABC`](https://cran.r-project.org/web/packages/EasyABC/index.html), which contains multiple sampling schemes for Approximate Bayes Computations. In addition, we need two other packages for some auxiliary tasks.
+
+For ABC, we need to define the prior density and a function that generates
+random outputs from our model $p(y|\theta)$. That means we are
+sampling from the likelihood. Note however, that we do not need a
+function which evaluates the density of the likelihood.
+
+
+## R {-}
+
+We use the R package
+[`EasyABC`](https://cran.r-project.org/web/packages/EasyABC/index.html),
+which contains multiple sampling schemes for Approximate Bayes
+Computations.
 ```{r message=FALSE, warning=FALSE}
 library(EasyABC)
 library(FME)  # for adaptive Metropolis algorithm
@@ -44,39 +58,77 @@ head(obs)
 
 For ABC, we always need a function that evaluates the prior density, a
 function that samples from the prior, and a function that generates
-random model outputs (our model). **Note that we do not need a
-function which evaluates the density of the likelihood**.
+random model outputs (our model).
 The functions that we need are defined in the following:
 ```{r}
 d.prior <- function(par) dunif(par, min=0.01, max=0.6) # density of prior
-r.prior <- function() runif(1, min=0.01, max=0.6)      # sampler from prior
+r.prior <- function() runif(1, min=0.01, max=0.6)      # sample from prior
 
 ## produce model output
-survival.sampler <- function(par, t=obs$time, N=30){
-    if(par<0) return(rep(0,length(t)))  # return "no deaths" if par is negative:
-    S <- exp(-par*c(0,t))               # and add zero "at time-point infinity"
+survival.sampler <- function(par, t = obs$time, N = 30){
+    if(par<0) return(rep(0,length(t)))       # return "no deaths" if par is negative:
+    S <- exp(-par*c(0,t))                    # and add zero "at time-point infinity"
     S <- c(S,0)
-    p <- -diff(S)                       # probabilities to die within observation windows
+    p <- -diff(S)                            # probabilities to die within observation windows
     y <- rmultinom(1, N, p)[-(length(t)+1) ] # sample from multinomial distribution
                                              # (assume that there are N individuals
                                              #  at the beginning of the experiment)
     return(y)
 }
+```
+
+## Julia {-}
 
 
+We use the Julia package [`SimulatedAnnealingABC.jl`](https://github.com/Eawag-SIAM/SimulatedAnnealingABC.jl), which implements the SABC algorithm. We also need packages for distributions and data handling.
+
+```{julia}
+using SimulatedAnnealingABC
+using Distributions
+using CSV
+using DataFrames
+```
+
+Next, we load the observed death counts. The experiment started with **N=30** individuals.
+
+```{julia}
+obs = CSV.read("../../data/model_survival.csv", DataFrame);
+```
+
+For ABC, we need a prior distribution, a function to sample from it, and a model function that generates random outputs.
+
+```{julia}
+# Define the prior distribution and functions to evaluate its density and to sample from it
+prior = Uniform(0.01, 0.6)
+d_prior(x) = pdf(prior, x)
+r_prior() = rand(prior)
+
+# Model function that generates a random output
+function survival_sampler(λ; N=30, t=obs.time)
+    # S is a vector whose first component is 1 and last is 0,
+    # because the probability to be alive at time t=0 is 1,
+    # and the probability to be alive at time t=infinity is 0
+    S = exp.(-λ .* t)
+    S = [1; S; 0]
+    p = -diff(S)
+
+    y = rand(Multinomial(N, p))[1:(end-1)]
+    return y
+end
 ```
 
 
-# 1. ABC without summary statistics {#task1}
+# 1. ABC without summary statistics {.tabset}
 
-Use the `SABC` function of the `EasyABC` package, without summary
-statistics, to get an approximate sample from the posterior.
-
-Remember that in ABC, we need a distance measure to compare the model
+For ABC we need a distance measure to compare the model
 output to the observations, in order to judge the plausibility of the
-parameters that generated this model output. Since we do not apply
-summary statistics in Task 1, we compare the model output and the
-observations directly in the original data space:
+parameters that generated this model output. Here we do not apply
+summary statistics, we compare the model output and the
+observations directly.
+
+## R {-}
+
+Use the use the sum of the absolute distances a distance function.
 
 ```{r}
 f.dist <- function(par) {
@@ -84,7 +136,7 @@ f.dist <- function(par) {
 }
 ```
 
-Now we can run the SABC without summary statistics, using the distance in the original space given by `f.dist`:
+Now we can run the SABC using `f.dist`:
 ```{r results='hide'}
 SABC.res <- SABC(
   r.model       = f.dist,  # function that directly returns scalar
@@ -93,40 +145,140 @@ SABC.res <- SABC(
   d.prior       = d.prior, # density evaluator of prior
   n.sample      = 2000,
   eps.init      = 20,
-  iter.max      = 60000,
+  iter.max      = 300000,
   v             = 1.2,
   beta          = 0.8
 )
 ```
 
-# 2. ABC with summary statistics {#task2}
+## Julia {-}
 
-Use the `SABC` function, with semi-automatically generated summary statistics, to get an approximate sample from the posterior. "Semi-automatically" means that the user needs to provide the function `f.summarystats` that transforms model outputs. The algorithm then employs a linear regression from the transformed outputs to the model parameters to define the summary statistics (Fearnhead and Prangle (2012)). For this exercise, use the identity `f.summarystats(y)=y`. This means that we use a standard linear regression to estimate the parameters from the output and use these estimators as summary statistics.
+
+We define a distance function that calculates the sum of absolute
+differences between the model output and the observations.
+
+```{julia}
+f_dist(par, obs) = Float64(sum((abs.(survival_sampler(par) .- obs.deaths))))
+```
+
+Now, we can run the SABC algorithm using this distance function.
+
+
+```{julia}
+sabc_res = sabc(f_dist, prior,  obs;
+                n_simulation = 300_000, # Maximum number function evaluations
+                n_particles = 2000)     # Number of samples to generate
+```
+
+
+# 2. ABC with semi-automatically generated summary statistics {.tabset}
+
+Finding good (ideally sufficient) summary statistics is no always
+easy. Fearnhead and Prangle (2012) proposes a semi-automatic way to
+generate summary statistics.
+
+
+## R {-}
+
+The `SABC` function can derive summary statistics semi-automatically.
+"Semi-automatically" means that the user needs to provide
+the function `f.summarystats` that transforms model outputs. The
+algorithm then employs a linear regression from the transformed
+outputs to the model parameters to define the summary statistics
+(Fearnhead and Prangle (2012)).
+
+For this exercise, use the identity
+`f.summarystats(y)=y`. This means that we use a standard linear
+regression to estimate the parameters from the output and use these
+estimators as summary.
 ```{r results='hide'}
 f.summarystats <- function(y) {y}
 
 SABC.SS.res <- SABC(
   r.model       = survival.sampler, # function that returns model output
-  r.prior       = r.prior,           # sampler from prior
-  d.prior       = d.prior,           # density evaluator of prior
+  r.prior       = r.prior,          # sampler from prior
+  d.prior       = d.prior,          # density evaluator of prior
   n.sample      = 2000,
   eps.init      = 20,
-  iter.max      = 60000,
+  iter.max      = 300000,
   summarystats  = TRUE,
   y             = obs$deaths,
   f.summarystats= f.summarystats,
   v             = 1.2,
   beta          = 0.8
 )
-
 ```
 
-# 3. Compare the previously generated posterior samples to a sample from the true posterior
+## Julia {-}
 
-In this toy exercise, the true posterior is available in closed form
-and we can sample directly from it. This allows us to compare the two
-samples generated in the previous tasks to a sample of the true
-posterior. To generate a sample of the true posterior, we first define
+This method is not yet implemented in `SimulatedAnnealingABC.jl`.
+
+
+# 3. Use sufficient summary statistics  {.tabset}
+
+This simple model has a set of two sufficient statistics (even though there is just one parameter!).
+You can try to derive them!
+
+## R {-}
+
+
+Definition of the summery statistics and the distance function:
+
+```{r results='hide'}
+ss <- function(y){
+    c(sum(y),                   # statistic 1
+      sum(y*seq(1,length(y))))  # statistic 2
+}
+
+f.dist <- function(par) {
+    sum(abs(ss(survival.sampler(par)) - ss(obs$deaths)))
+}
+
+
+SABC.suff.res <- SABC(
+  r.model       = f.dist,  # function that directly returns scalar
+                           # distance between a random model output and data
+  r.prior       = r.prior, # sampler from prior
+  d.prior       = d.prior, # density evaluator of prior
+  n.sample      = 2000,
+  eps.init      = 20,
+  iter.max      = 300000,
+  v             = 1.2,
+  beta          = 0.8
+)
+```
+
+## Julia {-}
+
+Definition of the summery statistics and the distance function:
+
+```{julia}
+# Function to calculate sufficient statistics
+ss(y) = (sum(y),
+         sum(y .* (1:length(y)))
+         )
+# Distance function based on sufficient statistics
+f_dist_suff(par, obs) = Float64(sum(abs.(ss(survival_sampler(par)) .- ss(obs.deaths))))
+```
+
+```{julia}
+sabc_suff_res = sabc(f_dist_suff, prior, obs;
+                     n_simulation = 300_000, # Maximum number function evaluations
+                     n_particles = 2000)     # Number of samples to generate
+```
+
+# 4. Compare the previously generated posterior samples to a sample from the true posterior {.tabset}
+
+
+For this model we do not need to use ABC (and should not!) because we
+can evaluate the density of the likelihood function, hence we can
+sample from the posterior with normal MCMC methods. This allows us to
+compare the two samples generated in the previous tasks to a sample of
+the "true posterior".
+
+
+## R {-}
+ To generate a sample of the true posterior, we first define
 the posterior function (see Monday excerises):
 ```{r}
 logposterior <- function(y, N=30, t, par){
@@ -176,19 +328,74 @@ AMDR.chain  <- AMDR$pars[-(1:1000),]
 ```
 
 Let us now compare the posterior samples generated with ABC with and
-without summary statistics, and the sample of the true posterior. In
-first Figure below, you can see that not using summary statistics can
+without summary statistics, and the sample of the true posterior. In the
+first figure below, you can see that not using summary statistics can
 lead to slow convergence: many proposals will be rejected since in
 high dimensions it is very unlikely to match the data with sufficient
 accuracy. However, the sample seems to converge to the true
-distribution. The lower Figure shows that summary statistics speed up convergence, but this comes at the cost of a loss of information, which leads to biased results. The more of the information w.r.t. the parameters is captured by the summary statistics, the smaller is the resulting bias.
+distribution. The second figure shows that summary statistics speed up convergence, but, since there is no single sufficient statistic, this comes at the cost of a loss of information, which leads to biased results. The third figure shows that using two sufficient statistics leads to a fast convergence to an unbiased result.
 ```{r wosummary, fig.cap = "True posterior (line) and sample generated via ABC **without** summary statistics (histogram)."}
-plot(density(AMDR.chain), xlab=expression(lambda), main="")
+plot(density(AMDR.chain), xlab=expression(lambda), main=" ABC without summary statistics")
 hist(SABC.res$E[,1], add=TRUE, probability=TRUE,
-     breaks=50, col=rgb(0,0,1,1/4))
+     breaks=100, col=rgb(0,0,1,1/4))
 ```
 ```{r wsummary, fig.cap = "True posterior (line) and sample generated via ABC **with** summary statistics (histogram)."}
-plot(density(AMDR.chain), xlab=expression(lambda), main="")
+plot(density(AMDR.chain), xlab=expression(lambda), main="ABC with summary statistics")
 hist(SABC.SS.res$E[,1], add=TRUE, probability=TRUE,
      breaks=100, col=rgb(0,0,1,1/4))
+```
+```{r wsummarys, fig.cap = "True posterior (line) and sample generated via ABC **with sufficient** summary statistics (histogram)."}
+plot(density(AMDR.chain), xlab=expression(lambda), main="ABC with sufficient summary statistics")
+hist(SABC.suff.res$E[,1], add=TRUE, probability=TRUE,
+     breaks=100, col=rgb(0,0,1,1/4))
+```
+
+## Julia {-}
+
+
+To get a sample from the "true" posterior, we first define the log-posterior function.
+
+```{julia}
+using AdaptiveMCMC
+using MCMCChains
+using Plots
+using StatsPlots
+
+function loglikelihood_survival(N::Int, t, y, λ)
+    S = exp.(-λ .* t)
+    S = [1; S; 0]
+    p = -diff(S)
+    ## Add number of survivors at the end of the experiment:
+    y = [y; N-sum(y)]
+
+    logpdf(Multinomial(N, p), y)
+end
+function logposterior(par)
+    ll = logpdf(prior, par[1])
+    if isfinite(ll)
+        ll = ll + loglikelihood_survival(30, obs.time, obs.deaths, par[1])
+    end
+    return ll
+end
+```
+
+Then we use the `AdaptiveMCMC` package to run a MCMC sampler to get a
+reference solution.
+
+```{julia}
+mcmc_res = adaptive_rwm([0.3], logposterior,
+                        10_000;
+                   algorithm = :ram,
+                   b = 1000,   # length of burn-in
+                   );
+```
+
+```{julia}
+StatsPlots.density(mcmc_res.X', label = "reference solution", xlab="λ");
+StatsPlots.density!(sabc_res.population, label = "ABC without sufficient summary statistics.")
+```
+
+```{julia}
+StatsPlots.density(mcmc_res.X', label = "reference solution", xlab="λ");
+StatsPlots.density!(sabc_suff_res.population, label = "ABC with sufficient summary statistics.")
 ```

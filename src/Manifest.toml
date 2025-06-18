@@ -2,7 +2,7 @@
 
 julia_version = "1.11.5"
 manifest_format = "2.0"
-project_hash = "1e39fe0e29d1e29f1e7dc57275763f7ac607727e"
+project_hash = "0a184faf7713a432bacdcd108cf7a463e7c4935d"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "e2478490447631aedba0823d4d7a80b2cc8cdb32"
@@ -2348,6 +2348,12 @@ version = "2.5.0"
 git-tree-sha1 = "58e6353e72cde29b90a69527e56df1b5c3d8c437"
 uuid = "ce78b400-467f-4804-87d8-8f486da07d0a"
 version = "1.1.0"
+
+[[deps.SimulatedAnnealingABC]]
+deps = ["Dates", "Distributions", "Interpolations", "LinearAlgebra", "ProgressMeter", "Random", "Roots", "StatsBase", "UnPack"]
+git-tree-sha1 = "5a53e3b614abf0b758ae96edcf615134fcb3f375"
+uuid = "2e0e63f1-f03b-4682-b156-8f8e3c0454d9"
+version = "0.4.0"
 
 [[deps.Sobol]]
 deps = ["DelimitedFiles", "Random"]
