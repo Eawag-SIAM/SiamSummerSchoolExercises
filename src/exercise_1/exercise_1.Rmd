@@ -34,15 +34,19 @@ Some exercises will use the toy models "Monod", "Growth", or "Survival", which w
 
 ## Analytical expression
 
-Construct the likelihood function for a simple one-dimensional linear model and additive, independent identically distributed (i.i.d.) normal errors. That is, the deterministic part of the model is given by
+Construct the likelihood function for a simple one-dimensional linear model with additive, independent identically distributed (i.i.d.) normal errors. That is, the deterministic part of the model is given by
 $$
-y_{det} (x,\beta,\gamma) = \beta x + \gamma \,,
+y_{det} (x,\beta,\gamma) = \beta x + \gamma \,.
 $$
 
-and the probabilistic model is obtained by adding a Gaussian noise term.
+For every observation we have the probabilistic model
+$$
+Y_i = y_{det} (x_i,\beta,\gamma) + \epsilon_i
+$$
+where $\epsilon_i \sim N(0, \sigma^2)$, so we assume a independent Gaussian noise term.
 
 
-**Hint**: Have a look at the slides "Formulation of model likelihood
+**Hint**: Have a close look at the slides "Formulation of model likelihood
 functions" if you need inspiration.
 
 

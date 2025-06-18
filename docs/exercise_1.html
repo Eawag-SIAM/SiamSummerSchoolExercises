@@ -1585,12 +1585,14 @@ Representation and Construction of Models”.</p>
 <p>Construct the likelihood function for a simple one-dimensional linear
 model and additive, independent identically distributed (i.i.d.) normal
 errors. That is, the deterministic part of the model is given by <span class="math display">\[
-y_{det} (x,\beta,\gamma) = \beta x + \gamma \,,
+y_{det} (x,\beta,\gamma) = \beta x + \gamma \,.
 \]</span></p>
-<p>and the probabilistic model is obtained by adding a Gaussian noise
-term.</p>
-<p><strong>Hint</strong>: Have a look at the slides “Formulation of
-model likelihood functions” if you need inspiration.</p>
+<p>For every observation we have the probabilistic model <span class="math display">\[
+Y_i = y_{det} (x_i,\beta,\gamma) + \epsilon_i
+\]</span> where <span class="math inline">\(\epsilon_i \sim N(0,
+\sigma^2)\)</span>, so assume a independent Gaussian noise term.</p>
+<p><strong>Hint</strong>: Have a close look at the slides “Formulation
+of model likelihood functions” if you need inspiration.</p>
 </div>
 <div id="likelihood-evaluation" class="section level2">
 <h2>Likelihood evaluation</h2>
