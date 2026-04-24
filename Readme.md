@@ -8,16 +8,16 @@ https://www.eawag.ch/summerschool/exercises
 (redirecting to):
 https://eawag-siam.github.io/SiamSummerSchoolExercises/
 
-## Build html's
+## Build HTML documents
 
-All `Rmarkdown` files are compiles with
+All `Rmarkdown` files are compiled with
 the R to html. this also triggers the Julia and the Python version.
 
 
 * You need R with the following packages installed:
   - `Rmarkdown`
   - `reticulate` to manage Python
-  - `JuliaCall` to commincate with Julia
+  - `JuliaCall` to communicate with Julia
 
 * Julia installation
 

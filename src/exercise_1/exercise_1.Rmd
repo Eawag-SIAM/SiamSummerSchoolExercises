@@ -122,7 +122,7 @@ You can read the external data using the following piece of code:
 ```{python eval=FALSE}
 
 # Specify the path to the CSV file
-file_path = r"../../data/model_linear.csv"
+file_path = r"data/model_linear.csv"
 
 # Load the CSV file into a pandas DataFrame
 dat = pd.read_csv(file_path, sep=" ")
