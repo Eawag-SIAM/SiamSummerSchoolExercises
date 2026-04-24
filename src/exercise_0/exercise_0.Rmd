@@ -1,6 +1,7 @@
 ---
 title: "Introductory exercises"
-author: "Eawag Summer School in Environmental Systems Analysis"
+author: "Eawag Summer School in Environmental Systems Analysis
+[(back to overview)](index.html)"
 output:
   html_document:
     toc: TRUE
@@ -196,8 +197,8 @@ from the package `Distribution.jl`. How does the covariance matrix for
 independent variables look like?
 
 #### Python
- You can use `numpy.random.normal()` and `numpy.random.multivariate_normal()` to 
- sample the required distributions. Additionally, you can use `np.column_stack` 
+ You can use `numpy.random.normal()` and `numpy.random.multivariate_normal()` to
+ sample the required distributions. Additionally, you can use `np.column_stack`
  to combine vectors to a matrix.
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_5.Rmd"}}
@@ -234,7 +235,7 @@ density plots and other more specialized plots look at [`StatsPlots.jl`](https:/
 
 #### Python
 You can to arrange multiple plots in the same window by setting
-`fig, axs = plt.subplots(nrows, ncols)` and then calling 
+`fig, axs = plt.subplots(nrows, ncols)` and then calling
 `plt.subplot(nrows, ncols, i)`. Use `np.percentile()` to calculate the
 percentiles; use `seaborn` and `matplotlib` to visualize
 the data; use `np.cov()`,`np.corrcoef()` for the covariance and the correlation,
@@ -284,7 +285,7 @@ data.x
 ```
 
 #### Python
-Use the `pandas` library to work with data frames. Read the data using 
+Use the `pandas` library to work with data frames. Read the data using
 `pd.read_csv(file_path, sep=" ")`. To select a specific column, user can simply
 type: `dataframe['columnname']`
 
@@ -339,18 +340,18 @@ def fun_square(number):
     This part is optional and is preferable used to describe what the function
     does to the users.
     This function returns the square of the given number.
-    
+
     Arguments:
     ----------
     - number: number to be processed.
-    
+
     Returns:
     -------
     - result: the squared given number.
     """
-    
+
     result = number * number
-    
+
     return result
 
 # Example usage

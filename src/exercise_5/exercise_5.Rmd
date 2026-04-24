@@ -1,6 +1,6 @@
 ---
 title: 'Exercise 5: Approximate Bayesian Computation (ABC)'
-author: "Eawag Summer School in Environmental Systems Analysis"
+author: "Eawag Summer School in Environmental Systems Analysis [(back to overview)](index.html)"
 output:
   html_document:
     number_sections: no

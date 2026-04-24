@@ -1,6 +1,6 @@
 ---
 title: "Exercise 3: Adaptive Monte Carlo Markov Chain samplers"
-author: "Eawag Summer School in Environmental Systems Analysis"
+author: "Eawag Summer School in Environmental Systems Analysis [(back to overview)](index.html)"
 output:
   html_document:
     number_sections: no
@@ -341,10 +341,10 @@ corner(chn)
 ### Python
 
 Population based samplers are implemented in the package
-`emcee`. 
+`emcee`.
 
 ```python
-sampler = emcee.EnsembleSampler(nwalkers, ndim, 
+sampler = emcee.EnsembleSampler(nwalkers, ndim,
 logposterior_monod, moves)
 ```
 
@@ -456,8 +456,8 @@ advanced adaptive ODE solver internally.
 using TransformedLogDensities: TransformedLogDensity
 using LogDensityProblemsAD: ADgradient
 
-# Define an object that is compatible with the LogDensityProblems.jl interface. 
-# It requires a parameter transformation and a function to compute the 
+# Define an object that is compatible with the LogDensityProblems.jl interface.
+# It requires a parameter transformation and a function to compute the
 # log probability density
 # This inyterface enables compability with different samplers.
 lp = TransformedLogDensity(trans, θ -> logposterior_monod(ComponentVector(θ)))

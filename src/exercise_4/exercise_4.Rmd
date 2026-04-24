@@ -1,6 +1,6 @@
 ---
 title: "Hierarchical Modeling with JAGS"
-author: "Helen Moor"
+author: "Helen Moor [(back to overview)](index.html)"
 output:
   html_document:
     toc: TRUE

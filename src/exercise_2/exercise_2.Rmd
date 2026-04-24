@@ -1,6 +1,6 @@
 ---
 title: 'Exercise 2: Bayesian inference with elementary Markov Chain sampling'
-author: "Eawag Summer School in Environmental Systems Analysis"
+author: "Eawag Summer School in Environmental Systems Analysis [(back to overview)](index.html)"
 output:
   html_document:
     number_sections: no
@@ -277,13 +277,13 @@ end
 def logposterior_survival(par, data):
     # Calculate log-likelihood
     log_likelihood = ??
-    
+
     # Calculate log-prior
     log_prior = ??
-    
+
     # Calculate log-posterior
     log_posterior = log_likelihood + log_prior
-    
+
     return log_posterior
 ```
 
@@ -545,7 +545,7 @@ def logprior_monod(par, mean, sd):
     Returns:
     - log_prior: the sum of log-prior values calculated from the log-normal distribution
     """
-    
+
     # Calculate sdlog and meanlog for log-normal distribution
     var = ??
     sdlog = ??
@@ -564,16 +564,16 @@ def loglikelihood_monod(y, C, par):
     - y: observed growth rates
     - C: substrate concentrations
     - par: array-like, the parameters ('r_max', 'K', 'sigma')
-    
+
     Returns:
     - log_likelihood: the sum of log-likelihood values
     """
     # Calculate growth rate using Monod model
     y_det = ??
-    
+
     # Calculate log-likelihood assuming a normal distribution
     log_likelihood = np.sum(??)
-    
+
     return log_likelihood
 
 def logposterior_monod(par, data, prior_mean, prior_sd):
@@ -678,8 +678,8 @@ Array(chn)                      # convert it to normal Array
 
 ### Python
 For this exercise, we provide the function below, which is simply an adaptation of
-the chain you wrote in exercise 1. In the function doc strings you have an overview 
-of how to run your function for your model. Of course, feel free to use your own 
+the chain you wrote in exercise 1. In the function doc strings you have an overview
+of how to run your function for your model. Of course, feel free to use your own
 implementation instead!
 
 ```{python, eval=FALSE}
@@ -703,23 +703,23 @@ def run_mcmc_monod(logposterior_func, data, prior_mean, prior_sd, par_init, samp
     chain = np.zeros((sampsize, len(par_init) + 1))
     chain[0, :-1] = par_init
     chain[0, -1] = logposterior_func(par_init, data, prior_mean, prior_sd)
-    
+
     accepted = 0
     for i in range(1, sampsize):
         par_prop = chain[i-1, :-1] + np.random.multivariate_normal(np.zeros(len(par_init)), scale)
         logpost_prop = logposterior_func(par_prop, data, prior_mean, prior_sd)
         acc_prob = min(1, np.exp(logpost_prop - chain[i-1, -1]))
-        
+
         if np.random.rand() < acc_prob:
             chain[i, :-1] = par_prop
             chain[i, -1] = logpost_prop
             accepted += 1
         else:
             chain[i, :] = chain[i-1, :]
-    
+
     acceptance_rate = accepted / sampsize
 
-    
+
     return chain, acceptance_rate
 ```
 
@@ -758,8 +758,8 @@ Adapt the covariance matrix `Σjump` of the jump
 distribution that is used in the function `sample_proposal`.
 
 ### Python
-The provided function "run_mcmc_monod" takes argument `scale` to modify the 
-jump distribution. 
+The provided function "run_mcmc_monod" takes argument `scale` to modify the
+jump distribution.
 
 ## Residual Diagnostics {.tabset}
 
