@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", function(){
 	document.addEventListener('click', function (event) {
 		// Check if the clicked element is a tab
 		if (event.target.getAttribute('data-toggle') === 'tab') {
-			// Get the ID of the clicked tab (withouth the number)
+			// Get the ID of the clicked tab (without the number)
 			var clickedTabId = event.target.getAttribute('href').replace(/-[0-9]*/g, '');
 
-			// Get all tabs whos ID is the same (ignoring the number)
+			// Get all tabs whose ID is the same (ignoring the number)
 			var tabs = document.querySelectorAll('[href^="' + clickedTabId + '"][data-toggle="tab"]')
 
 			// activate all tabs

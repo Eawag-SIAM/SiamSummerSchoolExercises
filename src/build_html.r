@@ -1,8 +1,8 @@
 ## -------------------------------------------------------
 ##
-## Build html for all exercises from *rmd files
+## Build HTML documents for all exercises from *rmd files
 ##
-## June  4, 2025 -- Andreas Scheidegger
+## April 24, 2026 -- Andreas Scheidegger
 ## andreas.scheidegger@eawag.ch
 ## -------------------------------------------------------
 

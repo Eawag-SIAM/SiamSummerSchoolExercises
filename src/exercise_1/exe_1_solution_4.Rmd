@@ -57,7 +57,7 @@ model.survival <- function(N, t, par){
     S <- exp(-par*c(0,t))
     S <- c(S,0)
 
-    ## Calcute probabilities to die within observation windows:
+    ## Calculate probabilities to die within observation windows:
     p <- -diff(S)
 
     ## Simulate from multinomial distribution:
@@ -204,7 +204,7 @@ loglikelihood.survival <- function(y, N, t, par){
     S <- exp(-par*c(0,t))
     S <- c(S,0)
 
-    ## Calcute probabilities to die within observation windows:
+    ## Calculate probabilities to die within observation windows:
     p <- -diff(S)
 
     ## Add number of survivors at the end of the experiment:
@@ -309,4 +309,3 @@ y_sim = model_survival(N, t, par_survival)
 LL = loglikelihood_survival(y_sim, N, t, par_survival)
 print(f"Log-likelihood: {LL}")
 ```
-

@@ -1,5 +1,5 @@
 ---
-title: Rmarkdown Template for Summer School Exercises
+title: R Markdown Template for Summer School Exercises
 number_sections: TRUE
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author: "Eawag Summer School in Environmental Systems Analysis"
@@ -49,9 +49,9 @@ conda_python(envname = "SummerSchoolTest") # show the active python binary
 ```
 
 
-# Rendering Rmarkdown files
+# Rendering R Markdown files
 
-`Rmarkdown` files (typical file eding is `*.rmd`) are compiles with
+`R Markdown` files (typical file ending is `*.rmd`) are compiled with
 the R packages `rmarkdown`. Additionally `pandoc` may need to be
 installed.
 
@@ -61,7 +61,7 @@ library(rmarkdown)
 rmarkdown::render("example.rmd")
 ```
 
-In Rstudio there is a button to execute this command.
+In RStudio there is a button to execute this command.
 
 # Show and evaluate code
 
@@ -165,18 +165,18 @@ optionally included with
 ## ```
 ````
 
-<!-- inlcude the solutions if `showsolutions==TRUE` -->
+<!-- include the solutions if `showsolutions==TRUE` -->
 ```{r, child = if(params$showsolutions){"exercise_template_solution_1.Rmd"}}
 ```
 
 # Math
 
-Latex syntax is used to for equation. Either inline $a=\int g(x)\, \text{d}x$ or as
+LaTeX syntax is used for equations. Either inline $a=\int g(x)\, \text{d}x$ or as
 separate equation like this
 
 $$M(x, \theta) = \theta_1 + \theta_2 x^2 + \theta_1 \theta_2 \sqrt{x} .$$
 
 
-# More on Rmarkdown
+# More on R Markdown
 
-[This online book](https://bookdown.org/yihui/rmarkdown/) provides a very comprehensive description what can be done with Rmarkdown.
+[This online book](https://bookdown.org/yihui/rmarkdown/) provides a very comprehensive description of what can be done with R Markdown.

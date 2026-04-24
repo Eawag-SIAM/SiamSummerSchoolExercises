@@ -43,7 +43,7 @@ For every observation we have the probabilistic model
 $$
 Y_i = y_{det} (x_i,\beta,\gamma) + \epsilon_i
 $$
-where $\epsilon_i \sim N(0, \sigma^2)$, so we assume a independent Gaussian noise term.
+where $\epsilon_i \sim N(0, \sigma^2)$, so we assume an independent Gaussian noise term.
 
 
 **Hint**: Have a close look at the slides "Formulation of model likelihood

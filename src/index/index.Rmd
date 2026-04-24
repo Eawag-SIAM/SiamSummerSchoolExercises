@@ -35,7 +35,7 @@ comfortable with, however, in some cases you may find it difficult to
 find corresponding packages.
 
 **R** is a popular free software environment for statistical
-computing, with an wide range of packages for a extensive array
+computing, with a wide range of packages for an extensive array
 of statistical procedures, plotting options, data handling, and
 more. See this
 [overview](https://cran.r-project.org/web/views/). However, as an
@@ -58,7 +58,7 @@ distinct advantage of Julia is the availability of [Automatic
 Differentiation](https://juliadiff.org/) that can help a lot with
 optimization and posterior sampling.
 
-**Python** is a versatile and widely-used programming language known for its readability and simplicity. It has a rich ecosystem of libraries and frameworks for various applications. Libraries for data handling are comparable ot R (e.g., Pandas, NumPy) and deep learning learning frameworks such as Pytorch, Jax, Tensorflow are usually best integrated with Python. As an interpreted language, Python, like R, belongs to the slower languages (although Cython and Numba can often optimize performance-critical parts of the code).
+**Python** is a versatile and widely-used programming language known for its readability and simplicity. It has a rich ecosystem of libraries and frameworks for various applications. Libraries for data handling are comparable to R (e.g., Pandas, NumPy) and deep learning frameworks such as PyTorch, JAX, TensorFlow are usually best integrated with Python. As an interpreted language, Python, like R, belongs to the slower languages (although Cython and Numba can often optimize performance-critical parts of the code).
 
 
 ## R
@@ -66,13 +66,13 @@ optimization and posterior sampling.
 
 1. Install R from the  official [webpage](https://www.r-project.org/).
 
-2. If you do not have a favorite text editor, we recommend to install [R Studio](https://posit.co/download/rstudio-desktop/), the most
+2. If you do not have a favorite text editor, we recommend installing [RStudio](https://posit.co/download/rstudio-desktop/), the most
     widely used IDE for R.
 
 ### Install the packages used for the course
 
 Run this code once to install all required packages for this
-course. Check careful for any error messages!
+course. Check carefully for any error messages!
 ```r
 ## all packages that we need to install
 pkgs <- c("mcmcensemble", "IDPmisc", "FME", "rootSolve", "EasyABC",
@@ -103,18 +103,18 @@ for(pkg in pkgs){
 
 2. If you do not have a favorite text editor, install
      [Visual Studio Code](https://code.visualstudio.com/), and the Visual Studio Code [Julia
-     Plugin](https://www.julia-vscode.org/) following this [instructions](https://www.julia-vscode.org/docs/dev/gettingstarted/#Installation-and-Configuration).
+     Plugin](https://www.julia-vscode.org/) following these [instructions](https://www.julia-vscode.org/docs/dev/gettingstarted/#Installation-and-Configuration).
 
 3. Optional: install packages for a better user experience. Packages
    are installed by typing  `] add packagename` in the Julia interpreter.
    - [Revise.jl](https://timholy.github.io/Revise.jl/stable/). Applies
      changes automatically when you save a file.
    - [BenchmarkTools.jl](https://github.com/JuliaCI/BenchmarkTools.jl). Measure
-     the execution speed, very helpful if your care about fast code.
+     the execution speed, very helpful if you care about fast code.
 
 ### Install packages used for the course
 
-Julia has a build-in package manager that also handles environments
+Julia has a built-in package manager that also handles environments
 (for Python users, think `pip` and `virtualenv` combined), see the documentation [here](https://pkgdocs.julialang.org/v1/). The required packages used in the exercises
 are defined in the files:
 
@@ -174,7 +174,7 @@ programmers.
 
 ### Installation
 
-Python can be installed in many ways. For this exercises we used a `miniconda` installation.
+Python can be installed in many ways. For these exercises we used a `miniconda` installation.
 
 1. Install `miniconda` following the instructions given [here](https://docs.anaconda.com/free/miniconda/index.html).
 
@@ -199,7 +199,7 @@ conda activate SummerSchoolExercises
 ### Data
 
 Download this [zip file](
-https://github.com/scheidan/SiamSummerSchoolExercises/blob/main/data/exercise_data.zip?raw=true) and extract it to convenient location. It
+https://github.com/scheidan/SiamSummerSchoolExercises/blob/main/data/exercise_data.zip?raw=true) and extract it to a convenient location. It
 contains all `csv` files needed for the exercises.
 
 ### Models {.tabset}
@@ -221,7 +221,7 @@ You can load it with `include("path_to/models.jl")` in your scripts.
 - [`models.py`](https://raw.githubusercontent.com/Eawag-SIAM/SiamSummerSchoolExercises/main/models/models.py){target="_blank"}
 
 The easiest way to load the models into your scripts is by storing the models.py file in the same location as the scripts.
-If models.py are not stored in the same directory as the scripts, one should change the working directory to the given location
+If models.py is not stored in the same directory as the scripts, one should change the working directory to the given location
 before importing the functions.
 
 # Exercises
@@ -236,14 +236,14 @@ before importing the functions.
 
 - [Wednesday](exercise_3.html): Adaptive Bayesian computations, MCMC
 
-#### Advances Topics
+#### Advanced Topics
 
-This exercises may use additional software packages.
+These exercises may use additional software packages.
 
 - [Thursday A](exercise_4.html): Inference for Hierarchical models
   with STAN and JAGS
 
-- [Thursday B](exercise_5.html): Approximative Bayesian Computation
+- [Thursday B](exercise_5.html): Approximate Bayesian Computation
   (ABC)
 
 

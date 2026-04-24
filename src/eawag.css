@@ -3,7 +3,7 @@
 /* @import url('https://www.fontify.me/wf/acb50a04aabeb4d5b691edf1c28e8f31'); /\*the serif Bold (from eawag.ch)*\/ */
 /* @import url('https://fonts.googleapis.com/css?family=Bree+Serif'); /\*alternative to 'the serif Bold*\/ */
 
-/* download te google font. Somehow googlepfonts api is blocked via edurom? */
+/* download the Google font. Somehow the Google Fonts API is blocked via eduroam? */
 @font-face {
     font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
     font-family: 'Bree Serif';

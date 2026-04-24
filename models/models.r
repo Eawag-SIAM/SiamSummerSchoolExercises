@@ -36,7 +36,7 @@ model.monod <- function(par, C){
     ## ------------
 
     if (length(par) < 2) {
-        stop("error in model.monod: insufficent number of parameters provided")
+        stop("error in model.monod: insufficient number of parameters provided")
     }
 
 
@@ -80,7 +80,7 @@ model.growth <- function(par, times)
     ##   C_M      concentration of microorganisms in the reactor
     ##   C_S      concentration of substrate in the reactor
     ##
-    ## argments:
+    ## arguments:
     ## -----------
     ##
     ##  - par:  vector containing the following parameters:
@@ -91,7 +91,7 @@ model.growth <- function(par, times)
     ##             C_M_ini  initial concentration of microorganisms
     ##             C_S_ini  initial concentration of substrate
     ##           The vector can be named.
-    ##  - times: vector of time points to evalute the ODE
+    ##  - times: vector of time points to evaluate the ODE
     ##
     ## value:
     ## ------
@@ -182,5 +182,3 @@ model.growth <- function(par, times)
 
 
 ###############################################################################
-
-

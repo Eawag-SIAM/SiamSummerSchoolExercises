@@ -16,7 +16,7 @@ using DataFrames
 """
 # Monod model
 
-## argments
+## arguments
 
  * `C`: vector of concentrations
  * `par`:  `ComponentVector` containing the following parameters:
@@ -58,9 +58,9 @@ end
 model_growth(times::AbstractVector, par::ComponentArray)
 ```
 
-## argments
+## arguments
 
- * `times`: vector of time points to evalute the ODE
+ * `times`: vector of time points to evaluate the ODE
  * `par`:  `ComponentVector` containing the following parameters:
 
     - `mu`       maximum growth rate of microorganisms

@@ -56,7 +56,7 @@ presence-absences.
 # 1. Toad colonization 🐸
 
 
-To demonstrate model development with `JAGS` with use we use field
+To demonstrate model development with `JAGS`, we use field
 observations of toads. The dataset used here is a subset of the
 long-term monitoring data set of observations of the [yellow-bellied
 toad](https://en.wikipedia.org/wiki/Yellow-bellied_toad) (*Bombina

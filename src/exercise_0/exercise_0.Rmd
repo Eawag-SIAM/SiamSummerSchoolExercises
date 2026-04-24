@@ -187,13 +187,13 @@ the random samples.
 #### R
  You can use `rnorm()` to sample form a one-dimensional normal
 distribution. With `cbind()` you can combine vectors to a matrix. For
-the depended normal distribution use `rmvnorm()` from the package
+the dependent normal distribution use `rmvnorm()` from the package
 `mvtnorm`.
 
 #### Julia
 Given a mean vector $\mu$ and a correlation matrix $\Sigma$, you can
 construct a multivariate normal distribution with  `MvNormal(μ, Σ)`
-from the package `Distribution.jl`. How does the covariance matrix for
+from the package `Distributions.jl`. How does the covariance matrix for
 independent variables look like?
 
 #### Python
@@ -271,7 +271,7 @@ by assigning the desired names with function `colnames()` applied to the newly c
 #### Julia
 Use the package `DataFrames.jl`
 to read and manipulate data. To import csv (comma separated values)
-files, we also use `CSV.jl`. You can use `pwd()` the find
+files, we also use `CSV.jl`. You can use `pwd()` to find
 your currently working directory.
 ```{julia, eval = FALSE}
 using DataFrames
@@ -286,7 +286,7 @@ data.x
 
 #### Python
 Use the `pandas` library to work with data frames. Read the data using
-`pd.read_csv(file_path, sep=" ")`. To select a specific column, user can simply
+`pd.read_csv(file_path, sep=" ")`. To select a specific column, you can simply
 type: `dataframe['columnname']`
 
 ```{r, child = if(params$showsolutions){"exe_0_solution_7.Rmd"}}
