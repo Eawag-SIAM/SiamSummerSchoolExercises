@@ -10,9 +10,19 @@ https://eawag-siam.github.io/SiamSummerSchoolExercises/
 
 ## Build html's
 
-The `Rmarkdown` files  are compiles with
-the R packages `rmarkdown`. Additionally `pandoc` may need to be
-installed manually.
+All `Rmarkdown` files are compiles with
+the R to html. this also triggers the Julia and the Python version.
+
+
+* You need R with the following packages installed:
+  - `Rmarkdown`
+  - `reticulate` to manage Python
+  - `JuliaCall` to commincate with Julia
+
+* Julia installation
+
+* [`pandoc`](https://pandoc.org/)
+
 
 Run the R script `src/build_html.R` to generate the documents in
 `docs/` and all solutions. This means that R and Julia need to be

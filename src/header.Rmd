@@ -29,12 +29,12 @@ document.addEventListener("DOMContentLoaded", function(){
 ```{julia, echo = FALSE, results = FALSE}
 import Pkg
 Pkg.activate(".")
-# Pkg.update()
+Pkg.update()
 
 # set up plot style
 using Plots
 theme(:wong2)
-default(fontfamily = "Computer Modern", minorticks=5, dpi = 300)
+# default(fontfamily = "Computer Modern", minorticks=5, dpi = 300)
 Plots.scalefontsizes(1.1)
 ```
 
@@ -49,4 +49,3 @@ if(!condaenv_exists("SummerSchoolExercises")) {
 use_condaenv("SummerSchoolExercises") # activate environment
 ## conda_python(envname = "SummerSchoolExercises") # show the active python binary
 ```
-

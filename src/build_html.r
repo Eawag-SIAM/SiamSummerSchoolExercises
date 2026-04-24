@@ -12,7 +12,7 @@ library(rmarkdown)
 library(knitr)
 
 library(JuliaCall)  # needed for Julia
-## julia_setup("C:/Users/nascimth/AppData/Local/Programs/Julia-1.10.3/bin")
+
 
 ## --- settings
 out.dir <- "../docs"
@@ -24,27 +24,27 @@ exercises <- c("exercise_0", "exercise_1", "exercise_2",
 
 exercises <- c(exercises, "index")
 for(exer in exercises){
-    source.file <- paste0(gsub("\\./", "", exer), ".Rmd")
-    source <- file.path(src.dir, exer, source.file)
-    print(paste("Compile:", source))
-    
-    ## compile without solutions
+  source.file <- paste0(gsub("\\./", "", exer), ".Rmd")
+  source <- file.path(src.dir, exer, source.file)
+  print(paste("Compile:", source))
+  
+  ## compile without solutions
+  rmarkdown::render(source,
+                    output_file = gsub("\\.Rmd", ".html", source.file),
+                    output_dir = out.dir,
+                    params = list(showsolutions=FALSE))
+  
+  ## compile with solutions
+  if(exer != "index"){
+    ## `models.py` has to be located in the current dir, copy it from `models/`
+    file.copy("../models/models.py", file.path(src.dir, exer, "models.py"), overwrite = TRUE)
     rmarkdown::render(source,
-                      output_file = gsub("\\.Rmd", ".html", source.file),
+                      output_file = gsub("\\.Rmd", "_solution.html", source.file),
                       output_dir = out.dir,
-                      params = list(showsolutions=FALSE))
-    
-    ## compile with solutions
-    if(exer != "index"){
-        ## `models.py` has to be located in the current dir, copy it from `models/`
-        file.copy("../models/models.py", file.path(src.dir, exer, "models.py"), overwrite = TRUE)
-        rmarkdown::render(source,
-                          output_file = gsub("\\.Rmd", "_solution.html", source.file),
-                          output_dir = out.dir,
-                          params = list(showsolutions=TRUE))
-        ## remove the copied `models.py` again
-        file.remove(file.path(src.dir, exer, "models.py"))
-    }
+                      params = list(showsolutions=TRUE))
+    ## remove the copied `models.py` again
+    file.remove(file.path(src.dir, exer, "models.py"))
+  }
 }
 
 

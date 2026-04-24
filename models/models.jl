@@ -125,7 +125,7 @@ function model_growth(times::AbstractVector, par::ComponentArray)
     end
 
     # solving ODE
-    u0 = par.inits
+    u0 = copy(par.inits)
     tspan = extrema(times)
     prob = ODEProblem(growth!, u0, tspan, par)
     sol = solve(prob, Tsit5())
