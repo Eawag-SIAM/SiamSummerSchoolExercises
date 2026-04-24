@@ -31,6 +31,13 @@ AMDR <- FME::modMCMC(f         = neg.log.post,
 ## plot chains
 plot(AMDR)
 
+## 1D marginals
+par(mfrow=c(2,2))
+hist(AMDR$pars[,1], main="r_max", xlab="r_max")
+hist(AMDR$pars[,2], main="K", xlab="K")
+hist(AMDR$pars[,3], main="sigma", xlab="sigma")
+par(mfrow=c(1,1))
+
 ## 2d marginals
 pairs(AMDR$pars)
 IDPmisc::ipairs(AMDR$pars)
