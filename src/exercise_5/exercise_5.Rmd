@@ -33,8 +33,8 @@ algorithm for this problem. Why?
 
 For ABC, we need to define the prior density and a function that generates
 random outputs from our model $p(y|\theta)$. That means we are
-sampling from the likelihood. Note however, that we do not need a
-function which evaluates the density of the likelihood.
+sampling from the probabilistic model. Note however, that we do not need a
+function which evaluates the associated density, i.e., the likelihood.
 
 
 ## R {-}
@@ -50,7 +50,7 @@ library(FME)  # for adaptive Metropolis algorithm
 
 As a next step, let's read the data that we observed in the form of
 death counts per observation interval, and which we try to explain by
-the model survival. The experiment was started with `N=30` individuals.
+the model survival. The experiment was started with `N=100` individuals.
 ```{r}
 obs <- read.table("../../data/model_survival.csv", header=T)
 head(obs)
@@ -65,7 +65,7 @@ d.prior <- function(par) dunif(par, min=0.01, max=0.6) # density of prior
 r.prior <- function() runif(1, min=0.01, max=0.6)      # sample from prior
 
 ## produce model output
-survival.sampler <- function(par, t = obs$time, N = 30){
+survival.sampler <- function(par, t = obs$time, N = 100){
     if(par<0) return(rep(0,length(t)))       # return "no deaths" if par is negative:
     S <- exp(-par*c(0,t))                    # and add zero "at time-point infinity"
     S <- c(S,0)
@@ -89,7 +89,7 @@ using CSV
 using DataFrames
 ```
 
-Next, we load the observed death counts. The experiment started with **N=30** individuals.
+Next, we load the observed death counts. The experiment started with **N=100** individuals.
 
 ```{julia}
 obs = CSV.read("../../data/model_survival.csv", DataFrame);
@@ -104,7 +104,7 @@ d_prior(x) = pdf(prior, x)
 r_prior() = rand(prior)
 
 # Model function that generates a random output
-function survival_sampler(λ; N=30, t=obs.time)
+function survival_sampler(λ; N=100, t=obs.time)
     # S is a vector whose first component is 1 and last is 0,
     # because the probability to be alive at time t=0 is 1,
     # and the probability to be alive at time t=infinity is 0
@@ -128,7 +128,7 @@ observations directly.
 
 ## R {-}
 
-Use the use the sum of the absolute distances a distance function.
+Use the sum of the absolute distances as distance function.
 
 ```{r}
 f.dist <- function(par) {
@@ -136,7 +136,7 @@ f.dist <- function(par) {
 }
 ```
 
-Now we can run the SABC using `f.dist`:
+Now we can run SABC using `f.dist`:
 ```{r results='hide'}
 SABC.res <- SABC(
   r.model       = f.dist,  # function that directly returns scalar
@@ -145,7 +145,7 @@ SABC.res <- SABC(
   d.prior       = d.prior, # density evaluator of prior
   n.sample      = 2000,
   eps.init      = 20,
-  iter.max      = 300000,
+  iter.max      = 1000000,
   v             = 1.2,
   beta          = 0.8
 )
@@ -166,7 +166,7 @@ Now, we can run the SABC algorithm using this distance function.
 
 ```{julia}
 sabc_res = sabc(f_dist, prior,  obs;
-                n_simulation = 300_000, # Maximum number function evaluations
+                n_simulation = 1_000_000, # Maximum number function evaluations
                 n_particles = 2000)     # Number of samples to generate
 ```
 
@@ -241,8 +241,8 @@ SABC.suff.res <- SABC(
   r.prior       = r.prior, # sampler from prior
   d.prior       = d.prior, # density evaluator of prior
   n.sample      = 2000,
-  eps.init      = 20,
-  iter.max      = 300000,
+  eps.init      = 120,
+  iter.max      = 1000000,
   v             = 1.2,
   beta          = 0.8
 )
@@ -271,8 +271,9 @@ sabc_suff_res = sabc(f_dist_suff, prior, obs;
 
 
 For this model we do not need to use ABC (and should not!) because we
-can evaluate the density of the likelihood function, hence we can
-sample from the posterior with normal MCMC methods. This allows us to
+can evaluate the likelihood function, hence we can
+sample from the posterior with standard
+MCMC methods. This allows us to
 compare the two samples generated in the previous tasks to a sample of
 the "true posterior".
 
@@ -281,7 +282,7 @@ the "true posterior".
  To generate a sample of the true posterior, we first define
 the posterior function (see Monday excerises):
 ```{r}
-logposterior <- function(y, N=30, t, par){
+logposterior <- function(y, N=100, t, par){
     log.prior <- log(d.prior(par))
     if(!is.finite(log.prior)) return(-Inf)
 
@@ -309,7 +310,7 @@ acc.rate   <- 0.23    # Desired acceptance rate for the Robust Adaptive Metropol
 iterations <- 10000   # length of the chain
 
 ## Run the Adaptive Metropolis Algorithm with Delayed Rejection:
-obj.funct <- function(par, y, t){ -2*logposterior(y, N=30, t, par) }
+obj.funct <- function(par, y, t){ -2*logposterior(y, N=100, t, par) }
 
 AMDR <- modMCMC(
     f         = obj.funct,
@@ -333,7 +334,8 @@ first figure below, you can see that not using summary statistics can
 lead to slow convergence: many proposals will be rejected since in
 high dimensions it is very unlikely to match the data with sufficient
 accuracy. However, the sample seems to converge to the true
-distribution. The second figure shows that summary statistics speed up convergence, but, since there is no single sufficient statistic, this comes at the cost of a loss of information, which leads to biased results. The third figure shows that using two sufficient statistics leads to a fast convergence to an unbiased result.
+distribution. The second figure shows that summary statistics speed up convergence, but, since there is no single sufficient statistic, this comes at the cost of a loss of information, which leads to biased results. 
+The third figure shows that using two sufficient statistics leads to a fast convergence to an unbiased result.
 ```{r wosummary, fig.cap = "True posterior (line) and sample generated via ABC **without** summary statistics (histogram)."}
 plot(density(AMDR.chain), xlab=expression(lambda), main=" ABC without summary statistics")
 hist(SABC.res$E[,1], add=TRUE, probability=TRUE,
@@ -373,7 +375,7 @@ end
 function logposterior(par)
     ll = logpdf(prior, par[1])
     if isfinite(ll)
-        ll = ll + loglikelihood_survival(30, obs.time, obs.deaths, par[1])
+        ll = ll + loglikelihood_survival(100, obs.time, obs.deaths, par[1])
     end
     return ll
 end
