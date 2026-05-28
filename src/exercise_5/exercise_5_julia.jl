@@ -1,3 +1,9 @@
+import Pkg
+
+project_dir = normpath(joinpath(@__DIR__, ".."))
+Pkg.activate(project_dir)
+Pkg.instantiate()
+
 using Random
 using SimulatedAnnealingABC
 using Distributions
@@ -9,6 +15,7 @@ using MCMCChains
 ENV["GKSwstype"] = "100"
 using Plots
 using StatsPlots
+
 
 Random.seed!(20260525)
 
@@ -29,14 +36,14 @@ function survival_sampler(λ; N=100, t=obs.time)
     rand(Multinomial(N, p))[1:(end-1)]
 end
 
-f_dist(par, obs) = Float64(sum(abs.(survival_sampler(par) .- obs.deaths)))
+f_dist(par, obs) = Float64.(abs.(survival_sampler(par) .- obs.deaths))
 
 sabc_res = sabc(f_dist, prior, obs;
                 n_simulation = 1_000_000,
                 n_particles = 2000)
 
 ss(y) = (sum(y), sum(y .* (1:length(y))))
-f_dist_suff(par, obs) = Float64(sum(abs.(ss(survival_sampler(par)) .- ss(obs.deaths))))
+f_dist_suff(par, obs) = Float64.(abs.(ss(survival_sampler(par)) .- ss(obs.deaths)))
 
 sabc_suff_res = sabc(f_dist_suff, prior, obs;
                      n_simulation = 1_000_000,
