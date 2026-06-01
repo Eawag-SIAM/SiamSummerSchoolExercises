@@ -24,7 +24,8 @@ The joint discrete probability table of $P_{A,B}(a,b)$ is given below:
 
 ```{r echo=FALSE, results='asis'}
 tab <- data.frame(B.1=c(0.2, 0.1), B.2=c(0.1, 0.1), B.3=c(0.3, 0.2))
-row.names(tab) <- c("A.1", "A.2")
+rownames(tab) <- c("A=1", "A=2")
+colnames(tab) <- c("B=1", "B=2", "B=3")
 kable(tab)
 ```
 Derive the following probabilities:
