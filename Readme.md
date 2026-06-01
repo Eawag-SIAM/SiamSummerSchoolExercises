@@ -30,6 +30,21 @@ installed.  Then commit all changes (*including the `html` files in
 `docs/`!*) and push it to GitHub. The new html will be deployed
 automatically in a few minutes.
 
+## Install additional packages
+
+### R
+
+### Python
+
+```R
+library(reticulate)
+conda_install(envname="SummerSchoolexercises", packages="packagename")`
+```
+
+### Julia
+
+1. Activate the environment in `src/`
+2. `] add MyPackage`
 
 ## License
 

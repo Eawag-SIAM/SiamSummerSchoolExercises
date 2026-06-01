@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.6"
+julia_version = "1.12.4"
 manifest_format = "2.0"
 project_hash = "c15fcb4e1b8f5d71b458ce2628a9f604c0a91704"
 
@@ -2592,9 +2592,7 @@ version = "0.9.5"
 
 [[deps.SimulatedAnnealingABC]]
 deps = ["Dates", "Distributions", "Interpolations", "LinearAlgebra", "ProgressMeter", "Random", "Roots", "StatsBase", "UnPack"]
-git-tree-sha1 = "81b176f47153346210c54e15114c857a715a5717"
-repo-rev = "main"
-repo-url = "https://github.com/Eawag-SIAM/SimulatedAnnealingABC.jl"
+git-tree-sha1 = "5a53e3b614abf0b758ae96edcf615134fcb3f375"
 uuid = "2e0e63f1-f03b-4682-b156-8f8e3c0454d9"
 version = "0.4.0"
 

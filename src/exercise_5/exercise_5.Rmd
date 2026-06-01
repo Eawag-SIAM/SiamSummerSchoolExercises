@@ -40,7 +40,7 @@ function which evaluates the associated density, i.e., the likelihood.
 ## Python {-}
 
 We use the Python package
-[`SimulatedAnnealingABC`](https://github.com/ulzegasi/SimulatedAnnealingABC), which implements the SABC algorithm. 
+[`SimulatedAnnealingABC`](https://github.com/ulzegasi/SimulatedAnnealingABC), which implements the SABC algorithm.
 
 ```{python}
 from pathlib import Path
@@ -66,7 +66,7 @@ death counts per observation interval, and which we try to explain by
 the model survival. The experiment was started with `N=100` individuals.
 
 ```{python}
-obs = pd.read_csv( "data/model_survival.csv", sep=r"\s+")
+obs = pd.read_csv( "../../data/model_survival.csv", sep=r"\s+")
 times = obs["time"].to_numpy(dtype=float)
 deaths_obs = obs["deaths"].to_numpy(dtype=int)
 ```
@@ -137,11 +137,7 @@ using StatsPlots
 Next, we load the observed death counts. The experiment started with **N=100** individuals.
 
 ```{julia}
-repo_dir = normpath(joinpath(@__DIR__, "../.."))
-out_dir = joinpath(repo_dir, "outputs_exercise5_N100")
-mkpath(out_dir)
-
-obs = CSV.read(joinpath(repo_dir, "data/model_survival.csv"), DataFrame)
+obs = CSV.read("../../data/model_survival.csv", DataFrame)
 ```
 
 For ABC, we need a prior distribution, a function to sample from it, and a model function that generates random outputs.
@@ -310,20 +306,15 @@ def logposterior(lam: float) -> float:
     probs = death_probabilities(np.array([lam]))[0]
     y = np.append(deaths_obs, N_INDIVIDUALS - np.sum(deaths_obs))
     return multinomial_logpmf(y, probs) - np.log(prior.upper - prior.lower)
-
-
-
 ```
 
 In the following, we use an adaptive Metropolis algorithm to generate a sample from the true posterior:
 ```{python}
-def run_metropolis(
-    start: float = 0.3,
-    proposal_sd: float = 0.01,
-    n_iter: int = 20_000,
-    burn_in: int = 2_000,
-    seed: int = SEED,
-) -> np.ndarray:
+def run_metropolis(start: float = 0.3,
+                   proposal_sd: float = 0.01,
+                   n_iter: int = 20_000,
+                   burn_in: int = 2_000,
+                   seed: int = SEED):
     rng = np.random.default_rng(seed)
     chain = np.empty(n_iter)
     current = start
@@ -345,8 +336,8 @@ first figure below, you can see that not using summary statistics can
 lead to slow convergence: many proposals will be rejected since in
 high dimensions it is very unlikely to match the data with sufficient
 accuracy. However, the sample seems to converge to the true
-distribution. 
-The second figure shows that using two sufficient statistics leads to 
+distribution.
+The second figure shows that using two sufficient statistics leads to
 a fast convergence to an unbiased result.
 ```{python}
 reference = run_metropolis()
@@ -368,7 +359,7 @@ plt.ylabel("Density")
 plt.title("Python: ABC posterior comparison")
 plt.legend(frameon=False)
 plt.tight_layout()
-plt.savefig("outputs_exercise5_N100/exercise_5_python_posterior.png", dpi=150)
+plt.show()
 ```
 
 ## Julia {-}
@@ -413,11 +404,10 @@ mcmc_res = adaptive_rwm([0.3], logposterior,
 reference = vec(mcmc_res.X')
 raw_pop = vec(sabc_res.population)
 suff_pop = vec(sabc_suff_res.population)
-
 plt = StatsPlots.density(reference, label = "Reference MCMC", xlab = "lambda",
                          title = "Julia: ABC posterior comparison",
-                         linewidth = 3, color = :black)
-StatsPlots.density!(plt, raw_pop, label = "ABC raw data", linewidth = 2)
-StatsPlots.density!(plt, suff_pop, label = "ABC sufficient summary", linewidth = 2)
-savefig(plt, joinpath(out_dir, "exercise_5_julia_posterior.png"))
+                         linewidth = 3, color = :black);
+StatsPlots.density!(plt, raw_pop, label = "ABC raw data", linewidth = 2);
+StatsPlots.density!(plt, suff_pop, label = "ABC sufficient summary", linewidth = 2);
+display(plt)
 ```

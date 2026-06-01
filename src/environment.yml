@@ -3,7 +3,7 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.9
+  - python>=3.10
   - numpy
   - pandas
   - matplotlib
@@ -12,3 +12,6 @@ dependencies:
   - emcee
   - statsmodels
   - SALib
+  - pip
+  - pip:
+      - git+https://github.com/ulzegasi/SimulatedAnnealingABC.git
