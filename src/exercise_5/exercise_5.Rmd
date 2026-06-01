@@ -287,9 +287,19 @@ MCMC methods. This allows us to
 compare the two samples generated in the previous tasks to a sample of
 the "true posterior".
 
+Let us now compare the posterior samples generated with ABC with and
+without summary statistics, and the sample of the true posterior. In the
+first figure below, you can see that not using summary statistics can
+lead to slow convergence: many proposals will be rejected since in
+high dimensions it is very unlikely to match the data with sufficient
+accuracy. However, the sample will eventually converge to the true
+distribution.
+The figure also shows that using two sufficient statistics leads to
+a fast convergence to an unbiased result.
+
 
 ## Python {-}
- To generate a sample of the true posterior, we first define
+To generate a sample of the true posterior, we first define
 the posterior function (see Monday excerises):
 ```{python}
 def multinomial_logpmf(y: np.ndarray, p: np.ndarray) -> float:
@@ -330,15 +340,7 @@ def run_metropolis(start: float = 0.3,
 
 ```
 
-Let us now compare the posterior samples generated with ABC with and
-without summary statistics, and the sample of the true posterior. In the
-first figure below, you can see that not using summary statistics can
-lead to slow convergence: many proposals will be rejected since in
-high dimensions it is very unlikely to match the data with sufficient
-accuracy. However, the sample seems to converge to the true
-distribution.
-The second figure shows that using two sufficient statistics leads to
-a fast convergence to an unbiased result.
+Plotting the samples:
 ```{python}
 reference = run_metropolis()
 raw_pop = raw_result.population[:, 0]
@@ -350,7 +352,7 @@ for sample, label, color, linewidth in [
     (raw_pop, "ABC raw data", "#1f77b4", 1.8),
     (suff_pop, "ABC sufficient summary", "#2ca02c", 1.8),
 ]:
-    density = np.histogram(sample, bins=30, density=True)
+    density = np.histogram(sample, bins=15, density=True)
     centers = 0.5 * (density[1][1:] + density[1][:-1])
     plt.plot(centers, density[0], label=label, color=color, linewidth=linewidth)
 
@@ -409,5 +411,5 @@ plt = StatsPlots.density(reference, label = "Reference MCMC", xlab = "lambda",
                          linewidth = 3, color = :black);
 StatsPlots.density!(plt, raw_pop, label = "ABC raw data", linewidth = 2);
 StatsPlots.density!(plt, suff_pop, label = "ABC sufficient summary", linewidth = 2);
-display(plt)
+plt
 ```
